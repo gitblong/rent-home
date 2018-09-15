@@ -1,23 +1,18 @@
 /**
- * Created by chenqilong on 2018/9/11.
+ * Created by chenqilong on 2018/9/15.
  */
-import React from 'react';
-import red from '@material-ui/core/colors/red';
-import {withStyles} from '@material-ui/core/styles/';
-import styles from '../styles/styles';
-import Header from './Header';
-import Middle from './Middle';
-import Content from './Content';
-import Footer from './Footer';
+import React from "react";
+import {withStyles} from "@material-ui/core/styles/";
+import styles from "../styles/styles";
+import Middle from "./Middle";
+import Content from "./Content";
 class Home extends React.Component {
     render() {
         const classes = this.props;
         return (
-            <div>
-                <Header/>
+            <div style={{backgroundColor: '#fafafa'}}>
                 <Middle/>
                 <Content/>
-                <Footer/>
             </div>
         )
     }

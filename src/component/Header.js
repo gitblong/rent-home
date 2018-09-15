@@ -1,27 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormGroup from '@material-ui/core/FormGroup';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import lightblue from '@material-ui/core/colors/lightblue';
-import grey from '@material-ui/core/colors/grey';
-import AccountBalance from '@material-ui/icons/AccountBalance';
-import Button from '@material-ui/core/Button';
-import Place from '@material-ui/icons/PlaceTwoTone';
-import Popper from '@material-ui/core/Popper';
-import Paper from '@material-ui/core/Paper';
-import PositionPopper from './PositionPopper';
-import Fade from '@material-ui/core/Fade';
-import Grid from '@material-ui/core/Grid';
+import React from "react";
+import PropTypes from "prop-types";
+import {withStyles} from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@material-ui/core/Menu";
+import lightblue from "@material-ui/core/colors/lightblue";
+import grey from "@material-ui/core/colors/grey";
+import AccountBalance from "@material-ui/icons/AccountBalance";
+import Button from "@material-ui/core/Button";
+import Place from "@material-ui/icons/PlaceTwoTone";
+import PositionPopper from "./PositionPopper";
+import Link from 'react-router-dom/Link';
 const styles = theme => ({
     appBar: {
         backgroundColor: lightblue[500],
@@ -40,7 +33,8 @@ const styles = theme => ({
     positionButton: {
         margin: theme.spacing.unit,
         color: grey[100],
-        fontSize:16
+        fontSize: 16,
+        textDecorationLine: 'none'
     },
     textButton: {
         textAlign: 'left'
@@ -54,6 +48,10 @@ const styles = theme => ({
     typography: {
         padding: theme.spacing.unit * 2,
     },
+    clearA: {
+        color: "black",
+        textDecorationLine: 'none'
+    }
 
 });
 class MenuAppBar extends React.Component {
@@ -78,8 +76,8 @@ class MenuAppBar extends React.Component {
         this.setState({anchorEl: null});
     };
 
-    openPositionPopper = (value,event)=> {
-        console.log("openRentTypePopper==>"+event.currentTarget);
+    openPositionPopper = (value, event)=> {
+        console.log("openRentTypePopper==>" + event.currentTarget);
         event.preventDefault();
         const currentTarget = event.currentTarget;
         this.setState(state =>({
@@ -87,7 +85,7 @@ class MenuAppBar extends React.Component {
             rentTypePopperOpen: !state.rentTypePopperOpen
 
         }));
-        if(value == 0) {
+        if (value == 0) {
             return;
         }
         this.setState(state =>({
@@ -101,23 +99,32 @@ class MenuAppBar extends React.Component {
         const {auth, anchorEl, positionAnchorEl, positionPopperOpen} = this.state;
         const open = Boolean(anchorEl);
         const id = positionPopperOpen ? 'simple-popper' : null;
-        console.log("render==>"+this.state.rentTypePopperOpen,this.state.rentTypeAnchorEl)
+        console.log("render==>" + this.state.rentTypePopperOpen, this.state.rentTypeAnchorEl)
         return (
             <div className={classes.root}>
 
                 <AppBar position="static" className={classes.appBar}>
                     <Toolbar>
                         <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-                            <AccountBalance/>
+                            <Link to='/' className={classes.clearA}> <AccountBalance/></Link>
                         </IconButton>
                         <Typography variant="title" color="inherit" className={classes.grow}>
                             区块链租房
 
-                            <Button id="pop" className={classes.positionButton} onClick={(e)=>this.openPositionPopper(0,e)}>
+                            <Button id="pop" className={classes.positionButton}
+                                    onClick={(e)=>this.openPositionPopper(0, e)}>
                                 {this.state.cityName}<Place className={classes.buttonIcon}/>
                             </Button>
-                            <Button className={classes.positionButton}>立即找房</Button>
-                            <Button className={classes.positionButton}>我要出租</Button>
+                            <Button className={classes.positionButton}>
+                                <Link to='/areaSearch' className={classes.positionButton}>
+                                    立即找房
+                                </Link>
+                            </Button>
+                            <Button className={classes.positionButton}>
+                                <Link to='/fillForm' className={classes.positionButton}>
+                                    我要出租
+                                </Link>
+                            </Button>
                         </Typography>
 
                         {auth && (
@@ -144,8 +151,21 @@ class MenuAppBar extends React.Component {
                                     open={open}
                                     onClose={this.handleClose}
                                 >
-                                    <MenuItem onClick={this.handleClose}>Profile</MenuItem>
-                                    <MenuItem onClick={this.handleClose}>My account</MenuItem>
+                                    <MenuItem onClick={this.handleClose}>
+                                        <Link className={classes.clearA} to='/myContract'>
+                                            我的租赁合同
+                                        </Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={this.handleClose}>
+                                        <Link className={classes.clearA} to='/myHouses'>
+                                            我发布的房源
+                                        </Link>
+                                    </MenuItem>
+                                    <MenuItem onClick={this.handleClose}>
+                                        <Link className={classes.clearA} to='/createContract'>
+                                            创建新的合同
+                                        </Link>
+                                    </MenuItem>
                                 </Menu>
                             </div>
 

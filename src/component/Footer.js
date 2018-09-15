@@ -10,12 +10,13 @@ import grey from '@material-ui/core/colors/grey';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
-const styles = {
+const styles = theme =>({
     root: {
-        position: 'relative',
+        position: 'absolute',
         marginTop: 100,
         backgroundColor: lightblue[50],
         height: 60,
+        width:'100%'
     },
     textColor: {
         color: '#fff'
@@ -31,8 +32,19 @@ const styles = {
     },
     gridItemTitle: {
         marginRight: 50
+    },
+    footer:{
+        // backgroundColor: theme.palette.background.default,
+        // padding: theme.spacing.unit * 100,
+        marginLeft:0,
+        marginRight:0,
+        margin:'auto',
+        width:'100%',
+        backgroundColor:lightblue[100],
+        padding:20,
+        marginTop:50
     }
-};
+});
 
 class Footer extends React.Component {
     state = {
@@ -65,44 +77,52 @@ class Footer extends React.Component {
     render() {
         const {classes} = this.props;
         return (
-            <footer className={classes.root}>
-
-                {/*<Grid container xs={7} spacing={30} className={classes.gridLayout}>*/}
-                    {/*<Grid item xs={1} className={classes.gridItemTitle}>*/}
-                        {/*<Typography>*/}
-                            {/*<Button style={{fontSize: 20, width: 150, bottom: 11,}} alignCenter>快速链接:</Button>*/}
-                        {/*</Typography>*/}
-                    {/*</Grid>*/}
-                        {/*{*/}
-                            {/*this.state.about.map((value, index)=> {*/}
-                                {/*return (*/}
-                                    {/*<Grid key={value} item xs={1}>*/}
-                                        {/*<a>*/}
-                                            {/*<Typography variant='body'>*/}
-                                                {/*{value}*/}
-                                            {/*</Typography>*/}
-                                        {/*</a>*/}
-                                    {/*</Grid>*/}
-                                {/*)*/}
-                            {/*})*/}
-                        {/*}*/}
-                {/*</Grid>*/}
-                <Grid container xs={7} spacing={30} className={classes.gridLayout}>
-                    {
-                        this.state.frendlyLink.map((value, index)=> {
-                            return (
-                                <Grid key={value} item xs={1}>
-                                    <a href={value.linkUrl} style={{textDecorationColor:'#8998a0'}}>
-                                        <Typography variant='body' style={{color:"#8998a0"}}>
-                                            {value.linkName}
-                                        </Typography>
-                                    </a>
-                                </Grid>
-                            )
-                        })
-                    }
-                </Grid>
+            <footer className={classes.footer}>
+                <Typography variant="title" align="center" gutterBottom>
+                    Footer
+                </Typography>
+                <Typography variant="subheading" align="center" color="textSecondary" component="p">
+                    Something here to give the footer a purpose!
+                </Typography>
             </footer>
+            // <footer className={classes.root}>
+            //
+            //     <Grid container xs={7} spacing={30} className={classes.gridLayout}>
+            //         <Grid item xs={1} className={classes.gridItemTitle}>
+            //             <Typography>
+            //                 <Button style={{fontSize: 20, width: 150, bottom: 11,}} alignCenter>快速链接:</Button>
+            //             </Typography>
+            //         </Grid>
+            //             {
+            //                 this.state.about.map((value, index)=> {
+            //                     return (
+            //                         <Grid key={value} item xs={1}>
+            //                             <a>
+            //                                 <Typography variant='body'>
+            //                                     {value}
+            //                                 </Typography>
+            //                             </a>
+            //                         </Grid>
+            //                     )
+            //                 })
+            //             }
+            //     </Grid>
+            //     <Grid container xs={7} spacing={30} className={classes.gridLayout}>
+            //         {
+            //             this.state.frendlyLink.map((value, index)=> {
+            //                 return (
+            //                     <Grid key={value} item xs={1}>
+            //                         <a href={value.linkUrl} style={{textDecorationColor:'#8998a0'}}>
+            //                             <Typography variant='body' style={{color:"#8998a0"}}>
+            //                                 {value.linkName}
+            //                             </Typography>
+            //                         </a>
+            //                     </Grid>
+            //                 )
+            //             })
+            //         }
+            //     </Grid>
+            // </footer>
         )
     }
 
