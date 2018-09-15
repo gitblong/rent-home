@@ -9,7 +9,7 @@ import Home from '../../component/Home';
 import Router from 'react-router-dom/BrowserRouter';
 import Route from 'react-router-dom/Route';
 
-class AreaSearch extends React.Component {
+class CreateRentHousePager extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -25,4 +25,4 @@ class AreaSearch extends React.Component {
     }
 }
 
-export default AreaSearch;
+export default CreateRentHousePager;

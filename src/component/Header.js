@@ -15,6 +15,7 @@ import Button from "@material-ui/core/Button";
 import Place from "@material-ui/icons/PlaceTwoTone";
 import PositionPopper from "./PositionPopper";
 import Link from 'react-router-dom/Link';
+import RouterConfig from '../config/RouteConfig';
 const styles = theme => ({
     appBar: {
         backgroundColor: lightblue[500],
@@ -106,7 +107,7 @@ class MenuAppBar extends React.Component {
                 <AppBar position="static" className={classes.appBar}>
                     <Toolbar>
                         <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-                            <Link to='/' className={classes.clearA}> <AccountBalance/></Link>
+                            <Link to='/' className={classes.clearA}> <AccountBalance style={{color:"#fff"}}/></Link>
                         </IconButton>
                         <Typography variant="title" color="inherit" className={classes.grow}>
                             区块链租房
@@ -116,12 +117,12 @@ class MenuAppBar extends React.Component {
                                 {this.state.cityName}<Place className={classes.buttonIcon}/>
                             </Button>
                             <Button className={classes.positionButton}>
-                                <Link to='/areaSearch' className={classes.positionButton}>
+                                <Link to={RouterConfig.areaSearch} className={classes.positionButton}>
                                     立即找房
                                 </Link>
                             </Button>
                             <Button className={classes.positionButton}>
-                                <Link to='/fillForm' className={classes.positionButton}>
+                                <Link to={RouterConfig.creatRentHouse} className={classes.positionButton}>
                                     我要出租
                                 </Link>
                             </Button>
@@ -152,17 +153,17 @@ class MenuAppBar extends React.Component {
                                     onClose={this.handleClose}
                                 >
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to='/myContract'>
+                                        <Link className={classes.clearA} to={RouterConfig.myContract}>
                                             我的租赁合同
                                         </Link>
                                     </MenuItem>
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to='/myHouses'>
+                                        <Link className={classes.clearA} to={RouterConfig.myHouses}>
                                             我发布的房源
                                         </Link>
                                     </MenuItem>
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to='/createContract'>
+                                        <Link className={classes.clearA} to={RouterConfig.createContract}>
                                             创建新的合同
                                         </Link>
                                     </MenuItem>

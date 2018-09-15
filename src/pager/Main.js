@@ -9,15 +9,15 @@ import Home from "../component/Home";
 import Route from "react-router-dom/Route";
 import Switch from "react-router-dom/Switch";
 
-import AreaSearch from "./houseInfo/AreaSearchPager";
-import HouseDetail from "./houseInfo/HouseDetailPager";
-import FillForm from './houseInfo/FillFormPager';
+import AreaSearchPager from "./houseInfo/AreaSearchPager";
+import HouseDetailPager from "./houseInfo/HouseDetailPager";
+import CreateRentHousePager from './houseInfo/CreateRentHousePager';
 import MyHousesPager from './houseInfo/MyHousesPager';
 
 import MyContractsPager from './contractInfo/MyContractsPager';
 import CreateContractPager from './contractInfo/CreateContractPager';
 import ContractDetailPager from './contractInfo/ContractDetailPager';
-
+import RouterConfig from '../config/RouteConfig';
 class Main extends React.Component {
     constructor(props) {
         super(props);
@@ -31,20 +31,20 @@ class Main extends React.Component {
                 <Header/>
                 <Switch>
                     <Route path='/' exact component={Home}/>
-                    <Route path='/areaSearch' component={AreaSearch}/>
-                    <Route path='/houseDetail' component={HouseDetail}/>
-                    <Route path='/fillForm' component={FillForm}/>
-                    <Route path='/myHouses' component={MyHousesPager}/>
+                    <Route path={RouterConfig.areaSearch} component={AreaSearchPager}/>
+                    <Route path={RouterConfig.houseDetail} component={HouseDetailPager}/>
+                    <Route path={RouterConfig.creatRentHouse} component={CreateRentHousePager}/>
+                    <Route path={RouterConfig.myHouses} component={MyHousesPager}/>
 
-                    <Route path='/myContract' component={MyContractsPager}/>
-                    <Route path='/createContract' component={CreateContractPager}/>
-                    <Route path='/contractDetail' component={ContractDetailPager}/>
+                    <Route path={RouterConfig.myContract} component={MyContractsPager}/>
+                    <Route path={RouterConfig.createContract} component={CreateContractPager}/>
+                    <Route path={RouterConfig.contractDetail} component={ContractDetailPager}/>
 
                 </Switch>
                 <Footer/>
             </div>
-    );
+        );
     }
-    }
+}
 
-    export default Main;
+export default Main;
