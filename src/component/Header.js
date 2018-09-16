@@ -14,8 +14,11 @@ import AccountBalance from "@material-ui/icons/AccountBalance";
 import Button from "@material-ui/core/Button";
 import Place from "@material-ui/icons/PlaceTwoTone";
 import PositionPopper from "./PositionPopper";
-import Link from 'react-router-dom/Link';
-import RouterConfig from '../config/RouteConfig';
+import Link from "react-router-dom/Link";
+import RouterConfig from "../config/RouteConfig";
+import {connect} from "react-redux";
+import {MapStateToProps, MapDispatchToProps} from "../config/ReduxMapToPropsConfig";
+
 const styles = theme => ({
     appBar: {
         backgroundColor: lightblue[500],
@@ -55,7 +58,7 @@ const styles = theme => ({
     }
 
 });
-class MenuAppBar extends React.Component {
+class Header extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -82,15 +85,12 @@ class MenuAppBar extends React.Component {
     };
 
     openPositionPopper = (value, event)=> {
-        this.props.onOpen();
-        console.log(this.props)
+        this.props.onOpen()
         event.preventDefault();
         event.stopPropagation();
         const currentTarget = event.currentTarget;
         this.setState(state =>({
-            rentTypeAnchorEl: this.state.rentTypeAnchorEl == null ? currentTarget : null,
-            rentTypePopperOpen: !state.rentTypePopperOpen
-
+            rentTypeAnchorEl: currentTarget
         }));
         if (value == 0) {
             return;
@@ -103,15 +103,15 @@ class MenuAppBar extends React.Component {
 
 
     render() {
-        const {classes,popperPositionIsOpen,onClose,onOpen} = this.props;
-        console.log(classes,popperPositionIsOpen,onClose,onOpen)
+        const {classes,isOpen} = this.props;
         const {auth, anchorEl, positionAnchorEl, positionPopperOpen} = this.state;
         const open = Boolean(anchorEl);
         const id = positionPopperOpen ? 'simple-popper' : null;
         return (
             <div className={classes.root}>
-
                 <AppBar position="static" className={classes.appBar}>
+
+
                     <Toolbar>
                         <Link to='/' className={classes.clearA}>
                             <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
@@ -130,13 +130,13 @@ class MenuAppBar extends React.Component {
                                     立即找房
                                 </Button>
                             </Link>
+
                             <Link to={RouterConfig.creatRentHouse} className={classes.positionButton}>
                                 <Button className={classes.positionButton}>
                                     我要出租
                                 </Button>
                             </Link>
                         </Typography>
-
                         {auth && (
                             <div>
                                 <IconButton
@@ -182,7 +182,7 @@ class MenuAppBar extends React.Component {
                         )}
                         {
                             (
-                                <PositionPopper open={popperPositionIsOpen}
+                                <PositionPopper open={isOpen}
                                                 anchorEl={this.state.rentTypeAnchorEl}
                                                 handler={this.openPositionPopper}
                                 />
@@ -198,10 +198,13 @@ class MenuAppBar extends React.Component {
     }
 }
 
-MenuAppBar.propTypes = {
+Header.propTypes = {
     classes: PropTypes.object.isRequired,
     popperPositionIsOpen:PropTypes.bool.isRequired,
     close:PropTypes.func.isRequired,
     open:PropTypes.func.isRequired
 };
-export default withStyles(styles)(MenuAppBar);
+
+Header = connect(MapStateToProps, MapDispatchToProps)(Header)
+Header = withStyles(styles)(Header);
+export default Header;

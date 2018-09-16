@@ -5,6 +5,12 @@ import Router from 'react-router-dom/BrowserRouter';
 import Route from 'react-router-dom/Route';
 import Main from "./pager/Main";
 import Album from './component/Album';
+import {createStore} from 'redux';
+import {Provider, connect} from 'react-redux';
+import reducer from './config/ReducerConfig';
+const store = createStore(reducer);
+
+
 class App extends React.Component {
 
     constructor(props) {
@@ -15,11 +21,14 @@ class App extends React.Component {
     render() {
         return (
             <Router>
-                <Main/>
+                <Provider store={store}>
+                    <Main/>
+                </Provider>
             </Router>
         )
 
     }
 }
+
 ReactDOM.render(<App />, document.getElementById('app'));
 

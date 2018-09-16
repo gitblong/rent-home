@@ -8,29 +8,24 @@ import Footer from "../component/Footer";
 import Home from "../component/Home";
 import Route from "react-router-dom/Route";
 import Switch from "react-router-dom/Switch";
-
 import AreaSearchPager from "./houseInfo/AreaSearchPager";
 import HouseDetailPager from "./houseInfo/HouseDetailPager";
-import CreateRentHousePager from './houseInfo/CreateRentHousePager';
-import MyHousesPager from './houseInfo/MyHousesPager';
+import CreateRentHousePager from "./houseInfo/CreateRentHousePager";
+import MyHousesPager from "./houseInfo/MyHousesPager";
+import MyContractsPager from "./contractInfo/MyContractsPager";
+import CreateContractPager from "./contractInfo/CreateContractPager";
+import ContractDetailPager from "./contractInfo/ContractDetailPager";
+import RouterConfig from "../config/RouteConfig";
+import {connect} from "react-redux";
+import {MapStateToProps, MapDispatchToProps} from "../config/ReduxMapToPropsConfig";
 
-import MyContractsPager from './contractInfo/MyContractsPager';
-import CreateContractPager from './contractInfo/CreateContractPager';
-import ContractDetailPager from './contractInfo/ContractDetailPager';
-import RouterConfig from '../config/RouteConfig';
-import {createStore} from 'redux';
-import PropperIsOpen from '../reducers/PropperIsOpen';
-const store = createStore(PropperIsOpen);
 class Main extends React.Component {
+
 
     render() {
         return (
-            <div onClick={() => store.dispatch({type:'close'})}>
-                <Header popperPositionIsOpen={store.getState()}
-                        onClose={() => store.dispatch({type:'close'})}
-                        onOpen={() => store.dispatch({type:'open'})}
-
-                />
+            <div onClick={this.props.onClose}>
+                <Header/>
                 <Switch>
                     <Route path='/' exact component={Home}/>
                     <Route path={RouterConfig.areaSearch} component={AreaSearchPager}/>
@@ -48,5 +43,5 @@ class Main extends React.Component {
         );
     }
 }
-
+Main = connect(MapStateToProps, MapDispatchToProps)(Main);
 export default Main;
