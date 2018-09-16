@@ -43,11 +43,11 @@ class Main extends React.Component {
 
                         </Switch>
                         <Footer/>
-                        </div>
+                    </div>
                 </Router>
             </div>
-    );
+        );
     }
-    }
-    Main = connect(MapStateToProps, MapDispatchToProps)(Main);
-    export default Main;
+}
+Main = connect(MapStateToProps, MapDispatchToProps)(Main);
+export default Main;

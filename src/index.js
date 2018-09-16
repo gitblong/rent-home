@@ -20,9 +20,9 @@ class App extends React.Component {
 
     render() {
         return (
-                <Provider store={store}>
-                    <Main/>
-                </Provider>
+            <Provider store={store}>
+                <Main/>
+            </Provider>
         )
 
     }
