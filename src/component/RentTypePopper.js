@@ -65,9 +65,6 @@ class RentTypePopper extends React.Component {
         const {classes, anchorEl, open,clickPopperId} = this.props;
 
         const citys = this.state.rentTypes;
-        {
-            console.log(this.props)
-        }
         return (
             <div >
 

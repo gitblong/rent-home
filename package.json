@@ -28,10 +28,11 @@
     "materialize-css": "^1.0.0-rc.2",
     "muicss": "^0.9.41",
     "react": "^16.5.0",
-    "react-dom": "^16.5.0",
+    "react-dom": "^16.5.1",
     "react-router-dom": "^4.3.1",
     "react-script": "^2.0.5",
-    "react-swipeable-views": "^0.12.17"
+    "react-swipeable-views": "^0.12.17",
+    "redux": "^4.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

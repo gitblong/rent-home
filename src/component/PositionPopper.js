@@ -62,9 +62,6 @@ class PositionPopper extends React.Component {
         const {classes, anchorEl, open} = this.props;
 
         const citys = this.state.rentTypes;
-        {
-            console.log(this.props)
-        }
         return (
             <div >
 

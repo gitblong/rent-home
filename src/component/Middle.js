@@ -1,35 +1,26 @@
 /**
  * Created by chenqilong on 2018/9/13.
  */
-import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import classNames from 'classnames';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import red from '@material-ui/core/colors/red';
+import React from "react";
+import Typography from "@material-ui/core/Typography";
+import PropTypes from "prop-types";
+import {withStyles} from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
+import Card from "@material-ui/core/Card";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
+import Input from "@material-ui/core/Input";
+import lightblue from "@material-ui/core/colors/lightblue";
+import Details from "@material-ui/icons/details";
+import RentTypePopper from "./RentTypePopper";
+import contractSvg from "../statics/images/contract.svg";
+import onLineConnect from "../statics/images/on-line-connect.svg";
+import transaction from "../statics/images/transaction.svg";
+import safe from "../statics/images/safe.svg";
+import RouterConfig from "../config/RouteConfig";
+import Link from "react-router-dom/Link";
 var image = require('../statics/images/rent-home.jpg');
-import Input from '@material-ui/core/Input';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import lightblue from '@material-ui/core/colors/lightblue';
-import Menu from '@material-ui/core/Menu';
-import Details from '@material-ui/icons/details';
-import RentTypePopper from './RentTypePopper';
-import contractImage from '../statics/images/contract.png';
-import contractSvg from '../statics/images/contract.svg';
-import onLineConnect from '../statics/images/on-line-connect.svg';
-import transaction from '../statics/images/transaction.svg';
-import safe from '../statics/images/safe.svg';
-
 const styles = {
     search: {
         left: 0,
@@ -57,17 +48,17 @@ const styles = {
             content: '',
             borderBottom: 0
         },
-        '&:-webkit-input-placeholder':{
-            color:'#8998a0',
-            fontSize:18
+        '&:-webkit-input-placeholder': {
+            color: '#8998a0',
+            fontSize: 18
         },
-        '&:-webkit-input-placeholder':{
-            color:'#8998a0',
-            fontSize:18
+        '&:-webkit-input-placeholder': {
+            color: '#8998a0',
+            fontSize: 18
         },
-        '&:-ms-input-placeholder':{
-            color:'#8998a0',
-            fontSize:18
+        '&:-ms-input-placeholder': {
+            color: '#8998a0',
+            fontSize: 18
         },
         width: '60%',
 
@@ -124,6 +115,10 @@ const styles = {
     contentTextBody: {
         marginTop: 20,
         color: '#8998a0'
+    },
+    clearA: {
+        color: "#42b5ff",
+        textDecorationLine: 'none'
     }
 };
 class Middle extends React.Component {
@@ -171,7 +166,11 @@ class Middle extends React.Component {
                             id="input-with-icon-adornment"
                             placeholder="输入地址"
                         />
-                        <Button className={classes.searchButton}>马上找房</Button>
+                        <Button className={classes.searchButton}>
+                            <Link to={RouterConfig.areaSearch} className={classes.clearA}>
+                                马上找房
+                            </Link>
+                        </Button>
                     </div>
                 </CardMedia>
                 <RentTypePopper anchorEl={this.state.rentTypeAnchorEl} open={this.state.rentTypePopperOpen}

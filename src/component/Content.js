@@ -30,6 +30,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AreaConditionTabs from './AreaConditionTabs';
 require('../styles/Content.css');
+import Link from 'react-router-dom/Link';
+import RouterConfig from '../config/RouteConfig';
+
 const styles = {
     root: {
         marginTop: 100,
@@ -48,7 +51,7 @@ const styles = {
     },
     contentCard: {
         paddingTop: 0,
-        cursor:'pointer'
+        cursor: 'pointer'
 
     },
     contentImage: {
@@ -73,7 +76,8 @@ const styles = {
             content: '元/每月',
             display: 'inline-block',
         }
-    }
+    },
+
 };
 class Content extends React.Component {
     state = {
@@ -94,12 +98,14 @@ class Content extends React.Component {
                 <Grid container xs={12} spacing={24} className={classes.contetnGrid}>
                     <Grid item xs={3}>
                         <Card className={classes.contentCard}>
+                            <Link to={RouterConfig.houseDetail}>
                                 <CardMedia
                                     component="img"
                                     className={classes.contentImage}
                                     image={rent}
                                 >
                                 </CardMedia>
+                            </Link>
                             <CardContent className={classes.contentText}>
                                 <Typography variant="title" className={classes.priceTextColor}>
                                     1800

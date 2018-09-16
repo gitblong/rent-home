@@ -56,14 +56,18 @@ const styles = theme => ({
 
 });
 class MenuAppBar extends React.Component {
-    state = {
-        auth: true,
-        anchorEl: null,
-        positionPopperOpen: false,
-        positionAnchorEl: null,
-        positionPopperId: "positionId",
-        cityName: "位置",
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            auth: true,
+            anchorEl: null,
+            positionPopperOpen: false,
+            positionAnchorEl: null,
+            positionPopperId: "positionId",
+            cityName: "位置",
+
+        };
+    }
 
     handleChange = event => {
         this.setState({auth: event.target.checked});
@@ -78,8 +82,10 @@ class MenuAppBar extends React.Component {
     };
 
     openPositionPopper = (value, event)=> {
-        console.log("openRentTypePopper==>" + event.currentTarget);
+        this.props.onOpen();
+        console.log(this.props)
         event.preventDefault();
+        event.stopPropagation();
         const currentTarget = event.currentTarget;
         this.setState(state =>({
             rentTypeAnchorEl: this.state.rentTypeAnchorEl == null ? currentTarget : null,
@@ -95,20 +101,23 @@ class MenuAppBar extends React.Component {
 
     }
 
+
     render() {
-        const {classes} = this.props;
+        const {classes,popperPositionIsOpen,onClose,onOpen} = this.props;
+        console.log(classes,popperPositionIsOpen,onClose,onOpen)
         const {auth, anchorEl, positionAnchorEl, positionPopperOpen} = this.state;
         const open = Boolean(anchorEl);
         const id = positionPopperOpen ? 'simple-popper' : null;
-        console.log("render==>" + this.state.rentTypePopperOpen, this.state.rentTypeAnchorEl)
         return (
             <div className={classes.root}>
 
                 <AppBar position="static" className={classes.appBar}>
                     <Toolbar>
-                        <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-                            <Link to='/' className={classes.clearA}> <AccountBalance style={{color:"#fff"}}/></Link>
-                        </IconButton>
+                        <Link to='/' className={classes.clearA}>
+                            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
+                                <AccountBalance style={{color: "#fff"}}/>
+                            </IconButton>
+                        </Link>
                         <Typography variant="title" color="inherit" className={classes.grow}>
                             区块链租房
 
@@ -116,16 +125,16 @@ class MenuAppBar extends React.Component {
                                     onClick={(e)=>this.openPositionPopper(0, e)}>
                                 {this.state.cityName}<Place className={classes.buttonIcon}/>
                             </Button>
-                            <Button className={classes.positionButton}>
-                                <Link to={RouterConfig.areaSearch} className={classes.positionButton}>
+                            <Link to={RouterConfig.areaSearch} className={classes.positionButton}>
+                                <Button className={classes.positionButton}>
                                     立即找房
-                                </Link>
-                            </Button>
-                            <Button className={classes.positionButton}>
-                                <Link to={RouterConfig.creatRentHouse} className={classes.positionButton}>
+                                </Button>
+                            </Link>
+                            <Link to={RouterConfig.creatRentHouse} className={classes.positionButton}>
+                                <Button className={classes.positionButton}>
                                     我要出租
-                                </Link>
-                            </Button>
+                                </Button>
+                            </Link>
                         </Typography>
 
                         {auth && (
@@ -173,7 +182,7 @@ class MenuAppBar extends React.Component {
                         )}
                         {
                             (
-                                <PositionPopper open={this.state.rentTypePopperOpen}
+                                <PositionPopper open={popperPositionIsOpen}
                                                 anchorEl={this.state.rentTypeAnchorEl}
                                                 handler={this.openPositionPopper}
                                 />
@@ -191,6 +200,8 @@ class MenuAppBar extends React.Component {
 
 MenuAppBar.propTypes = {
     classes: PropTypes.object.isRequired,
+    popperPositionIsOpen:PropTypes.bool.isRequired,
+    close:PropTypes.func.isRequired,
+    open:PropTypes.func.isRequired
 };
-
 export default withStyles(styles)(MenuAppBar);

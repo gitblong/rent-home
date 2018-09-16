@@ -18,17 +18,19 @@ import MyContractsPager from './contractInfo/MyContractsPager';
 import CreateContractPager from './contractInfo/CreateContractPager';
 import ContractDetailPager from './contractInfo/ContractDetailPager';
 import RouterConfig from '../config/RouteConfig';
+import {createStore} from 'redux';
+import PropperIsOpen from '../reducers/PropperIsOpen';
+const store = createStore(PropperIsOpen);
 class Main extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
-        console.log(this.props)
-        const {children} = this.props;
         return (
-            <div>
-                <Header/>
+            <div onClick={() => store.dispatch({type:'close'})}>
+                <Header popperPositionIsOpen={store.getState()}
+                        onClose={() => store.dispatch({type:'close'})}
+                        onOpen={() => store.dispatch({type:'open'})}
+
+                />
                 <Switch>
                     <Route path='/' exact component={Home}/>
                     <Route path={RouterConfig.areaSearch} component={AreaSearchPager}/>
