@@ -18,7 +18,7 @@ const styles = theme => ({
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
         width: '100%',
-        borderBottom: '5px solid #e8e8e8',
+        borderBottom: '2px solid #e8e8e8',
         position: "relative"
     },
     titleLayOut: {
@@ -33,7 +33,7 @@ const styles = theme => ({
     tabButton: {
 
         borderRadius: 0,
-        bottom: -5,
+        bottom: -2,
         padding: 20,
         textTransform: 'initial',
         fontSize: 16,
@@ -42,21 +42,21 @@ const styles = theme => ({
             color: '#40a9ff',
             borderStyle: 'solid',
             borderColor: '#388BFF',
-            borderBottomWidth: 6,
+            borderBottomWidth: 2,
         },
         '&:focus': {
             color: '#40a9ff',
             borderStyle: 'solid',
             borderColor: '#388BFF',
-            borderBottomWidth: 6,
+            borderBottomWidth: 2,
         },
 
     },
-    tabSelectButton:{
+    tabSelectButton: {
         color: '#40a9ff',
         borderStyle: 'solid',
         borderColor: '#388BFF',
-        borderBottomWidth: 6,
+        borderBottomWidth: 2,
     },
     moreFontLayout: {
         position: 'absolute',
@@ -65,27 +65,35 @@ const styles = theme => ({
         fontSize: 18,
         color: '#40a9ff'
     },
+    hiddenTitle: {
+        display: 'none'
+    }
 });
 
 class CustomizedTabs extends React.Component {
     state = {
         value: 0,
-        areas: ["西湖区", "江干区", "上城区", "下城区", "滨江区", "下沙区", "拱墅区"]
+        data: ["西湖区", "江干区", "上城区", "下城区", "滨江区", "下沙区", "拱墅区"]
     };
 
-    areaSelect = (index, event) => {
-
+    dataSelect = (index, event) => {
+        const {conditionData,tabsId} = this.props;
+        let data = new Array();
+        if (conditionData != undefined) {
+            data = conditionData;
+        }else{
+            data = this.state.data
+        }
         const {classes} = this.props;
         this.setState({index});
-        let tabs = document.getElementById('tabs');
+
+        let tabs = document.getElementById(tabsId);
         var buttons = tabs.children;
         var tabSelectButtonClassName = classes.tabSelectButton;
-        // buttons[index].className += ' ' + className;
-        // console.log(this.state.areas,buttons.length);
-        this.state.areas.map((value,ind)=>{
-            if(index === ind) {
+        data.map((value, ind)=> {
+            if (index === ind) {
                 buttons[ind].className += ' ' + tabSelectButtonClassName;
-            }else{
+            } else {
                 var btnClassName = buttons[ind].className.replace(tabSelectButtonClassName, "");
                 buttons[ind].className = btnClassName;
             }
@@ -94,27 +102,32 @@ class CustomizedTabs extends React.Component {
     };
 
     render() {
-        const {classes} = this.props;
-        const {value} = this.state;
+        const {classes, hiddenTitle, conditionData,tabsId} = this.props;
+        let data = new Array();
+        if (conditionData != undefined) {
+             data = conditionData;
+        }else{
+            data = this.state.data
+        }
 
         return (
             <div className={classes.root}>
 
-                <Typography variant='title' className={classes.titleLayOut}>
+                <Typography variant='title' className={hiddenTitle ? classes.hiddenTitle : classes.titleLayOut}>
                     区域找房
                 </Typography>
-                <div id="tabs" style={{display: 'inline-block'}}>
+                <div id={tabsId} style={{display: 'inline-block'}}>
                     {
 
-                        this.state.areas.map((value, index)=> {
+                        data.map((value, index)=> {
                             return (
                                 <Button key={index} className={classes.tabButton}
-                                        onClick={e=>this.areaSelect(index, e)}>{value}</Button>
+                                        onClick={e=>this.dataSelect(index, e)}>{value}</Button>
                             )
                         })
                     }
                 </div>
-                <Button className={classes.moreFontLayout}>
+                <Button className={hiddenTitle ? classes.hiddenTitle : classes.moreFontLayout}>
                     更多区域<KeyBoardArrowRightOutlined />
                 </Button>
             </div>

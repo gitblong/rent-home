@@ -32,7 +32,6 @@ import AreaConditionTabs from './AreaConditionTabs';
 require('../styles/Content.css');
 import Link from 'react-router-dom/Link';
 import RouterConfig from '../config/RouteConfig';
-
 const styles = {
     root: {
         marginTop: 100,
@@ -72,8 +71,10 @@ const styles = {
     priceTextColor: {
         color: '#ff8d1f',
         display: 'inline-block',
-        '&:before': {
-            content: '元/每月',
+        fontSize: '24px',
+        '&:after': {
+            fontSize: '14px',
+            content: `"元/每月"`,
             display: 'inline-block',
         }
     },
@@ -94,7 +95,7 @@ class Content extends React.Component {
         return (
             <div className={classes.contentLayout}>
 
-                <AreaConditionTabs/>
+                <AreaConditionTabs tabsId="contentTabs" hiddenTitle={false}/>
                 <Grid container xs={12} spacing={24} className={classes.contetnGrid}>
                     <Grid item xs={3}>
                         <Card className={classes.contentCard}>
@@ -319,6 +320,7 @@ class Content extends React.Component {
                         </Card>
                     </Grid>
                 </Grid>
+                <Pagination></Pagination>
             </div>
         );
     }

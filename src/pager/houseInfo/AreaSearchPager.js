@@ -14,11 +14,15 @@ import IconButton from "@material-ui/core/IconButton";
 import Search from "@material-ui/icons/Search";
 import grey from "@material-ui/core/colors/grey";
 import blue from "@material-ui/core/colors/blue";
+import orange from "@material-ui/core/colors/orange";
+
 import areas from "../../data/areas.json";
 import SearchCondition from '../../component/SearchCondition';
 import Chip from '@material-ui/core/Chip';
 import Delete from '@material-ui/icons/Delete';
-
+import AreaConditionTabs from '../../component/AreaConditionTabs';
+import room from '../../statics/images/room.jpg';
+import CardMedia from "@material-ui/core/CardMedia";
 const styles = theme =>({
 
     root: {
@@ -104,22 +108,92 @@ const styles = theme =>({
         borderRadius: '10px',
         border: `1px solid ${grey[300]}`,
         paddingRight: '0px 5px',
-        lineHeight:'14px',
-        fontSize:'14px',
-        paddingLeft:'5px',
+        lineHeight: '14px',
+        fontSize: '14px',
+        paddingLeft: '5px',
 
     },
-    selectedIconButton:{
-        fontSize:'12px',
-        width:'auto',
-        height:'auto',
-        padding:'6px',
-        lineHeight:'12px',
-        marginBottom:1
+    selectedIconButton: {
+        fontSize: '12px',
+        width: 'auto',
+        height: 'auto',
+        padding: '6px',
+        lineHeight: '12px',
+        marginBottom: 1
     },
-    selectedIcon:{
+    itemList: {
+        width: '100%',
+        clear: 'both',
+        '&:before': {
+            clear: 'both',
+        },
+        '&:after': {
+            clear: 'both',
+        },
+    },
+    item: {
+        padding: '0 24px',
+        backgroundColor: '#fff',
+        position: 'relative'
+    },
+    itemContent: {
+        padding: '24px 0px',
+        display: 'flex',
+        borderBottom:`1px solid ${grey[200]}`
+    },
+    itemContentImg: {
+        // float: "left",
+        cursor: 'pointer',
+        width: 246,
+        height: 184,
+        marginRight: 24
+    },
+    itemContentText: {
+        width: '450px',
+        float: 'left',
+        display: 'inline-block',
 
+    },
+    itemContentTextTitle: {
+        cursor: 'pointer',
+        color: orange[500],
+        marginBottom: '24px',
+        fontSize:24,
+        "&:hover": {
+            color: blue[400]
+        },
+    },
+    itemContentTextBody: {
+        color: grey[1000],
+        marginBottom: '24px'
+
+    },
+    itemContentTagsContent: {
+        bottom: 0,
+        display: 'flex'
+    },
+    itemContentTags: {
+        color: grey[400],
+        border: `1px solid ${grey[400]}`,
+        padding: '8px 16px',
+        bottom: 0,
+        marginRight: 8
+    },
+    priceContent: {
+        height: "100%",
+        fontSize:'26px',
+        width:300
+    },
+    priceText: {
+        float: 'right',
+        color: orange[400],
+        "&:after": {
+            content: `"元/月"`,
+            color: orange[400],
+            fontSize:14
+        }
     }
+
 
 });
 class AreaSearch extends React.Component {
@@ -215,22 +289,26 @@ class AreaSearch extends React.Component {
                 </div>
                 <div className={classes.toolBar}>
                     <div className={classes.navigation}>
-                        <div style={{color: `${grey[600]}`,paddingRight:'24px',fontSize:'16px'}}>筛选条件</div>
+                        <div style={{color: `${grey[600]}`, paddingRight: '24px', fontSize: '16px'}}>筛选条件</div>
                     </div>
                     <div className={classes.selectedLayout}>
                         <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
                     </div>
                     <div className={classes.selectedLayout}>
                         <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
-                    </div><div className={classes.selectedLayout}>
-                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
-                </div><div className={classes.selectedLayout}>
-                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
-                </div><div className={classes.selectedLayout}>
-                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
-                </div><div className={classes.selectedLayout}>
-                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
-                </div>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
                     <div className={classes.selectedLayout}>
                         <span>不限<IconButton className={classes.selectedIconButton}>X</IconButton></span>
                     </div>
@@ -238,6 +316,137 @@ class AreaSearch extends React.Component {
                         <span>不限<IconButton className={classes.selectedIconButton}>X</IconButton></span>
                     </div>
                     <span style={{color: blue[400], float: 'right'}}>清空筛选</span>
+                </div>
+                <AreaConditionTabs tabsId="searchTabs" hiddenTitle={true}
+                                   conditionData={["综合排序", "价格从高到底", "价格从低到高", "面积从大到小"]}/>
+                <div className={classes.itemList}>
+                    <div className={classes.item}>
+                        <div className={classes.itemContent}>
+                            <CardMedia
+                                className={classes.itemContentImg}
+                                image={room}
+                                component="img"
+                            >
+                            </CardMedia>
+                            <div className={classes.itemContentText}>
+                                <Typography variant="title" className={classes.itemContentTextTitle}>
+                                    整租<i>&nbsp;·&nbsp;</i>嘉和花苑<i>&nbsp;·&nbsp;</i>主卧
+                                </Typography>
+                                <Typography className={classes.itemContentTextBody}>
+                                    整套&nbsp;·&nbsp;30平米&nbsp;·&nbsp;朝南
+                                </Typography>
+                                <Typography className={classes.itemContentTextBody}>
+                                    阳城贵都 品质三房 1楼带地下室50多米 精装全配初次出租
+                                </Typography>
+                                <div className={classes.itemContentTagsContent}>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div className={classes.priceContent}>
+                                <span className={classes.priceText}>
+                                    2300
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className={classes.itemList}>
+                    <div className={classes.item}>
+                        <div className={classes.itemContent}>
+                            <CardMedia
+                                className={classes.itemContentImg}
+                                image={room}
+                                component="img"
+                            >
+                            </CardMedia>
+                            <div className={classes.itemContentText}>
+                                <Typography variant="title" className={classes.itemContentTextTitle}>
+                                    整租<i>&nbsp;·&nbsp;</i>嘉和花苑<i>&nbsp;·&nbsp;</i>主卧
+                                </Typography>
+                                <Typography className={classes.itemContentTextBody}>
+                                    整套&nbsp;·&nbsp;30平米&nbsp;·&nbsp;朝南
+                                </Typography>
+                                <Typography className={classes.itemContentTextBody}>
+                                    阳城贵都 品质三房 1楼带地下室50多米 精装全配初次出租
+                                </Typography>
+                                <div className={classes.itemContentTagsContent}>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div className={classes.priceContent}>
+                                <span className={classes.priceText}>
+                                    2300
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className={classes.itemList}>
+                    <div className={classes.item}>
+                        <div className={classes.itemContent}>
+                            <CardMedia
+                                className={classes.itemContentImg}
+                                image={room}
+                                component="img"
+                            >
+                            </CardMedia>
+                            <div className={classes.itemContentText}>
+                                <Typography className={classes.itemContentTextTitle}>
+                                    整租<i>&nbsp;·&nbsp;</i>嘉和花苑<i>&nbsp;·&nbsp;</i>主卧
+                                </Typography>
+                                <Typography className={classes.itemContentTextBody}>
+                                    整套&nbsp;·&nbsp;30平米&nbsp;·&nbsp;朝南
+                                </Typography>
+                                <Typography className={classes.itemContentTextBody}>
+                                    阳城贵都 品质三房 1楼带地下室50多米 精装全配初次出租
+                                </Typography>
+                                <div className={classes.itemContentTagsContent}>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+                                    <span className={classes.itemContentTags}>
+                                        付一押一
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div className={classes.priceContent}>
+                                <Typography className={classes.priceText}>
+                                    2300
+                                </Typography>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
