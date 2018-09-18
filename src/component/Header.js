@@ -125,15 +125,15 @@ class Header extends React.Component {
                                     onClick={(e)=>this.openPositionPopper(0, e)}>
                                 {this.state.cityName}<Place className={classes.buttonIcon}/>
                             </Button>
-                            <Link to={RouterConfig.areaSearch} className={classes.positionButton}>
+                            <Link to={RouterConfig.areaSearch.path} className={classes.positionButton}>
                                 <Button className={classes.positionButton}>
-                                    立即找房
+                                    {RouterConfig.areaSearch.pathName}
                                 </Button>
                             </Link>
 
-                            <Link to={RouterConfig.creatRentHouse} className={classes.positionButton}>
+                            <Link to={RouterConfig.creatRentHouse.path} className={classes.positionButton}>
                                 <Button className={classes.positionButton}>
-                                    我要出租
+                                    {RouterConfig.creatRentHouse.pathName}
                                 </Button>
                             </Link>
                         </Typography>
@@ -162,18 +162,18 @@ class Header extends React.Component {
                                     onClose={this.handleClose}
                                 >
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to={RouterConfig.myContract}>
-                                            我的租赁合同
+                                        <Link className={classes.clearA} to={RouterConfig.myContract.path}>
+                                            {RouterConfig.myContract.pathName}
                                         </Link>
                                     </MenuItem>
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to={RouterConfig.myHouses}>
-                                            我发布的房源
+                                        <Link className={classes.clearA} to={RouterConfig.myHouses.path}>
+                                            {RouterConfig.myHouses.pathName}
                                         </Link>
                                     </MenuItem>
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to={RouterConfig.createContract}>
-                                            创建新的合同
+                                        <Link className={classes.clearA} to={RouterConfig.createContract.path}>
+                                            {RouterConfig.createContract.pathName}
                                         </Link>
                                     </MenuItem>
                                 </Menu>

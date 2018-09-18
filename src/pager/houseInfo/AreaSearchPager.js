@@ -3,26 +3,248 @@
  */
 import React from "react";
 import {withStyles} from "@material-ui/core/styles/";
-import Header from "../../component/Header";
-import Footer from "../../component/Footer";
-import Home from '../../component/Home';
-import Router from 'react-router-dom/BrowserRouter';
-import Route from 'react-router-dom/Route';
+import PropTypes from "prop-types";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import Link from "react-router-dom/Link";
+import RouterConfig from "../../config/RouteConfig";
+import Button from "@material-ui/core/Button";
+import {parseLocation} from "../../Utils/util";
+import IconButton from "@material-ui/core/IconButton";
+import Search from "@material-ui/icons/Search";
+import grey from "@material-ui/core/colors/grey";
+import blue from "@material-ui/core/colors/blue";
+import areas from "../../data/areas.json";
+import SearchCondition from '../../component/SearchCondition';
+import Chip from '@material-ui/core/Chip';
+import Delete from '@material-ui/icons/Delete';
 
+const styles = theme =>({
+
+    root: {
+        width: 1000,
+        margin: 'auto',
+        left: 0,
+        right: 0,
+        "& div": {
+            boxShadow: 'none'
+        },
+        color: '#66747f',
+        fontSize: '14px',
+        "& a": {
+            color: '#66747f',
+            textDecoration: 'none',
+            "&:hover": {
+                color: "#4fcbff"
+            },
+            textAlign: 14
+        },
+    },
+    toolBar: {
+        height: 50,
+        margin: '24px 0px',
+        position: 'relative',
+        flexWrap: 'wrap',
+        width: '100%',
+        maxWidth: '100%',
+        flexBasis: '100%',
+        lineHeight: '50px'
+    },
+    navigation: {
+        display: 'inline-block',
+        margin: "auto 0",
+        lineHeight: '50px',
+        float: 'left'
+    },
+    searchTool: {
+        right: 0,
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        border: '1px solid rgb(217, 227, 244)',
+        borderRadius: "4px",
+        backgroundColor: '#fff',
+        float: 'right'
+    },
+    searchInput: {
+        background: "#fdfeff",
+        border: "none",
+        borderRadius: "4px",
+        width: "430px",
+        height: "48px",
+        boxSizing: "border-box",
+        fontSize: "14px",
+        paddingLeft: "16px",
+    },
+    conditionLayout: {
+        display: 'flex',
+        width: '100%',
+        borderBottom: `1px solid ${grey[300]}`,
+        backgroundColor: '#fff'
+    },
+    conditionTitle: {
+        width: '5%',
+        padding: '8px 16px',
+        color: grey[600],
+
+    },
+    conditionDetail: {
+        width: '95%',
+        '& :focus': {
+            color: blue[400]
+        }
+    },
+    conditionExtends: {
+        borderTop: `1px solid ${grey[300]}`,
+        display: 'static'
+    },
+    selectedLayout: {
+        display: 'inline',
+        marginRight: '12px',
+        borderRadius: '10px',
+        border: `1px solid ${grey[300]}`,
+        paddingRight: '0px 5px',
+        lineHeight:'14px',
+        fontSize:'14px',
+        paddingLeft:'5px',
+
+    },
+    selectedIconButton:{
+        fontSize:'12px',
+        width:'auto',
+        height:'auto',
+        padding:'6px',
+        lineHeight:'12px',
+        marginBottom:1
+    },
+    selectedIcon:{
+
+    }
+
+});
 class AreaSearch extends React.Component {
     constructor(props) {
         super(props);
     }
 
+    state = {
+        area: []
+    };
+
+    componentWillMount() {
+        let areaArray = new Array();
+        areas.map((area, index) => {
+            if (area.cityCode == '3301') {
+                areaArray.push(area);
+            }
+
+        })
+
+        this.setState({
+            area: areaArray
+        })
+    }
+
+
     render() {
-        console.log(this.props)
-        const {children} = this.props;
+        const {classes, location} = this.props;
+        console.log(location, this.props, RouterConfig);
+        var path = location.pathname;
+        var pathName = path.split('/')[1].toString();
+        console.log(this.state.area, pathName);
+
         return (
-            <div>
-                区域搜索
+            <div className={classes.root}>
+                <div>
+                    <div className={classes.toolBar}>
+                        <div className={classes.navigation}>
+                            <Link to={RouterConfig.home.path}>
+                                {RouterConfig.home.pathName}
+                            </Link>
+                            <span>&nbsp;/&nbsp;</span>
+                            {parseLocation(location)}
+                        </div>
+                        <div className={classes.searchTool}>
+                            <input placeholder="输入地址、写字楼、园区或地铁站" className={classes.searchInput}>
+                            </input>
+                            <IconButton>
+                                <Search />
+                            </IconButton>
+                        </div>
+
+                    </div>
+                    <div style={{backgroundColor: '#fff', padding: '8px 24px'}}>
+                        <div className={classes.conditionLayout}>
+                            <Typography className={classes.conditionTitle}>区域</Typography>
+
+                            <div className={classes.conditionDetail}>
+                                <div>
+                                    <Button>不限</Button>
+                                    {
+                                        this.state.area.map((value, index)=> {
+                                            console.log(value)
+                                            return (
+
+                                                <Button>{value.name}</Button>
+                                            )
+                                        })
+
+                                    }
+                                </div>
+                                <div className={classes.conditionExtends}>
+                                    <Button>不限</Button>
+                                    {
+                                        this.state.area.map((value, index)=> {
+                                            console.log(value)
+                                            return (
+
+                                                <Button>{value.name}</Button>
+                                            )
+                                        })
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <SearchCondition conditionTitle="方式" conditions={["不限", "整租", "合租"]}/>
+                        <SearchCondition conditionTitle="类型" conditions={["不限", "公寓", "小区住宅"]}/>
+                        <SearchCondition conditionTitle="户型" conditions={["不限", "一室", "二室", "三室", "四室及以上"]}/>
+                        <SearchCondition conditionTitle="租金"
+                                         conditions={["不限", "1500以下", "1500-2500", '2500-3500', '3500-4500', '4500-8000', '8000以上']}/>
+                    </div>
+                </div>
+                <div className={classes.toolBar}>
+                    <div className={classes.navigation}>
+                        <div style={{color: `${grey[600]}`,paddingRight:'24px',fontSize:'16px'}}>筛选条件</div>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div><div className={classes.selectedLayout}>
+                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                </div><div className={classes.selectedLayout}>
+                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                </div><div className={classes.selectedLayout}>
+                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                </div><div className={classes.selectedLayout}>
+                    <span>燕南街道<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                </div>
+                    <div className={classes.selectedLayout}>
+                        <span>不限<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
+                    <div className={classes.selectedLayout}>
+                        <span>不限<IconButton className={classes.selectedIconButton}>X</IconButton></span>
+                    </div>
+                    <span style={{color: blue[400], float: 'right'}}>清空筛选</span>
+                </div>
             </div>
-        )
+        );
     }
 }
 
-export default AreaSearch;
+AreaSearch.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+export default withStyles(styles)(AreaSearch);

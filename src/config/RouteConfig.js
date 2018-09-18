@@ -1,11 +1,35 @@
 const RoutePaths = {
-    areaSearch:'/areaSearch',
-    houseDetail:'/houseDetail',
-    houseDetail:'/houseDetail',
-    myHouses:'/myHouses',
-    myContract:'/myContract',
-    createContract:'/createContract',
-    contractDetail:'/contractDetail',
-    creatRentHouse:'/creatRentHouse'
+    home:{
+        path:'/',
+        pathName:'区块链租房',
+    },
+    areaSearch:{
+        path:'/areaSearch',
+        pathName:'立即找房',
+    },
+    houseDetail:{
+        path:'/houseDetail',
+        pathName:'房源详情',
+    },
+    myHouses:{
+        path:'/myHouses',
+        pathName:'我发布的房源',
+    },
+    myContract:{
+        path:'/myContract',
+        pathName:'我的租赁合同'
+    },
+    createContract:{
+        path:'/createContract',
+        pathName:'创建新的合同'
+    },
+    contractDetail:{
+        path:'/contractDetail',
+        pathName:'合同详情'
+    },
+    creatRentHouse:{
+        path:'/creatRentHouse',
+        pathName:'发布房源'
+    }
 }
 export default RoutePaths;

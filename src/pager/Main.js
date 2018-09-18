@@ -8,7 +8,7 @@ import Footer from "../component/Footer";
 import Home from "../component/Home";
 import Route from "react-router-dom/Route";
 import Switch from "react-router-dom/Switch";
-import Router from "react-router-dom/BrowserRouter";
+import Router from "react-router-dom/HashRouter";
 
 import AreaSearchPager from "./houseInfo/AreaSearchPager";
 import HouseDetailPager from "./houseInfo/HouseDetailPager";
@@ -21,27 +21,44 @@ import RouterConfig from "../config/RouteConfig";
 import {connect} from "react-redux";
 import {MapStateToProps, MapDispatchToProps} from "../config/ReduxMapToPropsConfig";
 
+const styles = {
+    clearFix: {
+        zoom: 1,
+        "&:before": {
+
+            display: 'block',
+            // visibility: 'hidden',
+            clear: 'both',
+            height: 0,
+            content: 'dsfsf'
+        }
+    }
+}
+
 class Main extends React.Component {
 
 
     render() {
+        const {classes} = this.props
         return (
             <div onClick={this.props.onClose}>
                 <Router>
                     <div>
                         <Header/>
-                        <Switch>
-                            <Route path='/' exact component={Home}/>
-                            <Route path={RouterConfig.areaSearch} component={AreaSearchPager}/>
-                            <Route path={RouterConfig.houseDetail} component={HouseDetailPager}/>
-                            <Route path={RouterConfig.creatRentHouse} component={CreateRentHousePager}/>
-                            <Route path={RouterConfig.myHouses} component={MyHousesPager}/>
+                        <main className={classes.clearFix}>
+                            <Switch>
+                                <Route path='/' exact component={Home}/>
+                                <Route path={RouterConfig.areaSearch.path} component={AreaSearchPager}/>
+                                <Route path={RouterConfig.houseDetail.path} component={HouseDetailPager}/>
+                                <Route path={RouterConfig.creatRentHouse.path} component={CreateRentHousePager}/>
+                                <Route path={RouterConfig.myHouses.path} component={MyHousesPager}/>
 
-                            <Route path={RouterConfig.myContract} component={MyContractsPager}/>
-                            <Route path={RouterConfig.createContract} component={CreateContractPager}/>
-                            <Route path={RouterConfig.contractDetail} component={ContractDetailPager}/>
+                                <Route path={RouterConfig.myContract.path} component={MyContractsPager}/>
+                                <Route path={RouterConfig.createContract.path} component={CreateContractPager}/>
+                                <Route path={RouterConfig.contractDetail.path} component={ContractDetailPager}/>
 
-                        </Switch>
+                            </Switch>
+                        </main>
                         <Footer/>
                     </div>
                 </Router>
@@ -50,4 +67,4 @@ class Main extends React.Component {
     }
 }
 Main = connect(MapStateToProps, MapDispatchToProps)(Main);
-export default Main;
+export default withStyles(styles)(Main);
