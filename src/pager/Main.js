@@ -21,6 +21,8 @@ import RouterConfig from "../config/RouteConfig";
 import {connect} from "react-redux";
 import {MapStateToProps, MapDispatchToProps} from "../config/ReduxMapToPropsConfig";
 
+import pagination from '../styles/pagination.css';
+
 const styles = {
     clearFix: {
         zoom: 1,

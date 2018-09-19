@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
+var babelpolyfill = require("babel-polyfill");
 HappyPack = require('happypack'),
     os = require('os'),
     happyThreadPool = HappyPack.ThreadPool({size: os.cpus().length});
@@ -44,6 +45,10 @@ module.exports = {
                     'style-loader',
                     'css-loader'
                 ]
+            },
+            {
+                test:/\.scss$/,
+                loaders:'style-loader!css-loader!sass-loader'
             },
             {
                 test: /\.(png|svg|jpg|gif)$/,

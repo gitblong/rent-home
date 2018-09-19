@@ -1,37 +1,26 @@
 /**
  * Created by chenqilong on 2018/9/13.
  */
-import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import classNames from 'classnames';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import red from '@material-ui/core/colors/red';
+import React from "react";
+import Typography from "@material-ui/core/Typography";
+import PropTypes from "prop-types";
+import {withStyles} from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
+import Card from "@material-ui/core/Card";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
+import rent from "../statics/images/room.jpg";
+import AreaConditionTabs from "./AreaConditionTabs";
+import Link from "react-router-dom/Link";
+import grey from "@material-ui/core/colors/grey";
+import RouterConfig from "../config/RouteConfig";
+import Pagination from "./Pagination";
 var image = require('../statics/images/rent-home.jpg');
-import Input from '@material-ui/core/Input';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import lightblue from '@material-ui/core/colors/lightblue';
-import Menu from '@material-ui/core/Menu';
-import Details from '@material-ui/icons/details';
-import RentTypePopper from './RentTypePopper';
-import rent from '../statics/images/room.jpg';
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import AreaConditionTabs from './AreaConditionTabs';
 require('../styles/Content.css');
-import Link from 'react-router-dom/Link';
-import RouterConfig from '../config/RouteConfig';
+import fetch from "isomorphic-fetch";
+import "babel-polyfill";
+import area from '../data/areas.json';
+import blue from '@material-ui/core/colors/blue';
 const styles = {
     root: {
         marginTop: 100,
@@ -49,6 +38,9 @@ const styles = {
 
     },
     contentCard: {
+        "&:hover": {
+            boxShadow: `0 0 10px 5px ${blue[200]}`
+        },
         paddingTop: 0,
         cursor: 'pointer'
 
@@ -78,12 +70,32 @@ const styles = {
             display: 'inline-block',
         }
     },
+    pageLayout: {
+        width: '100%',
+        textAlign: 'right',
+        paddingRight: 12,
+    },
+    pageText: {
+        color: grey[400]
+    }
+
 
 };
 class Content extends React.Component {
     state = {
         value: 0,
+        renderPage: false
     };
+
+    async componentDidMount() {
+        await setTimeout(()=> {
+            new Promise((res)=> {
+                this.setState({
+                    renderPage: true
+                })
+            })
+        }, 500)
+    }
 
     handleChange = (event, value) => {
         this.setState({value});
@@ -319,8 +331,10 @@ class Content extends React.Component {
                             </CardContent>
                         </Card>
                     </Grid>
+                    <div className={classes.pageLayout}>
+                        <Pagination/>
+                    </div>
                 </Grid>
-                <Pagination></Pagination>
             </div>
         );
     }

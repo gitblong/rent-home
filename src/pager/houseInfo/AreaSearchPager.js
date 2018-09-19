@@ -23,6 +23,7 @@ import Delete from '@material-ui/icons/Delete';
 import AreaConditionTabs from '../../component/AreaConditionTabs';
 import room from '../../statics/images/room.jpg';
 import CardMedia from "@material-ui/core/CardMedia";
+import Pagination from '../../component/Pagination';
 const styles = theme =>({
 
     root: {
@@ -132,14 +133,19 @@ const styles = theme =>({
         },
     },
     item: {
+        marginTop: 2,
         padding: '0 24px',
         backgroundColor: '#fff',
-        position: 'relative'
+        position: 'relative',
+        borderRadius: 0.5,
+        "&:hover": {
+            boxShadow: `0 0 10px 1px ${blue[100]}`
+        }
     },
     itemContent: {
         padding: '24px 0px',
         display: 'flex',
-        borderBottom:`1px solid ${grey[200]}`
+        borderBottom: `1px solid ${grey[200]}`
     },
     itemContentImg: {
         // float: "left",
@@ -158,7 +164,7 @@ const styles = theme =>({
         cursor: 'pointer',
         color: orange[500],
         marginBottom: '24px',
-        fontSize:24,
+        fontSize: 24,
         "&:hover": {
             color: blue[400]
         },
@@ -181,8 +187,8 @@ const styles = theme =>({
     },
     priceContent: {
         height: "100%",
-        fontSize:'26px',
-        width:300
+        fontSize: '26px',
+        width: 300
     },
     priceText: {
         float: 'right',
@@ -190,8 +196,12 @@ const styles = theme =>({
         "&:after": {
             content: `"元/月"`,
             color: orange[400],
-            fontSize:14
+            fontSize: 14
         }
+    },
+    pageLayout: {
+        width: '100%',
+        textAlign: 'right'
     }
 
 
@@ -447,6 +457,9 @@ class AreaSearch extends React.Component {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className={classes.pageLayout}>
+                    <Pagination/>
                 </div>
             </div>
         );
