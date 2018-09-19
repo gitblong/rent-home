@@ -8,6 +8,7 @@ exports.parseLocation = (location)=>
 {
     console.log(location)
     let path = location.pathname;
-    let pathName = path.split('/')[1];
-    return RouterConfig[pathName].pathName;
+    let pathName = path.split('/');
+    console.log(path.split('/'))
+    return pathName;
 }

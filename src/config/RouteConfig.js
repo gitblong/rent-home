@@ -8,7 +8,7 @@ const RoutePaths = {
         pathName:'立即找房',
     },
     houseDetail:{
-        path:'/houseDetail',
+        path:'/areaSearch/houseDetail',
         pathName:'房源详情',
     },
     myHouses:{

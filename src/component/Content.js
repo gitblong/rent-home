@@ -111,7 +111,7 @@ class Content extends React.Component {
                 <Grid container xs={12} spacing={24} className={classes.contetnGrid}>
                     <Grid item xs={3}>
                         <Card className={classes.contentCard}>
-                            <Link to={RouterConfig.houseDetail}>
+                            <Link to={RouterConfig.houseDetail.path}>
                                 <CardMedia
                                     component="img"
                                     className={classes.contentImage}
@@ -331,10 +331,10 @@ class Content extends React.Component {
                             </CardContent>
                         </Card>
                     </Grid>
+                </Grid>
                     <div className={classes.pageLayout}>
                         <Pagination/>
                     </div>
-                </Grid>
             </div>
         );
     }

@@ -5,7 +5,7 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles/";
 import Header from "../../component/Header";
 import Footer from "../../component/Footer";
-import Home from '../../component/Home';
+import Home from '../houseInfo/Home';
 import Router from 'react-router-dom/BrowserRouter';
 import Route from 'react-router-dom/Route';
 

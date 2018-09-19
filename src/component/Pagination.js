@@ -106,7 +106,6 @@ class Pagination extends React.Component {
                         return (
                             <li
                                 onClick={()=>this.currentPage(value)}
-
                                 key={value}
                             >
                                 <a class={cla} key={value}>

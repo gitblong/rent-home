@@ -5,7 +5,7 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles/";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
-import Home from "../component/Home";
+import Home from "./houseInfo/Home";
 import Route from "react-router-dom/Route";
 import Switch from "react-router-dom/Switch";
 import Router from "react-router-dom/HashRouter";
@@ -50,14 +50,14 @@ class Main extends React.Component {
                         <main className={classes.clearFix}>
                             <Switch>
                                 <Route path='/' exact component={Home}/>
-                                <Route path={RouterConfig.areaSearch.path} component={AreaSearchPager}/>
-                                <Route path={RouterConfig.houseDetail.path} component={HouseDetailPager}/>
-                                <Route path={RouterConfig.creatRentHouse.path} component={CreateRentHousePager}/>
-                                <Route path={RouterConfig.myHouses.path} component={MyHousesPager}/>
+                                <Route path={RouterConfig.areaSearch.path} exact component={AreaSearchPager}/>
+                                <Route path={RouterConfig.houseDetail.path} exact component={HouseDetailPager}/>
+                                <Route path={RouterConfig.creatRentHouse.path} exact component={CreateRentHousePager}/>
+                                <Route path={RouterConfig.myHouses.path} exact component={MyHousesPager}/>
 
-                                <Route path={RouterConfig.myContract.path} component={MyContractsPager}/>
-                                <Route path={RouterConfig.createContract.path} component={CreateContractPager}/>
-                                <Route path={RouterConfig.contractDetail.path} component={ContractDetailPager}/>
+                                <Route path={RouterConfig.myContract.path} exact component={MyContractsPager}/>
+                                <Route path={RouterConfig.createContract.path} exact component={CreateContractPager}/>
+                                <Route path={RouterConfig.contractDetail.path} exact component={ContractDetailPager}/>
 
                             </Switch>
                         </main>

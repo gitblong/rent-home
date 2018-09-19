@@ -24,6 +24,7 @@ import AreaConditionTabs from '../../component/AreaConditionTabs';
 import room from '../../statics/images/room.jpg';
 import CardMedia from "@material-ui/core/CardMedia";
 import Pagination from '../../component/Pagination';
+import Navigation from '../../component/ToolBar';
 const styles = theme =>({
 
     root: {
@@ -63,9 +64,7 @@ const styles = theme =>({
     },
     searchTool: {
         right: 0,
-        position: 'absolute',
         top: 0,
-        bottom: 0,
         border: '1px solid rgb(217, 227, 244)',
         borderRadius: "4px",
         backgroundColor: '#fff',
@@ -236,27 +235,11 @@ class AreaSearch extends React.Component {
         var path = location.pathname;
         var pathName = path.split('/')[1].toString();
         console.log(this.state.area, pathName);
-
+        let parsePath = parseLocation(location);
         return (
             <div className={classes.root}>
                 <div>
-                    <div className={classes.toolBar}>
-                        <div className={classes.navigation}>
-                            <Link to={RouterConfig.home.path}>
-                                {RouterConfig.home.pathName}
-                            </Link>
-                            <span>&nbsp;/&nbsp;</span>
-                            {parseLocation(location)}
-                        </div>
-                        <div className={classes.searchTool}>
-                            <input placeholder="输入地址、写字楼、园区或地铁站" className={classes.searchInput}>
-                            </input>
-                            <IconButton>
-                                <Search />
-                            </IconButton>
-                        </div>
-
-                    </div>
+                    <Navigation currentLocation={location}/>
                     <div style={{backgroundColor: '#fff', padding: '8px 24px'}}>
                         <div className={classes.conditionLayout}>
                             <Typography className={classes.conditionTitle}>区域</Typography>
