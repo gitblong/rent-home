@@ -22,7 +22,8 @@ import {connect} from "react-redux";
 import {MapStateToProps, MapDispatchToProps} from "../config/ReduxMapToPropsConfig";
 
 import pagination from '../styles/pagination.css';
-
+require('../../node_modules/react-id-swiper/src/styles/css/swiper.css');
+require('../styles/Swiper.css');
 const styles = {
     clearFix: {
         zoom: 1,

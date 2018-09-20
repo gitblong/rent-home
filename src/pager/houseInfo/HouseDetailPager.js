@@ -38,6 +38,11 @@ import toilet from'../../statics/icon/toilet.svg';
 import tv from'../../statics/icon/tv.svg';
 import washingMachine from'../../statics/icon/washing-machine.svg';
 import waterHeater from'../../statics/icon/water-heater.svg';
+import room from '../../statics/images/room.jpg';
+import rent from '../../statics/images/rent-home.jpg';
+import Button from '@material-ui/core/Button';
+import Swiper from '../../component/Swiper';
+import GalleryImage from '../../component/GalleryImage';
 
 const styles = theme =>({
 
@@ -68,17 +73,25 @@ const styles = theme =>({
         '&:after': {
             clear: "both"
         },
-        display: 'flex'
+        display: 'flex',
+
     },
     dividLeft: {
         float: 'left',
-        width: '50%',
+        width: '40%',
         paddingRight: 10
     },
     dividRight: {
+        "&:after": {
+            clear: 'both'
+        },
+        "&:before": {
+            clear: 'both'
+        },
         float: 'right',
-        width: '50%',
-        paddingLeft: 10
+        width: '60%',
+        paddingLeft: 10,
+        overFlow: 'hidden',
     },
     detailInfo: {
         width: '100%',
@@ -120,6 +133,10 @@ const styles = theme =>({
         color: '#000'
 
     },
+    sliderLayout: {
+        width: "100%",
+        height: 360,
+    }
 
 });
 class HouseDetail extends React.Component {
@@ -354,8 +371,9 @@ class HouseDetail extends React.Component {
                             </div>
                         </div>
                         <div className={classes.dividRight}>
-                        </div>
+                            <GalleryImage className={classes.sliderLayout} images={["https://imagecdn.hizhu.com/fang/17/55/173813122A36C54B36949F826598B37A2555.jpg?x-oss-process=style/w800",room,]}/>
 
+                        </div>
                     </div>
                 </div>
             </div>

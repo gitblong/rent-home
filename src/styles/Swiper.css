@@ -1,0 +1,20 @@
+.swiper-container {
+    margin: 16px auto;
+    position: relative;
+    overflow: hidden;
+    list-style: none;
+    padding: 0;
+    z-index: 1;
+}
+
+.swiper-button-next, .swiper-container-rtl .swiper-button-prev {
+    background-image: url('../statics/icon/right.svg');
+    right: 10px;
+    left: auto;
+}
+
+.swiper-button-prev, .swiper-container-rtl .swiper-button-next {
+    background-image: url('../statics/icon/left.svg');
+    left: 10px;
+    right: auto;
+}
