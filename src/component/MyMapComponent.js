@@ -18,45 +18,42 @@ export const ZoomCtrl = (props) => {
     </div>);
 };
 
-export const SearchTool = (props) => {
-    console.log(props)
-    const map = props.__map__;
-    if (!map) {
-        console.log('组件必须为map子组件');
-        return;
-    }
-    console.log("mapcompone")
-    //输入提示
-    var autoOptions = {
-        input: "tipinput"
-    };
-        // var autoComplete = map.Autocomplete(autoOptions);
-    // let autocomplete = new Map.Autocomplete(autoOptions);
-    // var auto = new Map.Autocomplete(autoOptions);
-    // var placeSearch = map.PlaceSearch({
-    //     map: map
-    // });  //构造地点查询类
-    // AMap.event.addListener(auto, "select", select);//注册监听，当选中某条记录时会触发
-    // function select(e) {
-    //     placeSearch.setCity(e.poi.adcode);
-    //     placeSearch.search(e.poi.name);  //关键字查询查询
-    // }
+export function poiPickerReady(poiPicker,map) {
 
+    window.poiPicker = poiPicker;
 
-    return (
-        <div id="myPageTop">
-            <table>
-                <tr>
-                    <td>
-                        <label>请输入关键字：</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input id="tipinput"/>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    )
+    var marker = new AMap.Marker();
+
+    var infoWindow = new AMap.InfoWindow({
+        offset: new AMap.Pixel(0, -20)
+    });
+
+    //选取了某个POI
+    poiPicker.on('poiPicked', function(poiResult) {
+
+        var source = poiResult.source,
+            poi = poiResult.item,
+            info = {
+                source: source,
+                id: poi.id,
+                name: poi.name,
+                location: poi.location.toString(),
+                address: poi.address
+            };
+
+        marker.setMap(map);
+        infoWindow.setMap(map);
+
+        marker.setPosition(poi.location);
+        infoWindow.setPosition(poi.location);
+
+        infoWindow.setContent('POI信息: <pre>' + JSON.stringify(info, null, 2) + '</pre>');
+        infoWindow.open(map, marker.getPosition());
+
+        //map.setCenter(marker.getPosition());
+    });
+
+    poiPicker.onCityReady(function() {
+        poiPicker.suggest('美食');
+    });
 }
