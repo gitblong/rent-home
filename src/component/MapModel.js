@@ -5,17 +5,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
-import CardMedia from "@material-ui/core/CardMedia";
-import Grid from "@material-ui/core/Grid";
-
-import {Map,Marker} from 'react-amap';
-import grey from '@material-ui/core/colors/grey';
-import blue from '@material-ui/core/colors/blue';
-
+import {Map} from "react-amap";
+import grey from "@material-ui/core/colors/grey";
+import blue from "@material-ui/core/colors/blue";
 import Typography from "@material-ui/core/Typography";
-import Button from '@material-ui/core/Button';
+import Button from "@material-ui/core/Button";
+import position from "../statics/icon/position.svg";
+import streets from "../data/streets.json";
 // import {poiPickerReady} from './MyMapComponent';
-
 const styles = theme => ({
     modelBody: {
         left: `50%`,
@@ -95,102 +92,52 @@ const styles = theme => ({
 });
 class MapModel extends React.Component {
     constructor() {
+
         super();
+        this.state = {
+            mapVersion: '1.4.10',//amap版本号
+            amapkey: '50cec8de756f62ade847f8efe25ba900',//ampap  key
+            lng: 0,//经度
+            lat: 0,//纬度
+            detailAddress: "",
+            adcode: "",
+            map: null,
+            markers: [],
+            selectArray: [],//下拉列表详情
+            streetNumber: "",    //门牌号
+            district: "",    //拱墅区
+            street: '',       //街
+            township: '',       //街道
+            name: '',            //房源名称
+        }
+        //地图的事件监听
         this.mapEvents = {
             created: (map) => {
-                let AMap = window.AMap;
-                let AMapUI = window.AMapUI;
                 this.setState({
-                    map:map
+                    map: map
                 })
-                map.plugin('AMap.Geolocation', function() {
-                    var geolocation = new AMap.Geolocation({
-                        // 是否使用高精度定位，默认：true
-                        enableHighAccuracy: true,
-                        // 设置定位超时时间，默认：无穷大
-                        timeout: 10000,
-                        // 定位按钮的停靠位置的偏移量，默认：Pixel(10, 20)
-                        buttonOffset: new AMap.Pixel(10, 20),
-                        //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-                        zoomToAccuracy: true,
-                        //  定位按钮的排放位置,  RB表示右下
-                        buttonPosition: 'RB'
-                    })
+                let AMapUI = window.AMapUI;
+                let AMap = window.AMap;
+                this.setCurrentPosition();
+                this.searchInit();
+                // AMapUI.loadUI(['misc/PositionPicker'], function (PositionPicker) {
 
-                    geolocation.getCurrentPosition()
-                    AMap.event.addListener(geolocation, 'complete', onComplete)
-                    AMap.event.addListener(geolocation, 'error', onError)
-
-                    function onComplete (data) {
-                        console.log(data);
-                        map.setCenter(data.position)
-                    }
-
-                    function onError (data) {
-                        // 定位出错
-                    }
-                })
-                AMapUI.loadUI(['misc/PoiPicker'], function (PoiPicker) {
-
-                    var poiPicker = new PoiPicker({
-                        //city:'北京',
-                        input: 'pickerInput'
-                    });
-
-                    //初始化poiPicker
-                    poiPickerReady(poiPicker);
-                });
-
-                function poiPickerReady(poiPicker) {
-
-                    window.poiPicker = poiPicker;
-
-                    var marker = new AMap.Marker();
-
-                    var infoWindow = new AMap.InfoWindow({
-                        offset: new AMap.Pixel(0, -20)
-                    });
-
-                    //选取了某个POI
-                    poiPicker.on('poiPicked', function (poiResult) {
-
-                        var source = poiResult.source,
-                            poi = poiResult.item,
-                            info = {
-                                source: source,
-                                id: poi.id,
-                                name: poi.name,
-                                location: poi.location.toString(),
-                                address: poi.address
-                            };
-
-                        marker.setMap(map);
-                        infoWindow.setMap(map);
-
-                        marker.setPosition(poi.location);
-                        infoWindow.setPosition(poi.location);
-
-                        infoWindow.setContent('POI信息: <pre>' + JSON.stringify(info, null, 2) + '</pre>');
-                        infoWindow.open(map, marker.getPosition());
-
-                        map.setCenter(marker.getPosition());
-                    });
-
-                    // poiPicker.onCityReady(function () {
-                    //     poiPicker.suggest('美食');
-                    // });
-                }
             },
-            click: () => {
-                console.log('clicked')
+            click: (e) => {
+                console.log('clicked', e);
+                let lnglat = e.lnglat;
+                let map = this.state.map;
+                this.getAddressDetail(lnglat, map);
             },
         }
+        //marker的事件监听
         this.markerEvents = {
             created: (marker) => {
+                console.log('markerCre===============')
                 let AMap = window.AMap;
                 let AMapUI = window.AMapUI;
                 this.setState({
-                    marker:marker
+                    marker: marker
                 })
             },
             click: () => {
@@ -199,19 +146,191 @@ class MapModel extends React.Component {
         }
 
     }
-    searchPoi(){
 
+    changeSelectArray = (adcode)=> {
+        let selectArray = new Array();
+        let self = this;
+        streets.map((street, index)=> {
+            let name = street.name;
+            if (street.areaCode == adcode) {
+                if (name.charAt(name.length - 1) != '乡' && name.charAt(name.length - 1) != '镇') {
+                    street["selected"] = false;
+                    let str = street.name == self.state.township;
+                    if (str) {
+                        street.selected = true;
+                    } else {
+                        street.selected = false;
+                    }
+                    selectArray.push(street)
+                }
+            }
+        });
+        this.setState({
+            selectArray: selectArray,
+        })
     }
-    setCurrentPosition(){
+    /**
+     * 获得地址详情
+     * @param lnglat 经纬度
+     * @param map   当前地图
+     */
+    getAddressDetail = (lnglat, map)=> {
 
+        let self = this;
+        let point = [lnglat.lng, lnglat.lat];
+        let AMap = window.AMap;
+        let marker = new AMap.Marker();
+        marker.setPosition(point);
+
+        let markers = this.state.markers;
+        map.remove(markers);
+        markers = [];
+
+        marker.setMap(map);
+        map.setCenter(marker.getPosition());
+        this.setState({
+            markers: marker
+        })
+        markers.push(marker);
+
+        this.setState({
+            markers: markers,
+        });
+        AMap.service('AMap.Geocoder', function () {//回调函数
+            let geocoder = new AMap.Geocoder({});
+            geocoder.getAddress(lnglat, function (status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+                    //获得了有效的地址信息:
+                    //即，result.regeocode.formattedAddress
+                    console.log("regeocode", result);
+                    var addressComponent = result.regeocode.addressComponent;
+                    var address = result.regeocode.formattedAddress;
+                    let streetNumber = addressComponent.streetNumber;
+                    let detailAddress = address + streetNumber;
+                    self.changeSelectArray(addressComponent.adcode)
+                    self.setState({
+                        detailAddress: detailAddress,
+                        adcode: addressComponent.adcode,
+                        lng: lnglat.lng,
+                        lat: lnglat.lat,
+                        street: addressComponent.street,
+                        township: addressComponent.township,
+                        streetNumber: streetNumber,
+                        name: addressComponent.street + streetNumber
+                    });
+                    self.InfoWindow(map, location, detailAddress, marker);
+                    console.log(self.state);
+                } else {
+                    //获取地址失败
+                    alert('获取信息失败请重试');
+                }
+            });
+        })
     }
-    state = {
-        mapVersion: '1.4.10',
-        amapkey: '50cec8de756f62ade847f8efe25ba900',
-        lng:0,
-        lat:0,
-        map:null,
+    searchInit = ()=> {
+        let self = this;
+        let map = self.state.map;
+        AMapUI.loadUI(['misc/PoiPicker', 'misc/PositionPicker'], function (PoiPicker) {
+            var poiPicker = new PoiPicker({
+                //city:'北京',
+                input: 'pickerInput'
+            });
 
+            //初始化poiPicker
+            self.poiPickerReady(poiPicker);
+
+        });
+    }
+    /**
+     * 地图的信息窗口
+     * @param map 地图
+     * @param location 当前的位置,经纬度
+     * @param address 当前的地址
+     * @param marker 设置infowindow的marker
+     * @constructor
+     */
+    InfoWindow = (map, location, address, marker) => {
+        AMap = window.AMap;
+        var infoWindow = new AMap.InfoWindow({
+            offset: new AMap.Pixel(5, -5)
+        });
+        infoWindow.setMap(map);
+        infoWindow.setPosition(location);
+        infoWindow.setContent(
+            `<div >
+                     <p>${address}</p>
+                 </div>`
+        )
+        infoWindow.open(map, marker.getPosition());
+    }
+    /**
+     * poi搜索查询
+     * @param poiPicker
+     */
+    poiPickerReady = (poiPicker)=> {
+        let map = this.state.map;
+        let self = this;
+        window.poiPicker = poiPicker;
+
+
+        //选取了某个POI
+        poiPicker.on('poiPicked', function (poiResult) {
+
+            var source = poiResult.source,
+                poi = poiResult.item;
+            console.log(poiResult)
+            self.getAddressDetail(poi.location, map)
+
+
+        });
+
+        // poiPicker.onCityReady(function () {
+        //     poiPicker.suggest('美食');
+        // });
+    }
+    /**
+     *通过Geolocation插件设置当前位置
+     */
+    setCurrentPosition = ()=> {
+        let self = this;
+        let map = self.state.map;
+        let AMap = window.AMap;
+        map.plugin('AMap.Geolocation', function () {
+            var geolocation = new AMap.Geolocation({
+                // 是否使用高精度定位，默认：true
+                enableHighAccuracy: true,
+                // 设置定位超时时间，默认：无穷大
+                timeout: 10000,
+                // 定位按钮的停靠位置的偏移量，默认：Pixel(10, 20)
+                buttonOffset: new AMap.Pixel(10, 20),
+                //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                zoomToAccuracy: true,
+                //  定位按钮的排放位置,  RB表示右下
+                buttonPosition: 'RB'
+            })
+
+            geolocation.getCurrentPosition()
+            AMap.event.addListener(geolocation, 'complete', onComplete)
+            AMap.event.addListener(geolocation, 'error', onError)
+
+            function onComplete(data) {
+                console.log(data);
+                let centerPosition = [data.position.lng, data.position.lat]
+                map.setCenter(centerPosition);
+                let marker = new AMap.Marker({
+                    icon: position,
+                    // offset:new AMap.Pixel(0,0)
+                });
+
+                marker.setPosition(centerPosition);
+                marker.setMap(map);
+                self.InfoWindow(map, data.position, "当前位置", marker);
+            }
+
+            function onError(data) {
+                // 定位出错
+            }
+        })
     }
 
     render() {
@@ -225,6 +344,7 @@ class MapModel extends React.Component {
                 },
             },
         }];
+        const {mapVersion, amapke, lng, lat, detailAddress, adcode, map, markers, selectArray, township, district, stree, name,}= this.state;
         return (
             <div>
                 <Modal
@@ -243,38 +363,42 @@ class MapModel extends React.Component {
                                 <Typography>
                                     小区名称
                                 </Typography>
-                                <input/>
+                                <input value={name}/>
                                 <Typography>
                                     商圈
                                 </Typography>
                                 <select>
-                                    <option>test1</option>
-                                    <option>test2</option>
-                                    <option>test3</option>
+                                    {
+                                        selectArray.map((value, index)=> {
+                                            return (
+                                                <option selected={value.selected}>{value.name}</option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
                             <div className={classes.contentInput}>
                                 <Typography>
                                     经度
                                 </Typography>
-                                <input/>
+                                <input value={lng} style={{width: 75}}/>
                                 <Typography>
                                     纬度
                                 </Typography>
-                                <input/>
+                                <input value={lat} style={{width: 75}}/>
                                 <Typography>
                                     详细地址
                                 </Typography>
-                                <input/>
+                                <input value={detailAddress} style={{width: 400}}/>
                             </div>
                             <div style={{width: '100%', height: 400}}>
                                 <Map amapkey={this.state.amapkey}
                                      version={this.state.mapVersion}
                                      events={this.mapEvents}
                                      plugins={plugins}
-                                     zoom = {14}
+                                     zoom={14}
+                                     useAMapUI
                                 >
-                                    {/*<div id="panel"></div>*/}
                                     <div id="pickerBox">
                                         <Button disabled style={{
                                             background: '#eee',
@@ -289,9 +413,8 @@ class MapModel extends React.Component {
                             <div className={classes.contentBottom}>
                                 <Button
                                     className={classes.confirmButton}>确认</Button>
-                                <Button className={classes.backButton}>返回</Button>
+                                <Button className={classes.backButton} onClick={handleClose}>返回</Button>
                             </div>
-
                         </div>
                     </div>
                 </Modal>
