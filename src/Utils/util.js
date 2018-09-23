@@ -4,11 +4,11 @@
 
 import RouterConfig from '../config/RouteConfig';
 
-exports.parseLocation = (location)=>
-{
+exports.parseLocation = (location)=> {
     console.log(location)
     let path = location.pathname;
     let pathName = path.split('/');
     console.log(path.split('/'))
     return pathName;
 }
+

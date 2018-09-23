@@ -3,46 +3,30 @@
  */
 import React from "react";
 import {withStyles} from "@material-ui/core/styles/";
-import PropTypes from 'prop-types';
-import Header from "../../component/Header";
-import Footer from "../../component/Footer";
-import Home from './Home';
-import Router from 'react-router-dom/BrowserRouter';
-import Route from 'react-router-dom/Route';
-import grey from '@material-ui/core/colors/grey';
-import blue from '@material-ui/core/colors/blue';
-import orange from '@material-ui/core/colors/orange';
-import Link from 'react-router-dom/Link';
-
-import IconButton from '@material-ui/core/IconButton';
-import RouterConfig from '../../config/RouteConfig';
-import {parseLocation} from '../../Utils/util';
-import Search from '@material-ui/icons/Search';
-import ToolBar from '../../component/ToolBar';
+import PropTypes from "prop-types";
+import blue from "@material-ui/core/colors/blue";
+import {parseLocation} from "../../Utils/util";
+import ToolBar from "../../component/ToolBarTop";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from '@material-ui/core/Typography'
-import window from'../../statics/icon/window.svg';
-import air from'../../statics/icon/air.svg';
-import balcony from'../../statics/icon/balcony.svg';
-import broaband from'../../statics/icon/broadband.svg';
-import desk from'../../statics/icon/desk.svg';
-import doubleBed from'../../statics/icon/double-bed.svg';
-import dresser from'../../statics/icon/dresser.svg';
-import kitchen from'../../statics/icon/kitchen.svg';
-import refrigerator from'../../statics/icon/refrigerator.svg';
-import singleBed from'../../statics/icon/single-bed.svg';
-import sofa from'../../statics/icon/sofa.svg';
-import toilet from'../../statics/icon/toilet.svg';
-import tv from'../../statics/icon/tv.svg';
-import washingMachine from'../../statics/icon/washing-machine.svg';
-import waterHeater from'../../statics/icon/water-heater.svg';
-import room from '../../statics/images/room.jpg';
-import rent from '../../statics/images/rent-home.jpg';
-import Button from '@material-ui/core/Button';
-import Swiper from '../../component/Swiper';
-import GalleryImage from '../../component/GalleryImage';
+import window from "../../statics/icon/window.svg";
+import air from "../../statics/icon/air.svg";
+import balcony from "../../statics/icon/balcony.svg";
+import broaband from "../../statics/icon/broadband.svg";
+import desk from "../../statics/icon/desk.svg";
+import doubleBed from "../../statics/icon/double-bed.svg";
+import dresser from "../../statics/icon/dresser.svg";
+import kitchen from "../../statics/icon/kitchen.svg";
+import refrigerator from "../../statics/icon/refrigerator.svg";
+import singleBed from "../../statics/icon/single-bed.svg";
+import sofa from "../../statics/icon/sofa.svg";
+import toilet from "../../statics/icon/toilet.svg";
+import tv from "../../statics/icon/tv.svg";
+import washingMachine from "../../statics/icon/washing-machine.svg";
+import waterHeater from "../../statics/icon/water-heater.svg";
+import room from "../../statics/images/room.jpg";
+import GalleryImage from "../../component/GalleryImage";
+import {Map, Marker, InfoWindow} from "react-amap";
 
 const styles = theme =>({
 
@@ -51,7 +35,7 @@ const styles = theme =>({
         margin: 'auto',
         left: 0,
         right: 0,
-        "& div": {
+        "& $dividLeft div": {
             boxShadow: 'none'
         },
         color: '#66747f',
@@ -142,7 +126,62 @@ const styles = theme =>({
 class HouseDetail extends React.Component {
     constructor(props) {
         super(props);
+        let self = this;
+        this.mapCenter = {longitude: 120.097083, latitude: 30.272038};
+        this.amapEvents = {
+            created: (mapInstance) => {
+                console.log('高德地图 Map 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
+                console.log(mapInstance.getZoom());
+            },
+            click: ()=> {
+
+            }
+
+        };
+        this.markerEvents = {
+            created: (markerInstance) => {
+                console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
+                console.log(markerInstance.getPosition());
+                console.log(markerInstance)
+            },
+            click: ()=> {
+
+                console.log(self);
+                self.setState({
+                    openPositionInfo: !self.state.openPositionInfo
+                })
+                console.log(self.state);
+            }
+
+        };
+        this.infoWindowEvents = {
+            created: (infoInstance) => {
+                console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
+                console.log(infoInstance.getPosition());
+                console.log(infoInstance)
+            },
+            click: ()=> {
+
+                console.log(self);
+                self.setState({
+                    openPositionInfo: !self.state.openPositionInfo
+                })
+                console.log(self.state);
+            }
+
+        };
+
+        this.markerPosition = {longitude: 120.096933, latitude: 30.272038};
     }
+
+    state = {
+        mapVersion: '1.4.10',
+        amapkey: '50cec8de756f62ade847f8efe25ba900',
+        curVisibleWindow: 3,
+        position: {longitude: 120.096933, latitude: 30.272038},
+        openPositionInfo: true
+    }
+
 
     render() {
         console.log(this.props)
@@ -371,8 +410,31 @@ class HouseDetail extends React.Component {
                             </div>
                         </div>
                         <div className={classes.dividRight}>
-                            <GalleryImage className={classes.sliderLayout} images={["https://imagecdn.hizhu.com/fang/17/55/173813122A36C54B36949F826598B37A2555.jpg?x-oss-process=style/w800",room,]}/>
-
+                            <GalleryImage className={classes.sliderLayout}
+                                          images={["https://imagecdn.hizhu.com/fang/17/55/173813122A36C54B36949F826598B37A2555.jpg?x-oss-process=style/w800", room,]}/>
+                            <div style={{
+                                width: '100%',
+                                height: '330px',
+                                backgroundColor: blue[100],
+                                marginTop: 16,
+                                boxShadow: '0px 0px 10px rgb(66,165,245)'
+                            }}>
+                                {/*<Map amapkey={this.state.amapkey} version={this.state.mapVersion}/>120.097083,30.272038*/}
+                                <Map zoom={14} center={this.mapCenter} amapkey={this.state.amapkey}
+                                     version={this.state.mapVersion}
+                                     events={this.amapEvents}>
+                                    <Marker position={this.markerPosition} events={this.markerEvents}/>
+                                    <InfoWindow
+                                        position={this.state.position}
+                                        visible={this.state.openPositionInfo}
+                                        isCustom={false}
+                                        events={this.infoWindowEvents}
+                                    >
+                                        <h3>嘉和花苑</h3>
+                                        <p>紫荆花路88号</p>
+                                    </InfoWindow>
+                                </Map>
+                            </div>
                         </div>
                     </div>
                 </div>

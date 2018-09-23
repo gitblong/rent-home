@@ -24,7 +24,7 @@ import AreaConditionTabs from '../../component/AreaConditionTabs';
 import room from '../../statics/images/room.jpg';
 import CardMedia from "@material-ui/core/CardMedia";
 import Pagination from '../../component/Pagination';
-import Navigation from '../../component/ToolBar';
+import Navigation from '../../component/ToolBarTop';
 const styles = theme =>({
 
     root: {

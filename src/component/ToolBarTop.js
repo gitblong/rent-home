@@ -14,7 +14,15 @@ const styles = {
         display: 'inline-block',
         margin: "auto 0",
         lineHeight: '50px',
-        float: 'left'
+        float: 'left',
+        "& a": {
+            color: '#66747f',
+            textDecoration: 'none',
+            "&:hover": {
+                color: "#4fcbff"
+            },
+            textAlign: 14
+        },
     },
     toolBar: {
         height: 50,
@@ -48,7 +56,8 @@ const styles = {
 class Navigation extends React.Component {
 
     render() {
-        const {classes, currentLocation} = this.props;
+        const {classes, currentLocation,searchHidden} = this.props;
+
         const parsePath = parseLocation(currentLocation);
         return (
             <div className={classes.toolBar}>
@@ -78,7 +87,7 @@ class Navigation extends React.Component {
                         })
                     }
                 </div>
-                <div className={classes.searchTool}>
+                <div className={classes.searchTool} hidden={searchHidden}>
                     <input placeholder="输入地址、写字楼、园区或地铁站" className={classes.searchInput}>
                     </input>
                     <IconButton>
