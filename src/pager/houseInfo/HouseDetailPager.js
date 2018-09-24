@@ -80,7 +80,8 @@ const styles = theme =>({
     detailInfo: {
         width: '100%',
         '& h1': {
-            color: '#000'
+            color: '#000',
+            'margin-block-start': '0.3em'
         },
         '& h2': {
             color: '#000'
@@ -131,7 +132,6 @@ class HouseDetail extends React.Component {
         this.amapEvents = {
             created: (mapInstance) => {
                 console.log('高德地图 Map 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
-                console.log(mapInstance.getZoom());
             },
             click: ()=> {
 
@@ -141,32 +141,24 @@ class HouseDetail extends React.Component {
         this.markerEvents = {
             created: (markerInstance) => {
                 console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
-                console.log(markerInstance.getPosition());
-                console.log(markerInstance)
             },
             click: ()=> {
 
-                console.log(self);
                 self.setState({
                     openPositionInfo: !self.state.openPositionInfo
                 })
-                console.log(self.state);
             }
 
         };
         this.infoWindowEvents = {
             created: (infoInstance) => {
                 console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
-                console.log(infoInstance.getPosition());
-                console.log(infoInstance)
             },
             click: ()=> {
 
-                console.log(self);
                 self.setState({
                     openPositionInfo: !self.state.openPositionInfo
                 })
-                console.log(self.state);
             }
 
         };
@@ -184,7 +176,6 @@ class HouseDetail extends React.Component {
 
 
     render() {
-        console.log(this.props)
         const {classes, location} = this.props;
         let parsePath = parseLocation(location);
         return (
@@ -197,6 +188,11 @@ class HouseDetail extends React.Component {
                                 <h1>
                                     整租<i>&nbsp;·&nbsp;</i>嘉和花苑<i>&nbsp;·&nbsp;</i>主卧
                                 </h1>
+
+                                <p>
+                                    <span>面&nbsp;·&nbsp;积</span><strong>27平米</strong>
+                                </p>
+
                                 <p>
                                     <span>朝&nbsp;·&nbsp;向</span><strong>朝南</strong>
                                 </p>
@@ -213,6 +209,10 @@ class HouseDetail extends React.Component {
                                     <span>地&nbsp;·&nbsp;址</span><strong>紫金花路88号</strong>
                                 </p>
                                 <p>
+                                    <span>房&nbsp;·&nbsp;号</span><strong>14幢1单元</strong>
+                                </p>
+
+                                <p>
                                     <span>更&nbsp;·&nbsp;新</span><strong>2018年9月14日</strong>
                                 </p>
                                 <p>
@@ -220,6 +220,9 @@ class HouseDetail extends React.Component {
                                 </p>
                                 <p>
                                     <span>服务费</span><strong>0元</strong>
+                                </p>
+                                <p>
+                                    <span>价&nbsp;·&nbsp;格</span><strong>1800元/月&nbsp;&nbsp;(押一付一)</strong>
                                 </p>
                                 <p>
                                     <span>电&nbsp;·&nbsp;话</span><strong>13763382916</strong>

@@ -51,7 +51,6 @@ class SearchCondition extends React.Component {
                     <div>
                         {
                             conditions.map((value, index)=> {
-                                console.log(value)
                                 return (
 
                                     <Button>{value}</Button>

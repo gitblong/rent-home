@@ -231,10 +231,8 @@ class AreaSearch extends React.Component {
 
     render() {
         const {classes, location} = this.props;
-        console.log(location, this.props, RouterConfig);
         var path = location.pathname;
         var pathName = path.split('/')[1].toString();
-        console.log(this.state.area, pathName);
         let parsePath = parseLocation(location);
         return (
             <div className={classes.root}>
@@ -249,7 +247,6 @@ class AreaSearch extends React.Component {
                                     <Button>不限</Button>
                                     {
                                         this.state.area.map((value, index)=> {
-                                            console.log(value)
                                             return (
 
                                                 <Button>{value.name}</Button>
@@ -262,7 +259,6 @@ class AreaSearch extends React.Component {
                                     <Button>不限</Button>
                                     {
                                         this.state.area.map((value, index)=> {
-                                            console.log(value)
                                             return (
 
                                                 <Button>{value.name}</Button>

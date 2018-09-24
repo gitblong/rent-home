@@ -129,7 +129,6 @@ class Middle extends React.Component {
         clickPopperId: ''
     }
     openRentTypePopper = (value, event)=> {
-        console.log("openRentTypePopper==>" + event.currentTarget);
         event.preventDefault();
         const currentTarget = event.currentTarget;
         this.setState(state =>({

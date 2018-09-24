@@ -56,7 +56,11 @@ const styles = {
 class Navigation extends React.Component {
 
     render() {
-        const {classes, currentLocation,searchHidden} = this.props;
+        let toolBarText = "输入地址、写字楼、园区或地铁站"
+        const {classes, currentLocation,searchHidden,placeText} = this.props;
+        if(placeText){
+            toolBarText = placeText;
+        }
 
         const parsePath = parseLocation(currentLocation);
         return (
@@ -69,7 +73,6 @@ class Navigation extends React.Component {
                     {
                         parsePath.map((value, index)=> {
                             if (index > 0 && index < parsePath.length - 1) {
-                                console.log(parsePath.length)
                                 return (
                                     <div style={{display: 'inline-block'}}>
                                         <Link to={RouterConfig[value].path}>
@@ -88,7 +91,7 @@ class Navigation extends React.Component {
                     }
                 </div>
                 <div className={classes.searchTool} hidden={searchHidden}>
-                    <input placeholder="输入地址、写字楼、园区或地铁站" className={classes.searchInput}>
+                    <input placeholder={toolBarText} className={classes.searchInput}>
                     </input>
                     <IconButton>
                         <Search />

@@ -92,7 +92,6 @@ const styles = theme => ({
 });
 class MapModel extends React.Component {
     constructor() {
-
         super();
         this.state = {
             mapVersion: '1.4.10',//amap版本号
@@ -124,7 +123,6 @@ class MapModel extends React.Component {
 
             },
             click: (e) => {
-                console.log('clicked', e);
                 let lnglat = e.lnglat;
                 let map = this.state.map;
                 this.getAddressDetail(lnglat, map);
@@ -133,7 +131,6 @@ class MapModel extends React.Component {
         //marker的事件监听
         this.markerEvents = {
             created: (marker) => {
-                console.log('markerCre===============')
                 let AMap = window.AMap;
                 let AMapUI = window.AMapUI;
                 this.setState({
@@ -141,7 +138,6 @@ class MapModel extends React.Component {
                 })
             },
             click: () => {
-                console.log('clicked')
             },
         }
 
@@ -196,18 +192,19 @@ class MapModel extends React.Component {
         this.setState({
             markers: markers,
         });
-        AMap.service('AMap.Geocoder', function () {//回调函数
+        AMap.plugin('AMap.Geocoder', function () {//回调函数
             let geocoder = new AMap.Geocoder({});
+            map.addControl(toolbar);
             geocoder.getAddress(lnglat, function (status, result) {
                 if (status === 'complete' && result.info === 'OK') {
                     //获得了有效的地址信息:
                     //即，result.regeocode.formattedAddress
-                    console.log("regeocode", result);
                     var addressComponent = result.regeocode.addressComponent;
                     var address = result.regeocode.formattedAddress;
                     let streetNumber = addressComponent.streetNumber;
                     let detailAddress = address + streetNumber;
                     self.changeSelectArray(addressComponent.adcode)
+                    let name = addressComponent.street + streetNumber;
                     self.setState({
                         detailAddress: detailAddress,
                         adcode: addressComponent.adcode,
@@ -216,10 +213,9 @@ class MapModel extends React.Component {
                         street: addressComponent.street,
                         township: addressComponent.township,
                         streetNumber: streetNumber,
-                        name: addressComponent.street + streetNumber
+                        name: name
                     });
                     self.InfoWindow(map, location, detailAddress, marker);
-                    console.log(self.state);
                 } else {
                     //获取地址失败
                     alert('获取信息失败请重试');
@@ -278,7 +274,6 @@ class MapModel extends React.Component {
 
             var source = poiResult.source,
                 poi = poiResult.item;
-            console.log(poiResult)
             self.getAddressDetail(poi.location, map)
 
 
@@ -314,7 +309,6 @@ class MapModel extends React.Component {
             AMap.event.addListener(geolocation, 'error', onError)
 
             function onComplete(data) {
-                console.log(data);
                 let centerPosition = [data.position.lng, data.position.lat]
                 map.setCenter(centerPosition);
                 let marker = new AMap.Marker({
@@ -340,7 +334,6 @@ class MapModel extends React.Component {
             options: {
                 visible: true,  // 不设置该属性默认就是 true
                 onCreated(ins){
-                    console.log(ins);
                 },
             },
         }];
@@ -360,6 +353,10 @@ class MapModel extends React.Component {
 
                         <div className={classes.modelContent}>
                             <div className={classes.contentInput}>
+                                <Typography>
+                                    楼层/房号
+                                </Typography>
+                                <input/>
                                 <Typography>
                                     小区名称
                                 </Typography>
@@ -400,12 +397,9 @@ class MapModel extends React.Component {
                                      useAMapUI
                                 >
                                     <div id="pickerBox">
-                                        <Button disabled style={{
-                                            background: '#eee',
-                                            padding: '13px 0',
-                                            borderRadius: 0,
-                                            color: '#000'
-                                        }}>搜索</Button><input id="pickerInput" placeholder="输入关键字选取地点"/>
+                                        <div style={{border:`1px solid ${grey[400]}`,display:'flex',alignItems:'center',backgroundColor:grey[200]}}>
+                                            <span style={{width:50,textAlign:'center',color:grey[800]}}>搜索</span><input id="pickerInput" placeholder="输入关键字选取地点"/>
+                                        </div>
                                         <div id="poiInfo"></div>
                                     </div>
                                 </Map>

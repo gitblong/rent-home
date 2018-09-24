@@ -18,7 +18,6 @@ const reducer = (state = initialState, action) => {
                 text: 'Hello world'
             }
         case OPEN_POSITION_POPPER:
-            console.log("open")
             return {
                 ...state,
                 isOpen:!state.isOpen,

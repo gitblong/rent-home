@@ -270,17 +270,14 @@ class TextFields extends React.Component {
         super()
         let elementsByClassName = document.getElementsByClassName('fileContainer');
         let childNodes = elementsByClassName[0]
-        console.log(elementsByClassName, childNodes);
     }
 
     componentWillMount() {
-        console.log(rent)
         let image = new Image(rent);
         this.onDrop(image);
     }
 
     onDrop = (picture) => {
-        console.log(picture)
         this.setState({
             pictures: this.state.pictures.concat(picture),
         });
@@ -304,7 +301,6 @@ class TextFields extends React.Component {
     render() {
 
         const {classes, location} = this.props;
-        console.log("pic", this.state.pictures);
         const {imgExtension,maxFileSize} = this.state
         return (
             <form className={classes.container} noValidate autoComplete="off">
@@ -540,7 +536,7 @@ class TextFields extends React.Component {
                     </Grid>
                     <Grid container xs="12" className={classes.gridContent}>
                         <Grid item xs="12" className={classes.gridItem}>
-                            <label>详细描述/介绍 0/1000字</label>
+                            <label>详细描述</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
                                 <textarea/>
                             </div>
