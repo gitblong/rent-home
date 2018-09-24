@@ -261,8 +261,17 @@ class TextFields extends React.Component {
 
         ],
         pictures: [],
-        openModal:true
+        openModal: false,
+        imgExtension:['.jpg', '.gif', '.png', '.gif'],
+        maxFileSize:1020*5
     };
+
+    constructor() {
+        super()
+        let elementsByClassName = document.getElementsByClassName('fileContainer');
+        let childNodes = elementsByClassName[0]
+        console.log(elementsByClassName, childNodes);
+    }
 
     componentWillMount() {
         console.log(rent)
@@ -280,22 +289,23 @@ class TextFields extends React.Component {
     handleChange = event => {
         this.setState({selectedValue: event.target.value});
     };
-    handleOpen = ()=>{
+    handleOpen = ()=> {
         this.setState({
-            openModal:true
+            openModal: true
         })
     }
 
-    handleClose = ()=>{
+    handleClose = ()=> {
         this.setState({
-            openModal:false
+            openModal: false
         })
     }
 
     render() {
 
         const {classes, location} = this.props;
-        console.log("pic", this.state.pictures)
+        console.log("pic", this.state.pictures);
+        const {imgExtension,maxFileSize} = this.state
         return (
             <form className={classes.container} noValidate autoComplete="off">
                 <ToolBar currentLocation={location} searchHidden={true} className={classes.toolBar}/>
@@ -536,16 +546,38 @@ class TextFields extends React.Component {
                             </div>
                         </Grid>
                     </Grid>
-                    <ImageUploader
-                        withIcon={true}
-                        buttonText='Choose images'
-                        onChange={this.onDrop}
-                        imgExtension={['.jpg', '.gif', '.png', '.gif']}
-                        maxFileSize={5242880}
-                        withPreview="true"
-                    />
+
+                    <Grid container xs="12" className={classes.gridContent}>
+                        <Grid item xs="12" className={classes.gridItem}>
+                            <label>选择要上传的图片(支持
+                                {
+
+                                    imgExtension.map((value,index)=>{
+                                        let s = value;
+                                        if (index < imgExtension.length-1) {
+                                            s += "、";
+                                        }
+                                        return s;
+                                    })
+
+                                }格式、且不大于{maxFileSize/1020}M的图片
+                                )</label>
+                            <div className={classes.divinput} style={{paddingLeft: 0}}>
+                                <ImageUploader
+                                    withIcon={true}
+                                    buttonText='Choose images'
+                                    onChange={this.onDrop}
+                                    imgExtension={imgExtension}
+                                    maxFileSize={maxFileSize}
+                                    withPreview="true"
+                                />
+                            </div>
+                        </Grid>
+                    </Grid>
+
                 </div>
-                <MapModel open={this.state.openModal} handleOpen={this.handleOpen} handleClose={this.handleClose} image={this.state.image}/>
+                <MapModel open={this.state.openModal} handleOpen={this.handleOpen} handleClose={this.handleClose}
+                          image={this.state.image}/>
             </form>
         )
             ;

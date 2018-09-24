@@ -1,0 +1,122 @@
+.amap-info-content {
+    font-size: 12px;
+    border-radius: 10px;
+    box-shadow: rgb(66, 165, 245) 0px 0px 10px;
+    border:1px solid rgb(66, 165, 245);
+}
+
+.amap-info-shadowContainer :hover {
+    box-shadow: rgb(66, 165, 245) 0px 0px 10px;
+}
+
+.amap-logo img {
+    display: none;
+}
+
+.amap-overlays {
+    z-index: 110;
+    cursor: default;
+    margin: -20px 0;
+}
+.amap-copyright{
+    font-size: 0px;
+}
+
+#panel {
+    position: absolute;
+    background-color: white;
+    max-height: 90%;
+    overflow-y: auto;
+    top: 10px;
+    right: 10px;
+    width: 280px;
+}
+
+
+
+#pickerBox {
+    position: absolute;
+    z-index: 9999;
+    top: 10px;
+    left: 50px;
+    width: auto;
+}
+
+/*#pickerBox span{*/
+    /*display:inline-block;*/
+    /*width:60px;*/
+    /*height:30px;*/
+    /*border:1px solid #ccc;*/
+    /*background-color: #eee;*/
+    /*font-size: 14px;*/
+    /*margin-block-start: 0em;*/
+    /*margin-block-end: 0em;*/
+    /*margin-inline-start: 0px;*/
+    /*margin-inline-end: 0px;*/
+    /*line-height: 30px;*/
+    /*text-align: center;*/
+    /*padding:6.5px 0px;*/
+    /*margin-top: 1px;*/
+/*}*/
+
+#pickerInput {
+    width: 300px;
+    padding: 5px 5px;
+    height:30px;
+    font-size: 14px;
+}
+
+#poiInfo {
+    background: #fff;
+    max-height: 100px;
+    width: 300px;
+}
+
+.amap_lib_placeSearch .poibox.highlight {
+    background-color: #CAE1FF;
+}
+
+.amap_lib_placeSearch .poi-more {
+    display: none!important;
+}
+
+#right {
+    color: #444;
+    background-color: #f8f8f8;
+    width: 40%;
+    float: left;
+    height: 100%;
+}
+
+#start,
+#stop,
+#right input {
+    margin: 4px;
+    margin-left: 15px;
+}
+
+.title {
+    width: 100%;
+    background-color: #dadada
+}
+
+button {
+    border: solid 1px;
+    margin-left: 15px;
+    background-color: #dadafa;
+}
+
+.c {
+    font-weight: 600;
+    padding-left: 15px;
+    padding-top: 4px;
+}
+
+#lnglat,
+#address,
+#nearestJunction,
+#nearestRoad,
+#nearestPOI,
+.title {
+    padding-left: 15px;
+}

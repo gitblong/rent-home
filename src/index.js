@@ -10,6 +10,7 @@ import {Provider, connect} from 'react-redux';
 import reducer from './config/ReducerConfig';
 const store = createStore(reducer);
 require('./styles/map.css');
+require('./styles/UploadImage.css');
 
 class App extends React.Component {
 
