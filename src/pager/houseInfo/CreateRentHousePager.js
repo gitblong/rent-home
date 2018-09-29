@@ -443,6 +443,16 @@ class TextFields extends React.Component {
 
                             </div>
                         </Grid>
+
+                        <Grid item xs="4" className={classes.gridItem}>
+                            <label>面积</label>
+                            <div className={classes.divinput} style={{paddingLeft: 0}}>
+                                <input /><label>平米</label>
+                            </div>
+                        </Grid>
+                    </Grid>
+                    <Grid container xs="12" className={classes.gridContent}>
+
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>朝向</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
@@ -452,9 +462,8 @@ class TextFields extends React.Component {
                                     <option>西北</option>
                                 </select>
                             </div>
+
                         </Grid>
-                    </Grid>
-                    <Grid container xs="12" className={classes.gridContent}>
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>装修级别</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
@@ -475,13 +484,9 @@ class TextFields extends React.Component {
                                 </select>
                             </div>
                         </Grid>
-                        <Grid item xs="4" className={classes.gridItem}>
-                            <label>面积</label>
-                            <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <input /><label>平米</label>
-                            </div>
-                        </Grid>
+
                     </Grid>
+
                     <Grid container xs="12" className={classes.gridContent}>
 
                         <Grid item xs="4" className={classes.gridItem}>
@@ -497,7 +502,7 @@ class TextFields extends React.Component {
                             </div>
                         </Grid>
                         <Grid item xs="4" className={classes.gridItem}>
-                            <label>位置</label>
+                            <label>联系方式</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
                                 <input style={{width: "54%"}}/><Button >点击获取验证码</Button>
                             </div>

@@ -162,13 +162,13 @@ class Header extends React.Component {
                                     onClose={this.handleClose}
                                 >
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to={RouterConfig.myContract.path}>
-                                            {RouterConfig.myContract.pathName}
+                                        <Link className={classes.clearA} to={RouterConfig.myHouses.path}>
+                                            {RouterConfig.myHouses.pathName}
                                         </Link>
                                     </MenuItem>
                                     <MenuItem onClick={this.handleClose}>
-                                        <Link className={classes.clearA} to={RouterConfig.myHouses.path}>
-                                            {RouterConfig.myHouses.pathName}
+                                        <Link className={classes.clearA} to={RouterConfig.myContract.path}>
+                                            {RouterConfig.myContract.pathName}
                                         </Link>
                                     </MenuItem>
                                     <MenuItem onClick={this.handleClose}>

@@ -14,8 +14,8 @@ import grey from "@material-ui/core/colors/grey";
 import TapContractContainer from './TapContractContainer';
 import TapDepositContainer from './TapWithdrawDepositContainer';
 import TapRentContainer from './TapRentContainer';
-import ContractSteps from './ContractSteps';
-import TapContent from './TapContent';
+import HorizontalNonLinearAlternativeLabelStepper from './ContractSteps';
+
 function TabContainer(props) {
     return (
         <Typography component="div" style={{padding: 8 * 3}}>
@@ -71,12 +71,9 @@ const styles = theme =>({
     tabContainer: {
         minHeight: 600,
         backgroundColor: "#f2f5ff"
-    },
-    tapContent:{
-        width:'100%'
     }
 })
-class MyContractsPager extends React.Component {
+class TapContent extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -94,21 +91,27 @@ class MyContractsPager extends React.Component {
         const {value} = this.state;
 
         return (
-            <div className={classes.root}>
-                <ToolBar currentLocation={location} placeText="快速查找我的租赁合同"/>
                 <div className={classes.tabRoot}>
                     <AppBar position="static" className={classes.appBar}>
                         <h3 className={classes.appBarTitle}>嘉和花苑,14幢1单元603</h3>
+                        <Tabs value={value} onChange={this.handleChange} style={{}} className={classes.tabContent}>
+                            <Tab label="租约详情" className={classes.tabItem}/>
+                            <Tab label="押金管理" className={classes.tabItem}/>
+                            <Tab label="租约信息" className={classes.tabItem}/>
+                        </Tabs>
                     </AppBar>
-                    <ContractSteps className={classes.tapContent}/>
-                </div>
+                    <div className={classes.tabContainer}>
+                        {value === 0 && <TapContractContainer>租约详情</TapContractContainer>}
+                        {value === 1 && <TapDepositContainer>押金管理</TapDepositContainer>}
+                        {value === 2 && <TapRentContainer>租约信息</TapRentContainer>}
+                    </div>
             </div>
         )
     }
 }
 
-MyContractsPager.propTypes = {
+TapContent.propTypes = {
     classes: PropTypes.object.isRequired,
 }
 
-export default withStyles(styles)(MyContractsPager);
+export default withStyles(styles)(TapContent);

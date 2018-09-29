@@ -38,31 +38,14 @@ const styles = {
 
     },
     searchInput: {
-        borderRadius: 10,
-        '&:before': {
-            content: '',
-            borderBottom: 0,
-            '&:visited': 'none'
-        },
-        '&:after': {
-            content: '',
-            borderBottom: 0
-        },
-        '&:-webkit-input-placeholder': {
-            color: '#8998a0',
-            fontSize: 18
-        },
-        '&:-webkit-input-placeholder': {
-            color: '#8998a0',
-            fontSize: 18
-        },
-        '&:-ms-input-placeholder': {
-            color: '#8998a0',
-            fontSize: 18
-        },
-        width: '60%',
-
-
+        background: "#fdfeff",
+        border: "none",
+        borderRadius: "4px",
+        width: "420px",
+        height: "60px",
+        boxSizing: "border-box",
+        fontSize: "20px",
+        paddingLeft: "16px",
     },
     searchButton: {
         width: '20%',
@@ -160,9 +143,8 @@ class Middle extends React.Component {
                                 onClick={e => this.openRentTypePopper(0, e)}>
                             {this.state.rentType}<Details className={classes.searchSelectIcon}/>
                         </Button>
-                        <Input
+                        <input
                             className={classes.searchInput}
-                            id="input-with-icon-adornment"
                             placeholder="输入地址"
                         />
                         <Button className={classes.searchButton}>
