@@ -22,7 +22,6 @@ import Checkbox from '@material-ui/core/Checkbox'
 import ImageUploader from 'react-images-upload';
 import rent from '../../statics/images/rent-home.jpg';
 import MapModel from '../../component/MapModel';
-
 const styles = theme => ({
     container: {
         display: 'flex',
@@ -262,8 +261,8 @@ class TextFields extends React.Component {
         ],
         pictures: [],
         openModal: false,
-        imgExtension:['.jpg', '.gif', '.png', '.gif'],
-        maxFileSize:1020*5
+        imgExtension: ['.jpg', '.gif', '.png', '.gif'],
+        maxFileSize: 1020 * 5
     };
 
     constructor() {
@@ -301,7 +300,7 @@ class TextFields extends React.Component {
     render() {
 
         const {classes, location} = this.props;
-        const {imgExtension,maxFileSize} = this.state
+        const {imgExtension, maxFileSize} = this.state
         return (
             <form className={classes.container} noValidate autoComplete="off">
                 <ToolBar currentLocation={location} searchHidden={true} className={classes.toolBar}/>
@@ -553,15 +552,15 @@ class TextFields extends React.Component {
                             <label>选择要上传的图片(支持
                                 {
 
-                                    imgExtension.map((value,index)=>{
+                                    imgExtension.map((value, index)=> {
                                         let s = value;
-                                        if (index < imgExtension.length-1) {
+                                        if (index < imgExtension.length - 1) {
                                             s += "、";
                                         }
                                         return s;
                                     })
 
-                                }格式、且不大于{maxFileSize/1020}M的图片
+                                }格式、且不大于{maxFileSize / 1020}M的图片
                                 )</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
                                 <ImageUploader
