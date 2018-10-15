@@ -22,6 +22,11 @@ import Checkbox from '@material-ui/core/Checkbox'
 import ImageUploader from 'react-images-upload';
 import rent from '../../statics/images/rent-home.jpg';
 import MapModel from '../../component/MapModel';
+import initialHouseInfo from "../../data/HouseInfo";
+
+const ipfsAPI = require('ipfs-api');
+const ipfs = ipfsAPI({host: 'localhost', port: '5001', protocol: 'http'});
+
 const styles = theme => ({
     container: {
         display: 'flex',
@@ -124,7 +129,7 @@ const styles = theme => ({
         },
         "& span input": {
             padding: 0
-        }
+        },
 
 
     },
@@ -151,26 +156,52 @@ const styles = theme => ({
         paddingBottom: 16,
         color: blue[400]
     },
-});
+    buttonStyle: {
+        display: 'flex',
+        alignItem: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        "& button": {
+            alignSelf: 'center',
+            backgroundColor: blue[400],
+            color: '#fff',
+            marginTop: 8,
+            marginBottom: 8,
+            width: 80,
+            height: 40,
+            padding: 4,
+            fontSize: 14,
+            "&:hover": {
+                backgroundColor: '#fff',
+                color: blue[400],
+                border: `1px solid ${blue[400]}`
+            },
+        }
+    },
+    submitButton: {
+        display: 'flex',
+        alignItem: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        "& button": {
+            alignSelf: 'center',
+            backgroundColor: '#413e58',
+            color: '#fff',
+            marginTop: 8,
+            marginBottom: 8,
+            width: 80,
+            height: 40,
+            padding: 4,
+            fontSize: 14,
+            "&:hover": {
+                backgroundColor: '#575473',
+                border: 0,
+            },
+        }
+    }
 
-const currencies = [
-    {
-        value: 'USD',
-        label: '$',
-    },
-    {
-        value: 'EUR',
-        label: '€',
-    },
-    {
-        value: 'BTC',
-        label: '฿',
-    },
-    {
-        value: 'JPY',
-        label: '¥',
-    },
-];
+});
+let detailInfo = initialHouseInfo.detailInfo;
 
 class TextFields extends React.Component {
     state = {
@@ -180,127 +211,210 @@ class TextFields extends React.Component {
         currency: 'EUR',
         value: 'female',
         selectedValue: 'a',
-        equipment: [
-            {
-                value: 'ari',
-                name: '空调',
-                checked: true,
-            },
-            {
-                value: 'balcony',
-                name: '阳台',
-                checked: true,
-            },
-            {
-                value: "broadband",
-                name: '宽度',
-                checked: true,
-            },
-            {
-                value: "desk",
-                name: '写字桌',
-                checked: true,
-            },
-            {
-                value: "doubleBeb",
-                name: '双人床',
-                checked: true,
-            },
-            {
-                value: "dresser",
-                name: '梳妆台',
-                checked: true,
-            },
-            {
-                value: "kitchen",
-                name: '厨房',
-                checked: true,
-            },
-            {
-                value: "refrigerator",
-                name: '冰箱',
-                checked: true,
-            },
-            {
-                value: "singleBel",
-                name: '单人床',
-                checked: true,
-            },
-            {
-                value: 'soft',
-                name: '沙发',
-                checked: true,
-            },
-            {
-                value: "toilet",
-                name: '卫生间',
-                checked: true,
-            },
-            {
-                value: 'tv',
-                name: '电视机',
-                checked: true,
-            },
-            {
-                value: 'washing-machine',
-                name: '洗衣机',
-                checked: true,
-            },
-            {
-                value: 'water-heater',
-                name: '热水器',
-                checked: true,
-            },
-            {
-                value: 'window',
-                name: '飘窗',
-                checked: true,
-            },
-
-
-        ],
-        pictures: [],
+        houseTypeSelectedValue: initialHouseInfo.houseType[0].typeId,
+        rentTypeSelectedValue: initialHouseInfo.houseType[0].typeId,
+        isOwnLiftTypeSelectedValue: initialHouseInfo.isOwnLiftType[0].typeId,
+        equipment: initialHouseInfo.houseEquipment,
+        chooseImgs: [],
         openModal: false,
-        imgExtension: ['.jpg', '.gif', '.png', '.gif'],
-        maxFileSize: 1020 * 5
+        imgExtension: ['.jpg', '.gif', '.png', '.gif', '.jpeg'],
+        maxFileSize: 1020 * 10,
+        initialHouseInfo: initialHouseInfo,
+        selectTotalLevel: 0,
+        selectCurrentLevel: 0,
+        selectRoom: 0,
+        selectHall: 0,
+        selectToilet: 0,
+        selectPledgeNum: 0,
+        selectCashPayNum: 0,
+        houseArea: "",
+        selectOrientationId: 0,
+        selectDecorateLevelId: 0,
+        rentFee: '',
+        locationInfo: {
+            houseNum: "",
+            estatName: "",
+            areas: "",
+            lng: "",//经度
+            lat: "",//纬度
+            detailAddress: ""
+        },
+        telephone: "",
+        detailIntroduce: '',
+        pictureBuffers: [],
+        imgHashArr:[]
     };
 
     constructor() {
-        super()
+        super();
         let elementsByClassName = document.getElementsByClassName('fileContainer');
         let childNodes = elementsByClassName[0]
     }
 
     componentWillMount() {
-        let image = new Image(rent);
-        this.onDrop(image);
+        // let image = new Image(rent);
+        // this.handleChooseImage(image);
     }
 
-    onDrop = (picture) => {
-        this.setState({
-            pictures: this.state.pictures.concat(picture),
-        });
-    }
+    addToIpfs = content => {
+        return new Promise(function (resolve, reject) {
 
-    handleChange = event => {
-        this.setState({selectedValue: event.target.value});
+            ipfs.add(content).then((response) => {
+                resolve(response[0].hash);
+
+            }).catch((err) => {
+                reject(err);
+            })
+        })
+    }
+    handleHouseTypeChange = event => {
+        this.setState({houseTypeSelectedValue: event.target.value});
     };
-    handleOpen = ()=> {
+    handleRentTypeChange = event => {
+        this.setState({rentTypeSelectedValue: event.target.value});
+    };
+    handleIsOwnLiftTypeChange = event => {
+        this.setState({isOwnLiftTypeSelectedValue: event.target.value});
+    };
+    handleSelectTotalLevelChange = event => {
+        this.setState({selectTotalLevel: event.target.value});
+    };
+    handleSelectCurrentLevel = event => {
+        this.setState({selectCurrentLevel: event.target.value});
+    };
+    handleSelectRoom = event => {
+        this.setState({selectRoom: event.target.value});
+    };
+    handleSelectHall = event => {
+        this.setState({selectHall: event.target.value});
+    };
+    handleSelectToilet = event => {
+        this.setState({selectToilet: event.target.value});
+    };
+    handleSelectPledgeNum = event => {
+        this.setState({selectPledgeNum: event.target.value});
+    };
+    handleSelectCashPayNum = event => {
+        this.setState({selectCashPayNum: event.target.value});
+    };
+    handleChangeSelectOrientationId = event => {
+        this.setState({selectOrientationId: event.target.value});
+    };
+    handleChangeSelectDecorateLevelId = event => {
+        this.setState({selectDecorateLevelId: event.target.value})
+    };
+    handleChangeHouseArea = event => {
+        this.setState({houseArea: event.target.value});
+    };
+    handleChangeRentFee = event => {
+        this.setState({rentFee: event.target.value});
+    };
+    handleChangeDetailAddress = event => {
+        let locationInfo = this.state.locationInfo;
+        this.setState({locationInfo: locationInfo})
+    };
+
+    handleChangeTelephone = event => {
+        this.setState({telephone: event.target.value})
+    };
+    handleChangeEquipment = event => {
+        let equipment = this.state.equipment;
+        equipment.map((obj,index)=>{
+            if (index == event.target.value) {
+                obj.checked = !obj.checked;
+            }
+        })
+        this.setState({equipment: equipment});
+
+    };
+    handleChangeDetailIntroduce = event => {
+        this.setState({detailIntroduce: event.target.value});
+    };
+    handleOpen = () => {
         this.setState({
             openModal: true
         })
-    }
+    };
+    handleChooseImage = (picture) => {
+        let pictureBuffers = [];
+        picture.map((obj, index) => {
+            let reader = new FileReader();
+            reader.readAsArrayBuffer(obj);
+            reader.onloadend = e => {
+                pictureBuffers.push(reader);
+                this.setState({
+                    pictureBuffers: pictureBuffers
+                });
+            };
+        });
+    };
+    handleSubmitImgToIpfs = () => {
+        let imgBuffers = new Promise((resolve, reject) => {
+            let imgHashArr = [];
+            this.state.pictureBuffers.map((obj, index) => [
+                this.addToIpfs(Buffer.from(obj.result)).then(result => {
+                    imgHashArr.push(result);
+                    // this.setState({
+                    //     imgHashArr: imgHashArr
+                    // })
+                }).catch(error => {
+                    reject(error);
+                })
 
-    handleClose = ()=> {
+            ]);
+            resolve(imgHashArr);
+
+        });
+        imgBuffers.then(result => {
+            this.setState({
+                imgHashArr: result
+            })
+        }).catch(error => {
+        })
+
+    };
+    handleClose = () => {
         this.setState({
             openModal: false
         })
-    }
-
+    };
+    handleSave = () => {
+        detailInfo.houseType = initialHouseInfo.houseType[this.state.houseTypeSelectedValue];
+        detailInfo.rentType = initialHouseInfo.rentType[this.state.rentTypeSelectedValue];
+        detailInfo.isOwnLiftType = initialHouseInfo.isOwnLiftType[this.state.isOwnLiftTypeSelectedValue];
+        detailInfo.houseFloor.totalLevel = this.state.selectTotalLevel + 1;
+        detailInfo.houseFloor.currentLevel = this.state.selectCurrentLevel + 1;
+        detailInfo.houseAppreciation.room = this.state.selectRoom + 1;
+        detailInfo.houseAppreciation.hall = this.state.selectHall + 1;
+        detailInfo.houseAppreciation.toilet = this.state.selectToilet + 1;
+        detailInfo.payType.cashPledgeNum = this.state.selectPledgeNum + 1;
+        detailInfo.payType.cashPayNum = this.state.selectCashPayNum + 1;
+        detailInfo.houseOrientation = initialHouseInfo.houseOrientation[this.state.selectOrientationId];
+        detailInfo.decorateLevel = initialHouseInfo.decorateLevel[this.state.selectDecorateLevelId];
+        detailInfo.houseArea = this.state.houseArea;
+        detailInfo.rentFee = this.state.rentFee;
+        detailInfo.telephone = this.state.telephone;
+        detailInfo.detailIntroduce = this.state.detailIntroduce;
+        this.state.equipment.map((obj, index) => {
+            if (obj.checked) {
+                detailInfo.houseEquipment.push(obj);
+            }
+        });
+        detailInfo.imageArr = this.state.imgHashArr;
+        detailInfo.locationInfo = this.state.locationInfo;
+        this.addToIpfs([Buffer.from(JSON.stringify(detailInfo))]).then(result => {
+        })
+    };
+    handleConfirm = locationInfo => {
+        this.setState({
+            locationInfo
+        });
+        this.handleClose();
+    };
     render() {
 
         const {classes, location} = this.props;
-        const {imgExtension, maxFileSize} = this.state
+        const {imgExtension, maxFileSize} = this.state;
         return (
             <form className={classes.container} noValidate autoComplete="off">
                 <ToolBar currentLocation={location} searchHidden={true} className={classes.toolBar}/>
@@ -308,112 +422,113 @@ class TextFields extends React.Component {
                     <Typography className={classes.title} variant='title'>
                         填写房源信息
                     </Typography>
-
                     <Grid container xs="12" className={classes.gridContent}>
-                        <Grid item xs="4" className={classes.gridItem}>
-                            <label>出租类型</label>
-                            <div className={classes.divinput}>
-                                <Radio
-                                    checked={this.state.selectedValue === 'a'}
-                                    onChange={this.handleChange}
-                                    value="a"
-                                    name="radio-button-demo"
-                                    aria-label="A"
-                                    classes={{
-                                        root: classes.radioRoot,
-                                        checked: classes.checked
-                                    }}
-                                />
-                                <label>整租</label>
-                                <Radio
-                                    checked={this.state.selectedValue === 'b'}
-                                    onChange={this.handleChange}
-                                    value="b"
-                                    name="radio-button-demo"
-                                    aria-label="B"
-                                    classes={{
-                                        root: classes.radioRoot,
-                                        checked: classes.checked
-                                    }}
-                                />
-                                <label>合租</label>
-                            </div>
-                        </Grid>
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>房源类型</label>
                             <div className={classes.divinput}>
-                                <Radio
-                                    checked={this.state.selectedValue === 'a'}
-                                    onChange={this.handleChange}
-                                    value="a"
-                                    name="radio-button-demo"
-                                    aria-label="A"
-                                    classes={{
-                                        root: classes.radioRoot,
-                                        checked: classes.checked
-                                    }}
-                                />
-                                <label>转租</label>
-                                <Radio
-                                    checked={this.state.selectedValue === 'b'}
-                                    onChange={this.handleChange}
-                                    value="b"
-                                    name="radio-button-demo"
-                                    aria-label="B"
-                                    classes={{
-                                        root: classes.radioRoot,
-                                        checked: classes.checked
-                                    }}
-                                />
-                                <label>非转租</label>
+                                {
+                                    initialHouseInfo.houseType.map((obj, index) => {
+                                        return (
+                                            <div>
+                                                <Radio
+                                                    checked={this.state.houseTypeSelectedValue == index}
+                                                    onChange={this.handleHouseTypeChange}
+                                                    value={index}
+                                                    name="radio-button-demo"
+                                                    aria-label={obj.type}
+                                                    classes={{
+                                                        root: classes.radioRoot,
+                                                        checked: classes.checked
+                                                    }}
+                                                />
+                                                <label>{obj.type}</label>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </Grid>
+                        <Grid item xs="4" className={classes.gridItem}>
+                            <label>出租类型</label>
+                            <div className={classes.divinput}>
+                                {
+                                    initialHouseInfo.rentType.map((obj, index) => {
+                                        return (
+                                            <div>
+                                                <Radio
+                                                    checked={this.state.rentTypeSelectedValue == index}
+                                                    onChange={this.handleRentTypeChange}
+                                                    value={index}
+                                                    name="radio-button-demo"
+                                                    aria-label={obj.type}
+                                                    classes={{
+                                                        root: classes.radioRoot,
+                                                        checked: classes.checked
+                                                    }}
+                                                />
+                                                <label>{obj.type}</label>
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </Grid>
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>有无电梯</label>
                             <div className={classes.divinput}>
-                                <Radio
-                                    checked={this.state.selectedValue === 'a'}
-                                    onChange={this.handleChange}
-                                    value="a"
-                                    name="radio-button-demo"
-                                    aria-label="A"
-                                    classes={{
-                                        root: classes.radioRoot,
-                                        checked: classes.checked
-                                    }}
-                                />
-                                <label>有电梯</label>
-                                <Radio
-                                    checked={this.state.selectedValue === 'b'}
-                                    onChange={this.handleChange}
-                                    value="b"
-                                    name="radio-button-demo"
-                                    aria-label="B"
-                                    classes={{
-                                        root: classes.radioRoot,
-                                        checked: classes.checked
-                                    }}
-                                />
-                                <label>无电梯</label>
+
+                                {
+                                    initialHouseInfo.isOwnLiftType.map((obj, index) => {
+                                        return (
+                                            <div>
+                                                <Radio
+                                                    checked={this.state.isOwnLiftTypeSelectedValue == index}
+                                                    onChange={this.handleIsOwnLiftTypeChange}
+                                                    value={index}
+                                                    name="radio-button-demo"
+                                                    aria-label={obj.type}
+                                                    classes={{
+                                                        root: classes.radioRoot,
+                                                        checked: classes.checked
+                                                    }}
+                                                />
+                                                <label>{obj.type}</label>
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </Grid>
                     </Grid>
-
                     <Grid container xs="12" className={classes.gridContent}>
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>楼层</label>
                             <div className={classes.divinput}>
-                                <label>在</label>
-                                <select>
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
+                                <label>共</label>
+                                <select onChange={this.handleSelectTotalLevelChange}>
+                                    {
+                                        initialHouseInfo.houseFloor.totalLevel.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectTotalLevel == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
-                                <label>层&nbsp;,&nbsp;有 </label>
-                                <select>
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
+                                <label>层&nbsp;,&nbsp;当前 </label>
+                                <select onChange={this.handleSelectCurrentLevel}>
+                                    {
+                                        initialHouseInfo.houseFloor.totalLevel.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectCurrentLevel == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
                                 <label>层 </label>
                             </div>
@@ -421,44 +536,100 @@ class TextFields extends React.Component {
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>房屋户型</label>
                             <div className={classes.divinput}>
-                                <select>
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
+                                <select onChange={this.handleSelectRoom}>
+                                    {
+                                        initialHouseInfo.houseAppreciation.room.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectRoom == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
                                 <label>室</label>
-                                <select>
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
+                                <select onChange={this.handleSelectHall}>
+                                    {
+                                        initialHouseInfo.houseAppreciation.hall.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectHall == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
                                 <label>厅</label>
-                                <select>
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
+                                <select onChange={this.handleSelectToilet}>
+                                    {
+                                        initialHouseInfo.houseAppreciation.toilet.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectToilet == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
                                 <label>卫</label>
 
                             </div>
                         </Grid>
-
                         <Grid item xs="4" className={classes.gridItem}>
-                            <label>面积</label>
+                            <label>付款方式</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <input /><label>平米</label>
+                                <label>押</label>
+                                <select onChange={this.handleSelectPledgeNum}>
+                                    {
+                                        initialHouseInfo.payType.cashPledgeNum.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectPledgeNum == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
+                                </select>
+                                <label>付</label>
+                                <select onChange={this.handleSelectCashPayNum}>
+                                    {
+                                        initialHouseInfo.payType.cashPayNum.map((obj, index) => {
+                                            return (
+                                                <option value={index} selected={this.state.selectCashPayNum == index}
+                                                        key={index}>
+                                                    {obj}
+                                                </option>
+                                            )
+                                        })
+                                    }
+                                </select>
                             </div>
+
                         </Grid>
+
                     </Grid>
                     <Grid container xs="12" className={classes.gridContent}>
 
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>朝向</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <select style={{width: '100%', height: 50}}>
-                                    <option>朝南</option>
-                                    <option>朝北</option>
-                                    <option>西北</option>
+                                <select onChange={this.handleChangeSelectOrientationId}
+                                        style={{width: '100%', height: 50}}>
+                                    {
+                                        initialHouseInfo.houseOrientation.map((obj, index) => {
+                                            return (
+                                                <option value={obj.typeId}
+                                                        selected={this.state.selectOrientationId == index}
+                                                        key={index}>
+                                                    {obj.type}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
 
@@ -466,44 +637,54 @@ class TextFields extends React.Component {
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>装修级别</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <select style={{width: '100%', height: 50}}>
-                                    <option>精装修</option>
-                                    <option>简装修</option>
-                                    <option>高档装修</option>
+                                <select onChange={this.handleChangeSelectDecorateLevelId}
+                                        style={{width: '100%', height: 50}}>
+                                    {
+                                        initialHouseInfo.decorateLevel.map((obj, index) => {
+                                            return (
+                                                <option value={obj.typeId}
+                                                        selected={this.state.selectDecorateLevelId == index}
+                                                        key={index}>
+                                                    {obj.type}
+                                                </option>
+                                            )
+                                        })
+                                    }
                                 </select>
                             </div>
                         </Grid>
+
                         <Grid item xs="4" className={classes.gridItem}>
-                            <label>付款方式</label>
+                            <label>面积</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <select style={{width: '100%', height: 50}}>
-                                    <option>押一付一</option>
-                                    <option>压一付三</option>
-                                    <option>压一付四</option>
-                                </select>
+                                <input onChange={this.handleChangeHouseArea}
+                                       value={this.state.houseArea}/><label>平米</label>
                             </div>
                         </Grid>
 
                     </Grid>
-
                     <Grid container xs="12" className={classes.gridContent}>
 
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>房租</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <input/><label>元/月</label>
+                                <input onChange={this.handleChangeRentFee}
+                                       value={this.state.rentFee}/><label>元/月</label>
                             </div>
                         </Grid>
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>位置</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <input style={{width: "69%"}}/><Button onClick={()=>this.handleOpen()}>选取地址</Button>
+                                <input value={this.state.locationInfo.detailAddress}
+                                       onChange={this.handleChangeDetailAddress} style={{width: "69%"}}/><Button
+                                onClick={() => this.handleOpen()}>选取地址</Button>
                             </div>
                         </Grid>
                         <Grid item xs="4" className={classes.gridItem}>
                             <label>联系方式</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <input style={{width: "54%"}}/><Button >点击获取验证码</Button>
+                                <input value={this.state.telephone} onChange={this.handleChangeTelephone}
+                                       style={{width: "54%"}}/><Button>点击获取验证码</Button>
                             </div>
                         </Grid>
 
@@ -513,28 +694,27 @@ class TextFields extends React.Component {
                             <label>选择房间配置</label>
                             <div className={classes.divinput}>
                                 {
-                                    this.state.equipment.map((value, index)=> {
+                                    this.state.equipment.map((obj, index) => {
                                         return (
                                             <div style={{width: '150px'}}>
                                                 <Checkbox
-                                                    onChange={this.handleChange}
-                                                    value={value.value}
+                                                    onChange={this.handleChangeEquipment}
+                                                    value={index}
                                                     color={blue[400]}
-                                                    checked={value.checked}
+                                                    checked={obj.checked}
                                                     classes={{
                                                         root: classes.radioRoot,
                                                         checked: classes.checked
                                                     }}
+                                                    key={index}
                                                 />
                                                 <label>
-                                                    {value.name}
+                                                    {obj.name}
                                                 </label>
                                             </div>
                                         )
                                     })
                                 }
-
-
                             </div>
                         </Grid>
                     </Grid>
@@ -542,17 +722,17 @@ class TextFields extends React.Component {
                         <Grid item xs="12" className={classes.gridItem}>
                             <label>详细描述</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
-                                <textarea/>
+                                <textarea onChange={this.handleChangeDetailIntroduce}
+                                          value={this.state.detailIntroduce}/>
                             </div>
                         </Grid>
                     </Grid>
-
                     <Grid container xs="12" className={classes.gridContent}>
                         <Grid item xs="12" className={classes.gridItem}>
                             <label>选择要上传的图片(支持
                                 {
 
-                                    imgExtension.map((value, index)=> {
+                                    imgExtension.map((value, index) => {
                                         let s = value;
                                         if (index < imgExtension.length - 1) {
                                             s += "、";
@@ -560,23 +740,28 @@ class TextFields extends React.Component {
                                         return s;
                                     })
 
-                                }格式、且不大于{maxFileSize / 1020}M的图片
+                                }格式的图片
                                 )</label>
                             <div className={classes.divinput} style={{paddingLeft: 0}}>
                                 <ImageUploader
                                     withIcon={true}
-                                    buttonText='Choose images'
-                                    onChange={this.onDrop}
+                                    onChange={this.handleChooseImage}
+                                    buttonText="选择文件"
                                     imgExtension={imgExtension}
-                                    maxFileSize={maxFileSize}
+                                    // maxFileSize={maxFileSize}
                                     withPreview="true"
                                 />
+                                <div onClick={this.handleSubmitImgToIpfs} className={classes.submitButton}>
+                                    <Button>提交</Button>
+                                </div>
                             </div>
                         </Grid>
                     </Grid>
-
+                    <div className={classes.buttonStyle} onClick={this.handleSave}>
+                        <Button>保存</Button>
+                    </div>
                 </div>
-                <MapModel open={this.state.openModal} handleOpen={this.handleOpen} handleClose={this.handleClose}
+                <MapModel open={this.state.openModal} handleConfirm={this.handleConfirm} handleOpen={this.handleOpen} handleClose={this.handleClose}
                           image={this.state.image}/>
             </form>
         )

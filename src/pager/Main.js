@@ -19,16 +19,14 @@ import CreateContractPager from "./contractInfo/CreateContractPager";
 import ContractDetailPager from "./contractInfo/ContractDetailPager";
 import RouterConfig from "../config/RouteConfig";
 import {connect} from "react-redux";
-import {MapStateToProps, MapDispatchToProps} from "../config/ReduxMapToPropsConfig";
+import {MapDispatchToProps, MapStateToProps} from "../config/ReduxMapToPropsConfig";
 
-import pagination from '../styles/pagination.css';
 require('../../node_modules/react-id-swiper/src/styles/css/swiper.css');
 require('../styles/Swiper.css');
 const styles = {
     clearFix: {
         zoom: 1,
         "&:before": {
-
             display: 'block',
             // visibility: 'hidden',
             clear: 'both',
@@ -42,7 +40,7 @@ class Main extends React.Component {
 
 
     render() {
-        const {classes} = this.props
+        const {classes} = this.props;
         return (
             <div onClick={this.props.onClose}>
                 <Router>

@@ -90,7 +90,24 @@ const styles = theme => ({
         marginLeft: 32
     }
 });
+
 class MapModel extends React.Component {
+    handleChangeAreas = (event) => {
+        this.setState({
+            streetInfo: this.state.selectArray[event.target.value]
+        });
+    };
+    handleChangeHouseNum = (event) => {
+        this.setState({
+            houseNum: event.target.value
+        });
+    };
+    handleChangeEstatName = (event) => {
+        this.setState({
+            name: event.target.value
+        });
+    };
+
     constructor() {
         super();
         this.state = {
@@ -108,7 +125,11 @@ class MapModel extends React.Component {
             street: '',       //街
             township: '',       //街道
             name: '',            //房源名称
-        }
+            areas: "",
+            houseNum: '',
+            estatName: '',
+            streetInfo: {}
+        };
         //地图的事件监听
         this.mapEvents = {
             created: (map) => {
@@ -143,10 +164,10 @@ class MapModel extends React.Component {
 
     }
 
-    changeSelectArray = (adcode)=> {
+    changeSelectArray = (adcode) => {
         let selectArray = new Array();
         let self = this;
-        streets.map((street, index)=> {
+        streets.map((street, index) => {
             let name = street.name;
             if (street.areaCode == adcode) {
                 if (name.charAt(name.length - 1) != '乡' && name.charAt(name.length - 1) != '镇') {
@@ -154,6 +175,12 @@ class MapModel extends React.Component {
                     let str = street.name == self.state.township;
                     if (str) {
                         street.selected = true;
+                        this.setState({
+                            areas: street.name
+                        })
+                        this.setState({
+                            streetInfo: street
+                        })
                     } else {
                         street.selected = false;
                     }
@@ -170,7 +197,7 @@ class MapModel extends React.Component {
      * @param lnglat 经纬度
      * @param map   当前地图
      */
-    getAddressDetail = (lnglat, map)=> {
+    getAddressDetail = (lnglat, map) => {
 
         let self = this;
         let point = [lnglat.lng, lnglat.lat];
@@ -203,7 +230,7 @@ class MapModel extends React.Component {
                     var address = result.regeocode.formattedAddress;
                     let streetNumber = addressComponent.streetNumber;
                     let detailAddress = address + streetNumber;
-                    self.changeSelectArray(addressComponent.adcode)
+
                     let name = addressComponent.street + streetNumber;
                     self.setState({
                         detailAddress: detailAddress,
@@ -215,6 +242,7 @@ class MapModel extends React.Component {
                         streetNumber: streetNumber,
                         name: name
                     });
+                    self.changeSelectArray(addressComponent.adcode);
                     self.InfoWindow(map, location, detailAddress, marker);
                 } else {
                     //获取地址失败
@@ -223,7 +251,7 @@ class MapModel extends React.Component {
             });
         })
     }
-    searchInit = ()=> {
+    searchInit = () => {
         let self = this;
         let map = self.state.map;
         AMapUI.loadUI(['misc/PoiPicker', 'misc/PositionPicker'], function (PoiPicker) {
@@ -263,7 +291,7 @@ class MapModel extends React.Component {
      * poi搜索查询
      * @param poiPicker
      */
-    poiPickerReady = (poiPicker)=> {
+    poiPickerReady = (poiPicker) => {
         let map = this.state.map;
         let self = this;
         window.poiPicker = poiPicker;
@@ -286,7 +314,7 @@ class MapModel extends React.Component {
     /**
      *通过Geolocation插件设置当前位置
      */
-    setCurrentPosition = ()=> {
+    setCurrentPosition = () => {
         let self = this;
         let map = self.state.map;
         let AMap = window.AMap;
@@ -328,16 +356,28 @@ class MapModel extends React.Component {
     }
 
     render() {
-        const {classes, open, handleClose} = this.props;
+        const {
+            classes, open, handleClose,
+            handleConfirm
+        } = this.props;
         const plugins = [{
             name: 'ToolBar',
             options: {
                 visible: true,  // 不设置该属性默认就是 true
-                onCreated(ins){
+                onCreated(ins) {
                 },
             },
         }];
-        const {mapVersion, amapke, lng, lat, detailAddress, adcode, map, markers, selectArray, township, district, stree, name,}= this.state;
+        const {
+            mapVersion,
+            amapke,
+            lng, lat,
+            detailAddress,
+            adcode, map,
+            markers, selectArray,
+            township, district,
+            stree, name, areas, houseNum
+        } = this.state;
         return (
             <div>
                 <Modal
@@ -356,19 +396,19 @@ class MapModel extends React.Component {
                                 <Typography>
                                     楼层/房号
                                 </Typography>
-                                <input/>
+                                <input onChange={this.handleChangeHouseNum} value={houseNum}/>
                                 <Typography>
                                     小区名称
                                 </Typography>
-                                <input value={name}/>
+                                <input value={name} onChange={this.handleChangeEstatName}/>
                                 <Typography>
-                                    商圈
+                                    街道
                                 </Typography>
-                                <select>
+                                <select onChange={this.handleChangeAreas}>
                                     {
-                                        selectArray.map((value, index)=> {
+                                        selectArray.map((obj, index) => {
                                             return (
-                                                <option selected={value.selected}>{value.name}</option>
+                                                <option selected={obj.selected} value={index}>{obj.name}</option>
                                             )
                                         })
                                     }
@@ -397,8 +437,17 @@ class MapModel extends React.Component {
                                      useAMapUI
                                 >
                                     <div id="pickerBox">
-                                        <div style={{border:`1px solid ${grey[400]}`,display:'flex',alignItems:'center',backgroundColor:grey[200]}}>
-                                            <span style={{width:50,textAlign:'center',color:grey[800]}}>搜索</span><input id="pickerInput" placeholder="输入关键字选取地点"/>
+                                        <div style={{
+                                            border: `1px solid ${grey[400]}`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            backgroundColor: grey[200]
+                                        }}>
+                                            <span style={{
+                                                width: 50,
+                                                textAlign: 'center',
+                                                color: grey[800]
+                                            }}>搜索</span><input id="pickerInput" placeholder="输入关键字选取地点"/>
                                         </div>
                                         <div id="poiInfo"></div>
                                     </div>
@@ -406,7 +455,17 @@ class MapModel extends React.Component {
                             </div>
                             <div className={classes.contentBottom}>
                                 <Button
-                                    className={classes.confirmButton}>确认</Button>
+                                    className={classes.confirmButton} onClick={() => {
+                                    handleConfirm({
+                                        houseNum: houseNum,
+                                        estatName: this.state.name,
+                                        streetInfo: this.state.streetInfo,
+                                        lng: lng,//经度
+                                        lat: lat,//纬度
+                                        detailAddress: detailAddress,
+                                    })
+
+                                }}>确认</Button>
                                 <Button className={classes.backButton} onClick={handleClose}>返回</Button>
                             </div>
                         </div>
