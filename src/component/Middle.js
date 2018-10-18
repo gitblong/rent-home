@@ -20,6 +20,7 @@ import transaction from "../statics/images/transaction.svg";
 import safe from "../statics/images/safe.svg";
 import RouterConfig from "../config/RouteConfig";
 import Link from "react-router-dom/Link";
+
 var image = require('../statics/images/rent-home.jpg');
 const styles = {
     search: {
@@ -46,12 +47,14 @@ const styles = {
         boxSizing: "border-box",
         fontSize: "20px",
         paddingLeft: "16px",
+        marginTop: 4
     },
     searchButton: {
         width: '20%',
         height: 60,
         fontSize: 22,
-        color: '#42b5ff'
+        color: '#42b5ff',
+        marginBottom: 2
     },
     imageCard: {
         width: '100%',
@@ -62,7 +65,8 @@ const styles = {
     searchSelect: {
         width: '20%',
         height: 60,
-        fontSize: 18
+        fontSize: 18,
+        marginBottom: 6
 
     },
     searchSelectIcon: {
@@ -104,34 +108,45 @@ const styles = {
         textDecorationLine: 'none'
     }
 };
+
 class Middle extends React.Component {
     state = {
         rentTypeAnchorEl: null,
         rentTypePopperOpen: false,
-        rentType: '全部',
-        clickPopperId: ''
-    }
-    openRentTypePopper = (value, event)=> {
+        currentRentType: {
+            type: '全部',
+            typeId: 3
+        },
+        clickPopperId: '',
+        detailAddress: ''
+    };
+    openRentTypePopper = (value, event) => {
         event.preventDefault();
         const currentTarget = event.currentTarget;
-        this.setState(state =>({
+        this.setState(state => ({
             rentTypeAnchorEl: this.state.rentTypeAnchorEl == null ? currentTarget : null,
             rentTypePopperOpen: !state.rentTypePopperOpen,
             clickPopperId: state.clickPopperId
 
         }));
-        if (value == 0) {
+        if (value.typeId == this.state.currentRentType.typeId) {
             return;
         }
-        this.setState(state =>({
-            rentType: value
+        this.setState(state => ({
+            currentRentType: value
         }));
 
     }
+    changeDetailAddress = (e) => {
+        this.setState({
+            detailAddress: e.target.value
+        });
+    };
 
     render() {
-        const {classes}= this.props;
+        const {classes} = this.props;
 
+        let state = this.state;
         return (
             <div>
                 <CardMedia
@@ -140,22 +155,26 @@ class Middle extends React.Component {
                 >
                     <div className={classes.search}>
                         <Button id="rentTypeId" className={classes.searchSelect}
-                                onClick={e => this.openRentTypePopper(0, e)}>
-                            {this.state.rentType}<Details className={classes.searchSelectIcon}/>
+                                onClick={e => this.openRentTypePopper(state.currentRentType, e)}>
+                            {state.currentRentType.type}<Details className={classes.searchSelectIcon}/>
                         </Button>
                         <input
                             className={classes.searchInput}
                             placeholder="输入地址"
+                            value={state.detailAddress}
+                            onChange={this.changeDetailAddress}
                         />
                         <Button className={classes.searchButton}>
-                            <Link to={RouterConfig.areaSearch} className={classes.clearA}>
+                            <Link
+                                to={`${RouterConfig.areaSearch.path}?rentType=${state.currentRentType.type}&detailAddress=${state.detailAddress}`}
+                                className={classes.clearA}>
                                 马上找房
                             </Link>
                         </Button>
                     </div>
                 </CardMedia>
-                <RentTypePopper anchorEl={this.state.rentTypeAnchorEl} open={this.state.rentTypePopperOpen}
-                                handler={this.openRentTypePopper} clickPopperId={this.state.clickPopperId}/>
+                <RentTypePopper anchorEl={state.rentTypeAnchorEl} open={state.rentTypePopperOpen}
+                                handler={this.openRentTypePopper} clickPopperId={state.clickPopperId}/>
                 <Grid container xs={12} className={classes.contentLayout} spacing={24}>
                     <Grid item xs={3}>
                         <Card className={classes.contentCard}>
@@ -234,6 +253,7 @@ class Middle extends React.Component {
         );
     }
 }
+
 Middle.propTypes = {
     classes: PropTypes.object.isRequired,
 };

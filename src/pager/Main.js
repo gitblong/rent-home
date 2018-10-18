@@ -32,40 +32,55 @@ const styles = {
             clear: 'both',
             height: 0,
             content: 'dsfsf'
-        }
+        },
+
     }
-}
+};
+
 
 class Main extends React.Component {
+    state = {
+        loading: true
+    };
+
+    constructor(props) {
+        super(props);
+    }
 
 
     render() {
-        const {classes} = this.props;
+        const {classes,store} = this.props;
+        console.log(this.props);
         return (
-            <div onClick={this.props.onClose}>
-                <Router>
-                    <div>
-                        <Header/>
-                        <main className={classes.clearFix}>
-                            <Switch>
-                                <Route path='/' exact component={Home}/>
-                                <Route path={RouterConfig.areaSearch.path} exact component={AreaSearchPager}/>
-                                <Route path={RouterConfig.houseDetail.path} exact component={HouseDetailPager}/>
-                                <Route path={RouterConfig.creatRentHouse.path} exact component={CreateRentHousePager}/>
-                                <Route path={RouterConfig.myHouses.path} exact component={MyHousesPager}/>
 
-                                <Route path={RouterConfig.myContract.path} exact component={MyContractsPager}/>
-                                <Route path={RouterConfig.createContract.path} exact component={CreateContractPager}/>
-                                <Route path={RouterConfig.contractDetail.path} exact component={ContractDetailPager}/>
+                <div onClick={this.props.onClose}>
+                    <Router>
+                        <div>
+                            <Header/>
+                            <main className={classes.clearFix}>
+                                <Switch>
+                                    <Route path='/' exact component={Home}/>
+                                    <Route path={RouterConfig.areaSearch.path} exact component={AreaSearchPager}/>
+                                    <Route path={RouterConfig.houseDetail.path} exact component={HouseDetailPager}/>
+                                    <Route path={RouterConfig.creatRentHouse.path} exact
+                                           component={CreateRentHousePager}/>
+                                    <Route path={RouterConfig.myHouses.path} exact component={MyHousesPager}/>
 
-                            </Switch>
-                        </main>
-                        <Footer/>
-                    </div>
-                </Router>
-            </div>
+                                    <Route path={RouterConfig.myContract.path} exact component={MyContractsPager}/>
+                                    <Route path={RouterConfig.createContract.path} exact
+                                           component={CreateContractPager}/>
+                                    <Route path={RouterConfig.contractDetail.path} exact
+                                           component={ContractDetailPager}/>
+
+                                </Switch>
+                            </main>
+                            <Footer/>
+                        </div>
+                    </Router>
+                </div>
         );
     }
 }
+
 Main = connect(MapStateToProps, MapDispatchToProps)(Main);
 export default withStyles(styles)(Main);

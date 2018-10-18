@@ -274,7 +274,7 @@ class MapModel extends React.Component {
      * @constructor
      */
     InfoWindow = (map, location, address, marker) => {
-        AMap = window.AMap;
+        let AMap = window.AMap;
         var infoWindow = new AMap.InfoWindow({
             offset: new AMap.Pixel(5, -5)
         });

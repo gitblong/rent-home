@@ -23,9 +23,14 @@ import ImageUploader from 'react-images-upload';
 import rent from '../../statics/images/rent-home.jpg';
 import MapModel from '../../component/MapModel';
 import initialHouseInfo from "../../data/HouseInfo";
+import {connect} from "react-redux";
+import {MapDispatchToProps, MapStateToProps} from "../../config/ReduxMapToPropsConfig";
+// import {addHouseInfo}from '../../smart-contract-ipfs/HouseInfoContract';
 
-const ipfsAPI = require('ipfs-api');
-const ipfs = ipfsAPI({host: 'localhost', port: '5001', protocol: 'http'});
+//
+// console.log(addHouseInfo("test"));
+// console.log(window.drizzle, window.drizzleState);
+
 
 const styles = theme => ({
     container: {
@@ -203,6 +208,7 @@ const styles = theme => ({
 });
 let detailInfo = initialHouseInfo.detailInfo;
 
+
 class TextFields extends React.Component {
     state = {
         name: 'Cat in the Hat',
@@ -242,7 +248,7 @@ class TextFields extends React.Component {
         telephone: "",
         detailIntroduce: '',
         pictureBuffers: [],
-        imgHashArr:[]
+        imgHashArr: []
     };
 
     constructor() {
@@ -256,17 +262,6 @@ class TextFields extends React.Component {
         // this.handleChooseImage(image);
     }
 
-    addToIpfs = content => {
-        return new Promise(function (resolve, reject) {
-
-            ipfs.add(content).then((response) => {
-                resolve(response[0].hash);
-
-            }).catch((err) => {
-                reject(err);
-            })
-        })
-    }
     handleHouseTypeChange = event => {
         this.setState({houseTypeSelectedValue: event.target.value});
     };
@@ -319,7 +314,7 @@ class TextFields extends React.Component {
     };
     handleChangeEquipment = event => {
         let equipment = this.state.equipment;
-        equipment.map((obj,index)=>{
+        equipment.map((obj, index) => {
             if (index == event.target.value) {
                 obj.checked = !obj.checked;
             }
@@ -351,8 +346,10 @@ class TextFields extends React.Component {
     handleSubmitImgToIpfs = () => {
         let imgBuffers = new Promise((resolve, reject) => {
             let imgHashArr = [];
-            this.state.pictureBuffers.map((obj, index) => [
-                this.addToIpfs(Buffer.from(obj.result)).then(result => {
+            this.state.pictureBuffers.map((obj, index) => {
+                this.props.ipfsUtils
+                    .addToIpfs(Buffer.from(obj.result)).then(result => {
+                    console.log(result);
                     imgHashArr.push(result);
                     // this.setState({
                     //     imgHashArr: imgHashArr
@@ -361,7 +358,7 @@ class TextFields extends React.Component {
                     reject(error);
                 })
 
-            ]);
+            });
             resolve(imgHashArr);
 
         });
@@ -379,6 +376,8 @@ class TextFields extends React.Component {
         })
     };
     handleSave = () => {
+        let {drizzle, ipfsUtils, drizzleState} = this.props;
+        console.log(drizzleState);
         detailInfo.houseType = initialHouseInfo.houseType[this.state.houseTypeSelectedValue];
         detailInfo.rentType = initialHouseInfo.rentType[this.state.rentTypeSelectedValue];
         detailInfo.isOwnLiftType = initialHouseInfo.isOwnLiftType[this.state.isOwnLiftTypeSelectedValue];
@@ -395,14 +394,20 @@ class TextFields extends React.Component {
         detailInfo.rentFee = this.state.rentFee;
         detailInfo.telephone = this.state.telephone;
         detailInfo.detailIntroduce = this.state.detailIntroduce;
+        let arr = [];
         this.state.equipment.map((obj, index) => {
             if (obj.checked) {
-                detailInfo.houseEquipment.push(obj);
+                arr.push(obj);
             }
         });
+        detailInfo.houseEquipment = arr;
         detailInfo.imageArr = this.state.imgHashArr;
         detailInfo.locationInfo = this.state.locationInfo;
-        this.addToIpfs([Buffer.from(JSON.stringify(detailInfo))]).then(result => {
+        console.log('details', detailInfo);
+
+        ipfsUtils.addToIpfs([Buffer.from(JSON.stringify(detailInfo), 'utf-8')]).then(result => {
+            console.log(result);
+            ipfsUtils.addHashToHouseInfoContracts(result);
         })
     };
     handleConfirm = locationInfo => {
@@ -411,8 +416,10 @@ class TextFields extends React.Component {
         });
         this.handleClose();
     };
-    render() {
 
+    render() {
+        console.log(this.state);
+        console.log(this.state, this.props);
         const {classes, location} = this.props;
         const {imgExtension, maxFileSize} = this.state;
         return (
@@ -761,7 +768,8 @@ class TextFields extends React.Component {
                         <Button>保存</Button>
                     </div>
                 </div>
-                <MapModel open={this.state.openModal} handleConfirm={this.handleConfirm} handleOpen={this.handleOpen} handleClose={this.handleClose}
+                <MapModel open={this.state.openModal} handleConfirm={this.handleConfirm} handleOpen={this.handleOpen}
+                          handleClose={this.handleClose}
                           image={this.state.image}/>
             </form>
         )
@@ -772,5 +780,5 @@ class TextFields extends React.Component {
 TextFields.propTypes = {
     classes: PropTypes.object.isRequired,
 };
-
+TextFields = connect(MapStateToProps, MapDispatchToProps)(TextFields);
 export default withStyles(styles)(TextFields);

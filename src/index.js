@@ -4,23 +4,36 @@ import ReactDOM from "react-dom";
 import Main from "./pager/Main";
 import {createStore} from "redux";
 import {Provider} from "react-redux";
-import reducer from "./config/ReducerConfig";
+import {
+    CHANGE_CURRENT_CITY,
+    CHANGE_HOUSE_INFO_BY_CONDITION,
+    CLOSE_POSITION_POPPER,
+    INIT_IPFS_UTILS,
+    OPEN_POSITION_POPPER
+} from './constants/ActionTypes';
+
+import HouseInfo from "./contracts/HouseInfo.json";
+import ArrayStorage from "./contracts/ArrayStorage.json";
+import {Drizzle, generateStore} from "drizzle";
+import {IPFSUtils} from "./smart-contract-ipfs/IPFSUtils";
+
 require('./styles/map.css');
 require('./styles/UploadImage.css');
 require('./styles/pagination.css');
-import {Drizzle, generateStore} from "drizzle";
-import HouseInfo from "./contracts/HouseInfo.json";
-import ArrayStorage from "./contracts/ArrayStorage.json";
 
 const options = {contracts: [HouseInfo,ArrayStorage]};
 const drizzleStore = generateStore(options);
 const drizzle = new Drizzle(options, drizzleStore);
 
-const store = createStore(reducer);
+const ipfsAPI = require('ipfs-api');
+const ipfs = ipfsAPI({host: 'localhost', port: '5001', protocol: 'http'});
+
+
 class App extends React.Component {
     state = {
         loading: true,
-        drizzleState: null
+        drizzleState: null,
+        store:null
     };
     constructor(props) {
         super(props);
@@ -29,16 +42,17 @@ class App extends React.Component {
 
     componentDidMount(){
 
+        // this.initReducer();
         this.unsubscribe = drizzle.store.subscribe(() => {
             const drizzleState = drizzle.store.getState();
             if (drizzleState.drizzleStatus.initialized) {
+                this.initReducer(drizzle);
                 this.setState({
                     loading: false,
-                    drizzleState
-                })
+                    drizzleState,
+                    drizzle
+                });
             }
-            window.drizzle = drizzle;
-            window.drizzleState = drizzleState;
         })
 
     }
@@ -47,8 +61,83 @@ class App extends React.Component {
         this.unsubscribe();
     }
 
+    initReducer = (drizzle => {
+        let ipfsUtils = new IPFSUtils(ipfs, drizzle);
+        let allHouseInfoData = ipfsUtils.init();
+        console.log(allHouseInfoData);
+        let houseInfoByCondition = new Promise(resolve => {
+            allHouseInfoData.then(result => {
+                let houseInfoByCondition = ipfsUtils.getHouseInfoByCondition(result, '3301');
+                resolve(houseInfoByCondition);
+            });
+        });
+        console.log(houseInfoByCondition);
+        const initialState = {
+            text: 'Hello',
+            isOpen: false,
+            currentCity: {
+                name: '杭州',
+                code: '3301'
+            },
+            init: true,
+            allHouseInfoData,
+            houseInfoByCondition,
+            ipfsUtils
+        };
+        const reducer = (state = initialState, action, option) => {
+            switch (action.type) {
+                case 'CHANGE_TEXT':
+                    return {
+                        ...state,
+                        text: state.text == 'Hello' ? 'world' : 'Hello'
+                    };
+                case 'BUTTON_CLICK':
+                    return {
+                        ...state,
+                        text: 'Hello world'
+                    };
+                case OPEN_POSITION_POPPER:
+                    console.log("OPEN_POSITION_POPPER", OPEN_POSITION_POPPER);
+                    return {
+                        ...state,
+                        isOpen: !state.isOpen,
+                    };
+                case CLOSE_POSITION_POPPER:
+                    return {
+                        ...state,
+                        isOpen: false,
+                        rentTypeAnchorEl: null
+                    };
+                case INIT_IPFS_UTILS:
+                    console.log(action.ipfsUtils);
+                    return {
+                        ...state,
+                        ipfsUtils: ipfsUtils
+                    };
+                case CHANGE_CURRENT_CITY:
+                    console.log(action.currentCity);
+                    return {
+                        ...state,
+                        currentCity: action.currentCity
+                    };
+                case CHANGE_HOUSE_INFO_BY_CONDITION:
+                    console.log("CHANGE_HOUSE_INFO_BY_CONDITION", action.houseInfoByCondition);
+                    return {
+                        ...state,
+                        init: false,
+                        houseInfoByCondition: action.houseInfoByCondition
+                    };
+                default:
+                    return initialState;
+            }
+        };
+        const store = createStore(reducer);
+        this.setState({
+            store
+        })
+    });
     render() {
-        let {loading,drizzleState} = this.state;
+        let {loading,drizzleState,store} = this.state;
         if(loading) return <div>loading smart contract</div>;
         return (
 

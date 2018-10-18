@@ -105,7 +105,7 @@ export default {
     rentFee: 1800,
     houseEquipment: [
         {
-            value: 'ari',
+            value: 'air',
             name: '空调',
             checked: false,
         },
@@ -116,7 +116,7 @@ export default {
         },
         {
             value: "broadband",
-            name: '宽度',
+            name: '宽带',
             checked: false,
         },
         {
@@ -125,7 +125,7 @@ export default {
             checked: false,
         },
         {
-            value: "doubleBeb",
+            value: "doubleBed",
             name: '双人床',
             checked: false,
         },
@@ -145,12 +145,12 @@ export default {
             checked: false,
         },
         {
-            value: "singleBel",
+            value: "singleBed",
             name: '单人床',
             checked: false,
         },
         {
-            value: 'soft',
+            value: 'sofa',
             name: '沙发',
             checked: false,
         },
@@ -165,12 +165,12 @@ export default {
             checked: false,
         },
         {
-            value: 'washing-machine',
+            value: 'washingMachine',
             name: '洗衣机',
             checked: false,
         },
         {
-            value: 'water-heater',
+            value: 'waterHeater',
             name: '热水器',
             checked: false,
         },

@@ -3,7 +3,9 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles}from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
+
+let log = "Pagination-----------";
 const styles = (theme) => ({
     pageText: {
         'line-height': '35px',
@@ -12,6 +14,7 @@ const styles = (theme) => ({
         color: '#42b5ff'
     }
 })
+
 class Pagination extends React.Component {
 
     state = {
@@ -19,23 +22,53 @@ class Pagination extends React.Component {
         pageSize: 10,
         pageNoStart: 1,
         pageNoEnd: 10,
-        pageNoArr: [],
-        currentPageNoArr: []
+        pageNoArr:new Array(),
+        currentPageNoArr: [],
+    };
+
+    constructor(props) {
+        super(props);
     }
 
-    componentWillMount() {
-        let arr = new Array();
-        for (let i = 1; i <= 100; i++) {
+    componentDidMount() {
+        console.log(log, "componentDidMount");
+        let {page, pageSize, pageCount, total} = this.props;
+        let arr = [];
+        for (let i = 1; i <= pageCount; i++) {
             arr.push(i);
         }
         this.setState({
             pageNoArr: arr,
-            maxPage: 100,
-            total: 10000
-        })
+            maxPage: pageCount,
+            total: total,
+            pageSize: pageSize,
+            currentPageNo: page
+        });
         this.initialPageNo();
     }
 
+
+    componentWillReceiveProps(nextProps, state) {
+        console.log(log, "shouldComponentUpdate", state.maxPage != nextProps.pageCount, nextProps, state);
+        let {page, pageSize, pageCount, total} = nextProps;
+        let arr = [];
+        for (let i = 1; i <= pageCount; i++) {
+            arr.push(i);
+        }
+        if (state.maxPage != nextProps.pageCount) {
+            console.log(arr);
+            this.setState({
+                pageNoArr: arr,
+                maxPage: pageCount,
+                total: total,
+                pageSize: pageSize,
+                currentPageNo: page
+            });
+            this.initialPageNo();
+        }
+        // return state.maxPage != nextProps.pageCount;
+
+    }
 
     initialPageNo() {
         let pageNoEnd = this.state.pageNoEnd;
@@ -49,10 +82,12 @@ class Pagination extends React.Component {
     }
 
 
-    currentPage = (value)=> {
+    currentPage = (value) => {
+        let {changePage,} = this.props;
         this.setState({
             currentPageNo: value
-        })
+        });
+        changePage(value);
         let maxPage = this.state.maxPage;
         let pageNoEnd = this.state.pageNoEnd;
         let pageNoStart = this.state.pageNoStart;
@@ -93,19 +128,20 @@ class Pagination extends React.Component {
     }
 
     render() {
+        console.log(log, "render", this.state);
         const {classes} = this.props;
         const {currentPageNoArr, pageNoStart, pageNoEnd, pageNoArr, currentPageNo, maxPage, total} = this.state;
         return (
             <ul class="pagination">
 
-                <li><a onClick={()=>this.upPage()} key="0">上一页</a></li>
+                <li><a onClick={() => this.upPage()} key="0">上一页</a></li>
                 {
-                    pageNoArr.map((value, index)=> {
+                    pageNoArr.map((value, index) => {
                         var cla = ((pageNoStart <= value) && (pageNoEnd >= value)) ? "" : "pageHidden"
                         cla += " " + ((currentPageNo == value) ? "pageShow" : "")
                         return (
                             <li
-                                onClick={()=>this.currentPage(value)}
+                                onClick={() => this.currentPage(value)}
                                 key={value}
                             >
                                 <a class={cla} key={value}>
@@ -115,13 +151,14 @@ class Pagination extends React.Component {
                         )
                     })
                 }
-                <li onClick={()=>this.nextPage()}><a key='10000'>下一页</a></li>
-                <span className={classes.pageText}>{currentPageNo}页/共{maxPage}页</span>
+                <li onClick={() => this.nextPage()}><a key='10000'>下一页</a></li>
+                <span className={classes.pageText}>第{currentPageNo}页/共{maxPage}页</span>
             </ul>
         )
     }
 
 }
+
 Pagination.propTypes = {
     classes: PropTypes.object.isRequired,
 };

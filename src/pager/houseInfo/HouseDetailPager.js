@@ -12,7 +12,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import window from "../../statics/icon/window.svg";
 import air from "../../statics/icon/air.svg";
 import balcony from "../../statics/icon/balcony.svg";
-import broaband from "../../statics/icon/broadband.svg";
+import broadband from "../../statics/icon/broadband.svg";
 import desk from "../../statics/icon/desk.svg";
 import doubleBed from "../../statics/icon/double-bed.svg";
 import dresser from "../../statics/icon/dresser.svg";
@@ -24,11 +24,32 @@ import toilet from "../../statics/icon/toilet.svg";
 import tv from "../../statics/icon/tv.svg";
 import washingMachine from "../../statics/icon/washing-machine.svg";
 import waterHeater from "../../statics/icon/water-heater.svg";
+
+const icons = {
+    window,
+    air,
+    balcony,
+    broadband,
+    desk,
+    doubleBed,
+    dresser,
+    kitchen,
+    refrigerator,
+    singleBed,
+    sofa,
+    toilet,
+    tv,
+    washingMachine,
+    waterHeater,
+}
 import room from "../../statics/images/room.jpg";
 import GalleryImage from "../../component/GalleryImage";
 import {Map, Marker, InfoWindow} from "react-amap";
+import connect from "react-redux/es/connect/connect";
+import {MapDispatchToProps, MapStateToProps} from "../../config/ReduxMapToPropsConfig";
+import DetailHouseInfo from '../../data/HouseInfo';
 
-const styles = theme =>({
+const styles = theme => ({
 
     root: {
         width: 1000,
@@ -124,6 +145,8 @@ const styles = theme =>({
     }
 
 });
+const log = 'housedETAIL --------------------------';
+
 class HouseDetail extends React.Component {
     constructor(props) {
         super(props);
@@ -133,7 +156,7 @@ class HouseDetail extends React.Component {
             created: (mapInstance) => {
                 console.log('高德地图 Map 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
             },
-            click: ()=> {
+            click: () => {
 
             }
 
@@ -142,7 +165,7 @@ class HouseDetail extends React.Component {
             created: (markerInstance) => {
                 console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
             },
-            click: ()=> {
+            click: () => {
 
                 self.setState({
                     openPositionInfo: !self.state.openPositionInfo
@@ -154,7 +177,7 @@ class HouseDetail extends React.Component {
             created: (infoInstance) => {
                 console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
             },
-            click: ()=> {
+            click: () => {
 
                 self.setState({
                     openPositionInfo: !self.state.openPositionInfo
@@ -166,66 +189,81 @@ class HouseDetail extends React.Component {
         this.markerPosition = {longitude: 120.096933, latitude: 30.272038};
     }
 
+    componentDidMount() {
+        let {houseInfoByCondition, location, ipfsUtils} = this.props;
+        let search = location.search;
+        let urlSearchParams = new URLSearchParams(search.substr(1));
+        let id = urlSearchParams.get("id");
+
+        let imgArr = [];
+        houseInfoByCondition.then(result => {
+            let houseInfo = result[id];
+            console.log(log, houseInfo.imageArr);
+            houseInfo.imageArr.map((obj, index) => {
+                imgArr.push(ipfsUtils.domain + obj);
+            });
+            this.setState({
+                houseInfo: houseInfo,
+                position: {longitude: houseInfo.locationInfo.lng, latitude: houseInfo.locationInfo.lat},
+                imgArr
+            })
+        })
+    }
+
     state = {
         mapVersion: '1.4.10',
         amapkey: '50cec8de756f62ade847f8efe25ba900',
         curVisibleWindow: 3,
         position: {longitude: 120.096933, latitude: 30.272038},
-        openPositionInfo: true
+        openPositionInfo: true,
+        houseInfo: DetailHouseInfo.detailInfo,
+        imgArr: []
     }
 
 
     render() {
         const {classes, location} = this.props;
+        const {houseInfo} = this.state;
+        console.log(log, this.state, this.props.location.search);
         let parsePath = parseLocation(location);
         return (
             <div className={classes.root}>
                 <div>
-                    <ToolBar currentLocation={location}/>
+                    <ToolBar currentLocation={location} currentContext={"HOUSE_DETAIL_PAGER"}/>
                     <div className={classes.dividLayout}>
                         <div className={classes.dividLeft}>
                             <div className={classes.detailInfo}>
                                 <h1>
-                                    整租<i>&nbsp;·&nbsp;</i>嘉和花苑<i>&nbsp;·&nbsp;</i>主卧
+                                    {houseInfo.houseType.type}<i>&nbsp;·&nbsp;</i>{houseInfo.rentType.type}
                                 </h1>
 
                                 <p>
-                                    <span>面&nbsp;·&nbsp;积</span><strong>27平米</strong>
+                                    <span>面&nbsp;·&nbsp;积</span><strong>{houseInfo.houseArea}平米</strong>
                                 </p>
 
                                 <p>
-                                    <span>朝&nbsp;·&nbsp;向</span><strong>朝南</strong>
+                                    <span>朝&nbsp;·&nbsp;向</span><strong>{houseInfo.houseOrientation.type}</strong>
                                 </p>
                                 <p>
-                                    <span>楼&nbsp;·&nbsp;层</span><strong>6/8层</strong>
+                                    <span>楼&nbsp;·&nbsp;层</span><strong>在{houseInfo.houseFloor.currentLevel}层/共{houseInfo.houseFloor.totalLevel}层</strong>
                                 </p>
                                 <p>
-                                    <span>户&nbsp;·&nbsp;型</span><strong>1室0厅1卫</strong>
+                                    <span>户&nbsp;·&nbsp;型</span><strong>{houseInfo.houseAppreciation.room}室{houseInfo.houseAppreciation.hall}厅{houseInfo.houseAppreciation.toilet}卫</strong>
                                 </p>
                                 <p>
-                                    <span>小&nbsp;·&nbsp;区</span><strong>嘉禾花苑</strong>
+                                    <span>小&nbsp;·&nbsp;区</span><strong>{houseInfo.locationInfo.estatName}</strong>
                                 </p>
                                 <p>
-                                    <span>地&nbsp;·&nbsp;址</span><strong>紫金花路88号</strong>
+                                    <span>地&nbsp;·&nbsp;址</span><strong>{houseInfo.locationInfo.detailAddress}</strong>
                                 </p>
                                 <p>
-                                    <span>房&nbsp;·&nbsp;号</span><strong>14幢1单元</strong>
-                                </p>
-
-                                <p>
-                                    <span>更&nbsp;·&nbsp;新</span><strong>2018年9月14日</strong>
+                                    <span>房&nbsp;·&nbsp;号</span><strong>{houseInfo.houseNum}</strong>
                                 </p>
                                 <p>
-                                    <span>编&nbsp;·&nbsp;号</span><strong>HZ201809130361005</strong>
+                                    <span>价&nbsp;·&nbsp;格</span><strong>{houseInfo.rentFee}元/月&nbsp;&nbsp;(押{houseInfo.payType.cashPledgeNum}付{houseInfo.payType.cashPayNum})</strong>
                                 </p>
                                 <p>
-                                    <span>服务费</span><strong>0元</strong>
-                                </p>
-                                <p>
-                                    <span>价&nbsp;·&nbsp;格</span><strong>1800元/月&nbsp;&nbsp;(押一付一)</strong>
-                                </p>
-                                <p>
-                                    <span>电&nbsp;·&nbsp;话</span><strong>13763382916</strong>
+                                    <span>电&nbsp;·&nbsp;话</span><strong>{houseInfo.telephone}</strong>
                                 </p>
 
 
@@ -235,7 +273,7 @@ class HouseDetail extends React.Component {
                                     房间介绍
                                 </h2>
                                 <p>
-                                    该公寓位于西湖区，紫金花路88号，周边有很多大商场，和各种美味的小吃，地段繁华，交通方便，出门就有公交车站，在嘉禾花苑小区，安全，安静，房间很大，双人床，有空调，冰箱，电脑桌，洗衣机，热水器，独立卫生间，卫生间也挺大的。有好闺蜜，好兄弟，热恋情侣，精英人事，这个户型和房子都非常适合你们，快联系我吧。
+                                    {houseInfo.detailIntroduce}
                                 </p>
                             </div>
                             <div className={classes.detailInfo}>
@@ -243,178 +281,34 @@ class HouseDetail extends React.Component {
                                     独用设备
                                 </h2>
                                 <div className={classes.equipmentLayout}>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={air}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>空调</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={balcony}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>阳台</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={broaband}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>宽带</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={desk}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>写字桌</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={doubleBed}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>双人床</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={dresser}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>梳妆台</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={kitchen}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>厨房</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={refrigerator}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>冰箱</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={singleBed}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>单人床</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={sofa}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>沙发</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={toilet}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>卫生间</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={tv}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>电视机</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={washingMachine}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>洗衣机</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={waterHeater}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>热水器</span>
-                                        </p>
-                                    </Card>
-                                    <Card className={classes.contentCard}>
-                                        <CardMedia
-                                            component="img"
-                                            className={classes.contentImage}
-                                            image={window}
-                                        >
-                                        </CardMedia>
-                                        <p>
-                                            <span>飘窗</span>
-                                        </p>
-                                    </Card>
+                                    {
+                                        houseInfo.houseEquipment.map((obj,index)=>{
+                                            return (
+                                                <Card className={classes.contentCard} key={index}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        className={classes.contentImage}
+                                                        image={icons[obj.value]}
+                                                    >
+                                                    </CardMedia>
+                                                    <p>
+                                                        <span>{obj.name}</span>
+                                                    </p>
+                                                </Card>
+                                            );
+                                        })
+                                    }
 
                                 </div>
                             </div>
                         </div>
                         <div className={classes.dividRight}>
-                            <GalleryImage className={classes.sliderLayout}
-                                          images={["https://imagecdn.hizhu.com/fang/17/55/173813122A36C54B36949F826598B37A2555.jpg?x-oss-process=style/w800", room,]}/>
+
+                            {
+                                this.state.imgArr == 0 ? <div></div> :
+                                    <GalleryImage className={classes.sliderLayout}
+                                                  images={this.state.imgArr}/>
+                            }
                             <div style={{
                                 width: '100%',
                                 height: '330px',
@@ -433,8 +327,8 @@ class HouseDetail extends React.Component {
                                         isCustom={false}
                                         events={this.infoWindowEvents}
                                     >
-                                        <h3>嘉和花苑</h3>
-                                        <p>紫荆花路88号</p>
+                                        <h3>{houseInfo.locationInfo.estatName}</h3>
+                                        <p>{houseInfo.locationInfo.detailAddress}</p>
                                     </InfoWindow>
                                 </Map>
                             </div>
@@ -445,7 +339,9 @@ class HouseDetail extends React.Component {
         )
     }
 }
+
 HouseDetail.propTypes = {
     classes: PropTypes.object.isRequired
 }
+HouseDetail = connect(MapStateToProps, MapDispatchToProps)(HouseDetail);
 export default withStyles(styles)(HouseDetail);

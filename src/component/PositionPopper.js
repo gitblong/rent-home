@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import lightblue from '@material-ui/core/colors/lightblue';
 import Grid from '@material-ui/core/Grid';
 import grey from '@material-ui/core/colors/grey';
+
 const styles = theme => ({
     popper: {
         zIndex: 10,
@@ -44,26 +45,66 @@ const styles = theme => ({
             color: lightblue[100]
         },
         cursor: "pointer",
-        fontSize:16
+        fontSize: 16
     },
 });
 
 class PositionPopper extends React.Component {
     state = {
         citys: [
-            ['杭州', '上海', '深圳'],
-            ['北京', '广州', '厦门'],
-            ['福州', '苏州', '天津']
+
+            [
+                {
+                    name: '北京',
+                    code: '1101'
+                },
+                {
+                    name: '广州',
+                    code: '4401'
+                },
+                {
+                    name: '上海',
+                    code: '3101'
+                }
+            ],
+            [
+                {
+                    name: '杭州',
+                    code: '3301'
+                },
+                {
+                    name: '苏州',
+                    code: '3205'
+                },
+                {
+                    name: '南京',
+                    code: '3201'
+                }
+            ],
+            [
+                {
+                    name: '福州',
+                    code: '3501'
+                },
+                {
+                    name: '厦门',
+                    code: '3502'
+                },
+                {
+                    name: '成都',
+                    code: '5101'
+                }
+            ],
 
         ]
     };
 
     render() {
-        const {classes, anchorEl, open} = this.props;
+        const {classes, anchorEl, open,handler} = this.props;
 
         const citys = this.state.rentTypes;
         return (
-            <div >
+            <div>
 
                 <Popper className={classes.popper} open={this.props.open} anchorEl={this.props.anchorEl}
                         disablePortal
@@ -82,7 +123,7 @@ class PositionPopper extends React.Component {
                         }}
                 >
                     {
-                        this.state.citys.map((city, index)=> {
+                        this.state.citys.map((city, index) => {
                             return (
                                 <Grid
                                     container
@@ -90,13 +131,13 @@ class PositionPopper extends React.Component {
                                     key={city}
                                 >
                                     {
-                                        city.map((value, index)=> {
+                                        city.map((value, index) => {
 
                                             return (
-                                                <Grid item key={value} xs={4}>
-                                                    <a onClick={e=>this.props.handler(value, e)}>
+                                                <Grid item key={value.code} xs={4}>
+                                                    <a onClick={e => handler(value,e)}>
                                                         <Typography
-                                                            className={classes.rentTypeGrid}>{value}</Typography>
+                                                            className={classes.rentTypeGrid}>{value.name}</Typography>
                                                     </a>
                                                 </Grid>
                                             )
@@ -108,10 +149,11 @@ class PositionPopper extends React.Component {
                     }
                 </Popper>
 
-            </div >
+            </div>
         );
     }
 }
+
 PositionPopper.propTypes = {
     classes: PropTypes.object.isRequired,
 };

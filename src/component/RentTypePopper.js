@@ -3,17 +3,15 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Popper from '@material-ui/core/Popper';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Fade from '@material-ui/core/Fade';
-import Paper from '@material-ui/core/Paper';
 import lightblue from '@material-ui/core/colors/lightblue';
 import Grid from '@material-ui/core/Grid';
-import grey from '@material-ui/core/colors/grey';
+import HouseInfo from '../data/HouseInfo';
+
 const styles = theme => ({
     popper: {
         zIndex: 10,
         backgroundColor: "#fff",
-        marginTop:5
+        marginTop: 5
     },
     typography: {
         padding: theme.spacing.unit * 2,
@@ -42,7 +40,7 @@ const styles = theme => ({
         flexGrow: 0,
         maxWidth: 'none',
         flexBasis: 'auto',
-        width:'120px',
+        width: '120px',
 
     },
     rentTypeGrid: {
@@ -52,21 +50,34 @@ const styles = theme => ({
         '&:hover': {
             color: lightblue[100]
         },
-        fontSize:18,
+        fontSize: 18,
         cursor: "pointer"
     },
 });
+const log = "RentTypePopper-------------------------";
 
 class RentTypePopper extends React.Component {
-    state = {
-        rentTypes: ['全部', '整租', '合租', '公寓']
-    };
-    render() {
-        const {classes, anchorEl, open,clickPopperId} = this.props;
+    constructor(props) {
+        super(props);
 
+        let houseType = HouseInfo.houseType;
+        this.state = {
+            houseTypes: [
+                {
+                    type:'全部',
+                    typeId:3,
+                },
+                ...houseType
+            ]
+        }
+    }
+
+    render() {
+        const {classes, anchorEl, open, clickPopperId} = this.props;
+        console.log(log, this.state);
         const citys = this.state.rentTypes;
         return (
-            <div >
+            <div>
 
                 <Popper className={classes.popper} open={this.props.open} anchorEl={this.props.anchorEl}
                         disablePortal
@@ -85,17 +96,17 @@ class RentTypePopper extends React.Component {
                         }}
                 >
                     {
-                        this.state.rentTypes.map((value, index)=> {
+                        this.state.houseTypes.map((value, index) => {
                             return (
 
                                 <Grid id="gridContainer"
-                                    container xs={1}
-                                    className={classes.grid}
+                                      container xs={1}
+                                      className={classes.grid}
                                 >
-                                    <Grid id="gridItem" item key={value} xs={1} className={classes.grid}>
-                                        <a onClick={e=>this.props.handler(value, e)}>
+                                    <Grid id="gridItem" item key={value.typeId} xs={1} className={classes.grid}>
+                                        <a onClick={e => this.props.handler(value, e)}>
                                             <Typography
-                                                className={classes.rentTypeGrid}>{value}</Typography>
+                                                className={classes.rentTypeGrid}>{value.type}</Typography>
                                         </a>
                                     </Grid>
                                 </Grid>
@@ -104,10 +115,11 @@ class RentTypePopper extends React.Component {
                     }
                 </Popper>
 
-            </div >
+            </div>
         );
     }
 }
+
 RentTypePopper.propTypes = {
     classes: PropTypes.object.isRequired,
 };

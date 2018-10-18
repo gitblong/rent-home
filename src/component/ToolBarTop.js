@@ -9,6 +9,7 @@ import RouterConfig from '../config/RouteConfig';
 import {parseLocation} from '../Utils/util';
 import IconButton from '@material-ui/core/IconButton';
 import Search from '@material-ui/icons/Search';
+
 const styles = {
     navigation: {
         display: 'inline-block',
@@ -53,12 +54,23 @@ const styles = {
         paddingLeft: "16px",
     },
 };
+
 class Navigation extends React.Component {
+    state = {
+        searchValue: ""
+    };
+
+    changeHandler = (e) => {
+        this.setState({
+            searchValue: e.target.value
+        })
+    }
+
 
     render() {
         let toolBarText = "输入地址、写字楼、园区或地铁站"
-        const {classes, currentLocation,searchHidden,placeText} = this.props;
-        if(placeText){
+        const {classes, currentLocation, searchHidden, placeText, searchValueChange, selectedCondition, currentContext,value} = this.props;
+        if (placeText) {
             toolBarText = placeText;
         }
 
@@ -71,7 +83,7 @@ class Navigation extends React.Component {
                     </Link>
                     <span>&nbsp;/&nbsp;</span>
                     {
-                        parsePath.map((value, index)=> {
+                        parsePath.map((value, index) => {
                             if (index > 0 && index < parsePath.length - 1) {
                                 return (
                                     <div style={{display: 'inline-block'}}>
@@ -91,18 +103,49 @@ class Navigation extends React.Component {
                     }
                 </div>
                 <div className={classes.searchTool} hidden={searchHidden}>
-                    <input placeholder={toolBarText} className={classes.searchInput}>
-                    </input>
-                    <IconButton>
-                        <Search />
-                    </IconButton>
-                </div>
+                    {
+                        currentContext == 'HOUSE_DETAIL_PAGER' ?
+                            (<input placeholder={toolBarText} className={classes.searchInput}
+                                    value={this.state.searchValue}
+                                    onKeyDown={event => {
+                                        this.changeHandler(event);
+                                    }}
+                                    onChange={e => {
+                                        this.changeHandler(e);
+                                    }}>
+                            </input>):
+                            (<input placeholder={toolBarText} className={classes.searchInput}
+                                   value={value}
+                                   onKeyDown={event => {
+                                       this.changeHandler(event);
+                                   }}
+                                   onChange={e => {
+                                       searchValueChange(e);
+                                       this.changeHandler(e);
+                                   }}>
+                            </input>)
+                    }
+                            {
+                                currentContext == 'HOUSE_DETAIL_PAGER' ?
+                                (<Link to={`${RouterConfig.areaSearch.path}?detailAddress=${this.state.searchValue}`}>
+                                    <IconButton>
+                                        <Search/>
+                                    </IconButton>
+                                </Link>) :
+                                (<IconButton>
+                                    <Search onClick={e => {
+                                        selectedCondition(this.state.searchValue, 'SEARCH_VALUE')
+                                    }}/>
+                                </IconButton>)
+                    }
 
+                </div>
             </div>
 
         )
     }
 }
+
 Navigation.propTypes = {
     classes: PropTypes.object.isRequired
 }

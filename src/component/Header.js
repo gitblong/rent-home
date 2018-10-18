@@ -58,6 +58,7 @@ const styles = theme => ({
     }
 
 });
+
 class Header extends React.Component {
     constructor(props) {
         super(props);
@@ -67,7 +68,7 @@ class Header extends React.Component {
             positionPopperOpen: false,
             positionAnchorEl: null,
             positionPopperId: "positionId",
-            cityName: "位置",
+            currentCity: props.currentCity,
 
         };
     }
@@ -84,27 +85,32 @@ class Header extends React.Component {
         this.setState({anchorEl: null});
     };
 
-    openPositionPopper = (value, event)=> {
-        this.props.onOpen()
+    openPositionPopper = (value, event) => {
+        let {onOpen, currentCity, changeCurrentCity, changeHouseInfoByCondition, allHouseInfoData, ipfsUtils} = this.props;
+        onOpen();
         event.preventDefault();
         event.stopPropagation();
         const currentTarget = event.currentTarget;
-        this.setState(state =>({
+        this.setState(state => ({
             rentTypeAnchorEl: currentTarget
         }));
-        if (value == 0) {
+        if (value.code == currentCity.code) {
             return;
         }
-        this.setState(state =>({
-            cityName: value
+        changeCurrentCity(value);
+        allHouseInfoData.then(result => {
+            changeHouseInfoByCondition(ipfsUtils.getHouseInfoByCondition(result, value.code));
+        })
+        this.setState(state => ({
+            currentCity: value
         }));
 
     }
 
 
     render() {
-        const {classes,isOpen} = this.props;
-        const {auth, anchorEl, positionAnchorEl, positionPopperOpen} = this.state;
+        const {classes, isOpen} = this.props;
+        const {auth, anchorEl, positionAnchorEl, positionPopperOpen, currentCity} = this.state;
         const open = Boolean(anchorEl);
         const id = positionPopperOpen ? 'simple-popper' : null;
         return (
@@ -122,8 +128,8 @@ class Header extends React.Component {
                             区块链租房
 
                             <Button id="pop" className={classes.positionButton}
-                                    onClick={(e)=>this.openPositionPopper(0, e)}>
-                                {this.state.cityName}<Place className={classes.buttonIcon}/>
+                                    onClick={(e) => this.openPositionPopper(currentCity, e)}>
+                                {currentCity.name}<Place className={classes.buttonIcon}/>
                             </Button>
                             <Link to={RouterConfig.areaSearch.path} className={classes.positionButton}>
                                 <Button className={classes.positionButton}>
@@ -145,7 +151,7 @@ class Header extends React.Component {
                                     onClick={this.handleMenu}
                                     color="inherit"
                                 >
-                                    <AccountCircle />
+                                    <AccountCircle/>
                                 </IconButton>
                                 <Menu
                                     id="menu-appbar"
@@ -192,7 +198,7 @@ class Header extends React.Component {
                     </Toolbar>
                 </AppBar>
 
-            </div >
+            </div>
         );
 
     }
@@ -200,9 +206,9 @@ class Header extends React.Component {
 
 Header.propTypes = {
     classes: PropTypes.object.isRequired,
-    popperPositionIsOpen:PropTypes.bool.isRequired,
-    close:PropTypes.func.isRequired,
-    open:PropTypes.func.isRequired
+    popperPositionIsOpen: PropTypes.bool.isRequired,
+    close: PropTypes.func.isRequired,
+    open: PropTypes.func.isRequired
 };
 
 Header = connect(MapStateToProps, MapDispatchToProps)(Header)
