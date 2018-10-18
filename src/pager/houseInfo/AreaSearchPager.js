@@ -349,7 +349,7 @@ class AreaSearch extends React.Component {
         });
 
     };
-    initUrlParam=()=>{
+    initUrlParam = () => {
 
         let search = this.props.location.search;
         let urlSearchParams = new URLSearchParams(search.substr(1));
@@ -367,7 +367,7 @@ class AreaSearch extends React.Component {
                 type: houseType,
                 typeId
             };
-            this.changeTypeArr(currentHouseType,HOUSE_TYPE);
+            this.changeTypeArr(currentHouseType, HOUSE_TYPE);
         }
         if (!isEmpty(detailAddress)) {
             this.setState({
@@ -378,6 +378,7 @@ class AreaSearch extends React.Component {
         }
 
     }
+
     componentDidMount() {
         let {houseInfoByCondition, ipfsUtils, location} = this.props;
         let {page, pageSize} = this.state;
@@ -396,7 +397,7 @@ class AreaSearch extends React.Component {
                 pageInfo,
                 loading: false,
 
-            },()=>{
+            }, () => {
                 this.initUrlParam();
             });
 
@@ -415,7 +416,8 @@ class AreaSearch extends React.Component {
             areasConditionArr
         })
     }
-    componentWillReceiveProps(nextProps,state){
+
+    componentWillReceiveProps(nextProps, state) {
 
         const {classes, houseInfoByCondition, ipfsUtils} = nextProps;
         const {page, pageSize} = this.state;
@@ -433,13 +435,9 @@ class AreaSearch extends React.Component {
             })
         })
     }
+
     changeAreasChecked = (areas) => {
-        if (areas.name == "不限") {
-            this.setState({
-                streetsConditionArr: [],
-                currentStreetsType: {checked: false}
-            })
-        }
+
         let areasConditionArr = this.state.areasConditionArr;
         areasConditionArr.map((obj, index) => {
             obj.checked = false;
@@ -447,12 +445,20 @@ class AreaSearch extends React.Component {
                 obj.checked = true;
             }
         });
-        this.setState({
-            areasConditionArr,
-            currentAreas: areas
-        }, () => {
-            this.selectedCondition(areas, AREAS_TYPE);
-        })
+        if (areas.name == "不限") {
+            this.setState({
+                streetsConditionArr: [],
+                currentStreetsType: {checked: false}
+            })
+        }else{
+            this.setState({
+                areasConditionArr,
+                currentAreas: areas
+            }, () => {
+                this.selectedCondition(areas, AREAS_TYPE);
+            })
+        }
+
     };
     changeStreetsChecked = (streets) => {
 
@@ -463,12 +469,19 @@ class AreaSearch extends React.Component {
                 obj.checked = true;
             }
         });
-        this.setState({
-            streetsConditionArr,
-            currentStreetsType: streets,
-        }, () => {
-            this.selectedCondition(streets, STREET_TYPE);
-        })
+        if (streets.name == "不限") {
+            this.setState({
+                currentStreetsType: {checked: false}
+            })
+        }else{
+            this.setState({
+                streetsConditionArr,
+                currentStreetsType: streets,
+            }, () => {
+                this.selectedCondition(streets, STREET_TYPE);
+            })
+        }
+
     };
     changeStreetInfo = (areas) => {
         this.changeAreasChecked(areas);
@@ -514,6 +527,7 @@ class AreaSearch extends React.Component {
         let arr = [];
         switch (type) {
             case RENT_TYPE:
+
                 let rentTypeArr = this.state.rentTypeArr;
                 rentTypeArr.map((obj, index) => {
                     obj.checked = false;
@@ -521,15 +535,21 @@ class AreaSearch extends React.Component {
                         obj.checked = true;
                     }
                 });
-                this.setState({
-                    rentTypeArr,
-                    currentRentType: value
-                }, () => {
-                    this.selectedCondition(value, RENT_TYPE);
-                });
-
+                if (value.type == "不限") {
+                    this.setState({
+                        currentRentType: {checked: false}
+                    })
+                } else {
+                    this.setState({
+                        rentTypeArr,
+                        currentRentType: value
+                    }, () => {
+                        this.selectedCondition(value, RENT_TYPE);
+                    });
+                }
                 break;
             case HOUSE_TYPE:
+
                 let houseTypeArr = this.state.houseTypeArr;
                 houseTypeArr.map((obj, index) => {
                     obj.checked = false;
@@ -537,15 +557,23 @@ class AreaSearch extends React.Component {
                         obj.checked = true;
                     }
                 });
-                this.setState({
-                    houseTypeArr,
-                    currentHouseType: value
-                }, () => {
+                if (value.type == "不限") {
+                    this.setState({
+                        currentHouseType: {checked: false}
+                    })
+                } else {
+                    this.setState({
+                        houseTypeArr,
+                        currentHouseType: value
+                    }, () => {
 
-                    this.selectedCondition(value, HOUSE_TYPE);
-                });
+                        this.selectedCondition(value, HOUSE_TYPE);
+                    });
+                }
+
                 break;
             case FEE_TYPE:
+
                 let rentFeeArr = this.state.rentFeeArr;
                 rentFeeArr.map((obj, index) => {
                     obj.checked = false;
@@ -553,12 +581,19 @@ class AreaSearch extends React.Component {
                         obj.checked = true;
                     }
                 });
-                this.setState({
-                    rentFeeArr,
-                    currentFeeType: value
-                }, () => {
-                    this.selectedCondition(value, FEE_TYPE);
-                });
+                if (value.type == "不限") {
+                    this.setState({
+                        currentFeeType: {checked: false}
+                    })
+                } else {
+                    this.setState({
+                        rentFeeArr,
+                        currentFeeType: value
+                    }, () => {
+                        this.selectedCondition(value, FEE_TYPE);
+                    });
+                }
+
                 break;
         }
 
@@ -834,7 +869,8 @@ class AreaSearch extends React.Component {
                         pageInfo.total == 0 ? <div>{info}</div> :
                             pageInfo.data.map((obj, index) => {
                                 return (
-                                    <Link to={`${RouterConfig.houseDetail.path}?id=${(page-1) * pageSize + index + 1}`}>
+                                    <Link
+                                        to={`${RouterConfig.houseDetail.path}?id=${(page - 1) * pageSize + index + 1}`}>
                                         <div className={classes.itemList}>
                                             <div className={classes.item}>
                                                 <div className={classes.itemContent}>
@@ -881,7 +917,8 @@ class AreaSearch extends React.Component {
                             })
                 }
                 <div className={classes.pageLayout}>
-                    <Pagination page={pageInfo.total==0?0:page} pageCount={pageInfo.pageCount} total={pageInfo.total}
+                    <Pagination page={pageInfo.total == 0 ? 0 : page} pageCount={pageInfo.pageCount}
+                                total={pageInfo.total}
                                 changePage={this.handleChange}/>
                 </div>
             </div>
