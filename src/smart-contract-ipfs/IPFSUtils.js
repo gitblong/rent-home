@@ -142,7 +142,7 @@ export class IPFSUtils {
                     i++;
                     arr.push(obj);
                 }
-                if (index == allHouseInfo.length - 5) {
+                if (index == allHouseInfo.length-1) {
                     resolve(arr);
                 }
             });

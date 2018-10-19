@@ -98,9 +98,11 @@ class Header extends React.Component {
             return;
         }
         changeCurrentCity(value);
-        allHouseInfoData.then(result => {
+        console.log(ipfsUtils.init(), "hosueDetail");
+        ipfsUtils.init().then(result => {
+            console.log("hosueDetail------",result);
             changeHouseInfoByCondition(ipfsUtils.getHouseInfoByCondition(result, value.code));
-        })
+        });
         this.setState(state => ({
             currentCity: value
         }));

@@ -170,15 +170,15 @@ class MapModel extends React.Component {
         streets.map((street, index) => {
             let name = street.name;
             if (street.areaCode == adcode) {
+                console.log('street-----------', street, self.state.township);
                 if (name.charAt(name.length - 1) != '乡' && name.charAt(name.length - 1) != '镇') {
                     street["selected"] = false;
-                    let str = street.name == self.state.township;
+                    let str = street.name.indexOf(self.state.township) != -1;
                     if (str) {
+                        console.log('street-----------', street, self.state.township);
                         street.selected = true;
                         this.setState({
-                            areas: street.name
-                        })
-                        this.setState({
+                            areas: street.name,
                             streetInfo: street
                         })
                     } else {
@@ -191,7 +191,7 @@ class MapModel extends React.Component {
         this.setState({
             selectArray: selectArray,
         })
-    }
+    };
     /**
      * 获得地址详情
      * @param lnglat 经纬度
@@ -224,13 +224,17 @@ class MapModel extends React.Component {
             map.addControl(toolbar);
             geocoder.getAddress(lnglat, function (status, result) {
                 if (status === 'complete' && result.info === 'OK') {
+                    if (result.regeocode.addressComponent.township.indexOf('镇') != -1||result.regeocode.addressComponent.township.indexOf('乡') != -1) {
+                        alert("不在服务范围");
+                        return;
+                    }
                     //获得了有效的地址信息:
                     //即，result.regeocode.formattedAddress
                     var addressComponent = result.regeocode.addressComponent;
                     var address = result.regeocode.formattedAddress;
                     let streetNumber = addressComponent.streetNumber;
                     let detailAddress = address + streetNumber;
-
+                    console.log("Geocoder=-----", result);
                     let name = addressComponent.street + streetNumber;
                     self.setState({
                         detailAddress: detailAddress,
@@ -241,9 +245,21 @@ class MapModel extends React.Component {
                         township: addressComponent.township,
                         streetNumber: streetNumber,
                         name: name
+                    },()=>{
+                        self.changeSelectArray(addressComponent.adcode);
+                        self.InfoWindow(map, location, detailAddress, marker);
                     });
-                    self.changeSelectArray(addressComponent.adcode);
-                    self.InfoWindow(map, location, detailAddress, marker);
+                    console.log({
+                        detailAddress: detailAddress,
+                        adcode: addressComponent.adcode,
+                        lng: lnglat.lng,
+                        lat: lnglat.lat,
+                        street: addressComponent.street,
+                        township: addressComponent.township,
+                        streetNumber: streetNumber,
+                        name: name
+                    })
+
                 } else {
                     //获取地址失败
                     alert('获取信息失败请重试');

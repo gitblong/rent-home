@@ -234,7 +234,7 @@ class HouseDetail extends React.Component {
                         <div className={classes.dividLeft}>
                             <div className={classes.detailInfo}>
                                 <h1>
-                                    {houseInfo.houseType.type}<i>&nbsp;·&nbsp;</i>{houseInfo.rentType.type}
+                                    {houseInfo.houseType.type}<i>&nbsp;·&nbsp;</i>{houseInfo.locationInfo.estatName}
                                 </h1>
 
                                 <p>

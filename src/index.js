@@ -64,7 +64,7 @@ class App extends React.Component {
     initReducer = (drizzle => {
         let ipfsUtils = new IPFSUtils(ipfs, drizzle);
         let allHouseInfoData = ipfsUtils.init();
-        console.log(allHouseInfoData);
+        console.log("index------",allHouseInfoData);
         let houseInfoByCondition = new Promise(resolve => {
             allHouseInfoData.then(result => {
                 let houseInfoByCondition = ipfsUtils.getHouseInfoByCondition(result, '3301');
