@@ -129,7 +129,8 @@ export function Uint8ArrayToString(array) {
 }
 
 export function isEmpty(obj) {
-    return obj == null || obj == undefined || obj == "";
+    // console.log(obj == null || obj == undefined || obj == "")
+    return (obj == null || obj == undefined || obj == "");
 }
 
 

@@ -330,10 +330,10 @@ class AreaSearch extends React.Component {
         }
 
         houseInfoByCondition.then(result => {
-            console.log(result);
+            // console.log(result);
             ipfsUtils.getHouseInfoByCondition(result, currentCity.code, area, street, rentType, houseType, feeType, search)
                 .then(result => {
-                    console.log("asdfsfsafsafasfsa", result);
+                    // console.log("asdfsfsafsafasfsa", result);
                     const pageInfo = ipfsUtils.getPageInfo(result, this.state.page, this.state.pageSize);
                     let info;
                     if (result.length == 0) {
@@ -385,14 +385,14 @@ class AreaSearch extends React.Component {
 
 
         houseInfoByCondition.then(result => {
-            console.log(result, "componeDidMount");
+            // console.log(result, "componeDidMount");
             if (result.length == 0) {
                 this.setState({
                     info: RESULT_INFO
                 })
             }
             let pageInfo = ipfsUtils.getPageInfo(result, page, pageSize);
-            console.log(pageInfo);
+            // console.log(pageInfo);
             this.setState({
                 pageInfo,
                 loading: false,
@@ -422,7 +422,7 @@ class AreaSearch extends React.Component {
         const {classes, houseInfoByCondition, ipfsUtils} = nextProps;
         const {page, pageSize} = this.state;
         houseInfoByCondition.then(result => {
-            console.log(result);
+            // console.log(result);
             let pageInfo = ipfsUtils.getPageInfo(result, page, pageSize);
             let info = this.state.info;
             if (result == 0) {
@@ -523,7 +523,7 @@ class AreaSearch extends React.Component {
         })
     }
     changeTypeArr = (value, type) => {
-        console.log(value, type);
+        // console.log(value, type);
         let arr = [];
         switch (type) {
             case RENT_TYPE:
@@ -689,7 +689,7 @@ class AreaSearch extends React.Component {
         let {pageSize} = this.state;
         houseInfoByCondition.then(result => {
             let pageInfo = ipfsUtils.getPageInfo(result, value, pageSize);
-            console.log(pageInfo, value);
+            // console.log(pageInfo, value);
             this.setState({
                 pageInfo,
                 page: value
@@ -721,7 +721,7 @@ class AreaSearch extends React.Component {
         var path = location.pathname;
         var pathName = path.split('/')[1].toString();
         let parsePath = parseLocation(location);
-        console.log(currentAreas, this.state);
+        // console.log(currentAreas, this.state);
         return (
             <div className={classes.root}>
                 <div>

@@ -8,7 +8,8 @@ import {
     changeTextAction,
     changeHouseInfoByCondition,
     changeCurrentCity,
-    initIpfsUtils
+    initIpfsUtils,
+    changeShowHouseInfoCount
 } from './ReduxActionConfig';
 
 
@@ -21,7 +22,8 @@ export function MapStateToProps(state) {
         ipfsUtils: state.ipfsUtils,
         init: state.init,
         houseInfoByCondition: state.houseInfoByCondition,
-        currentCity: state.currentCity
+        currentCity: state.currentCity,
+        showHouseInfoCount:state.showHouseInfoCount
     }
 }
 
@@ -34,7 +36,7 @@ export function MapDispatchToProps(dispatch) {
         onClose: () => dispatch(onClose),
         initIpfsUtils: (ipfsUtils) => dispatch(initIpfsUtils(ipfsUtils)),
         changeHouseInfoByCondition: (houseInfoByCondition) => dispatch(changeHouseInfoByCondition(houseInfoByCondition)),
-        changeCurrentCity: (currentCity) => dispatch(changeCurrentCity(currentCity))
-
+        changeCurrentCity: (currentCity) => dispatch(changeCurrentCity(currentCity)),
+        changeShowHouseInfoCount:(showHouseInfoCount) => dispatch(changeShowHouseInfoCount(showHouseInfoCount))
     }
 }

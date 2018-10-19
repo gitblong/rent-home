@@ -9,7 +9,9 @@ import {
     CHANGE_HOUSE_INFO_BY_CONDITION,
     CLOSE_POSITION_POPPER,
     INIT_IPFS_UTILS,
-    OPEN_POSITION_POPPER
+    OPEN_POSITION_POPPER,
+    CHANGE_SHOW_HOUSE_INFO_COUNT
+
 } from './constants/ActionTypes';
 
 import HouseInfo from "./contracts/HouseInfo.json";
@@ -64,14 +66,15 @@ class App extends React.Component {
     initReducer = (drizzle => {
         let ipfsUtils = new IPFSUtils(ipfs, drizzle);
         let allHouseInfoData = ipfsUtils.init();
-        console.log("index------",allHouseInfoData);
+        // console.log("index------",allHouseInfoData);
         let houseInfoByCondition = new Promise(resolve => {
             allHouseInfoData.then(result => {
                 let houseInfoByCondition = ipfsUtils.getHouseInfoByCondition(result, '3301');
                 resolve(houseInfoByCondition);
             });
         });
-        console.log(houseInfoByCondition);
+        let showHouseInfoCount = ipfsUtils.getShowHouseInfoCount();
+        // console.log(houseInfoByCondition);
         const initialState = {
             text: 'Hello',
             isOpen: false,
@@ -82,7 +85,9 @@ class App extends React.Component {
             init: true,
             allHouseInfoData,
             houseInfoByCondition,
-            ipfsUtils
+            ipfsUtils,
+            showHouseInfoCount:new Promise(resolve => resolve(0))
+
         };
         const reducer = (state = initialState, action, option) => {
             switch (action.type) {
@@ -97,7 +102,7 @@ class App extends React.Component {
                         text: 'Hello world'
                     };
                 case OPEN_POSITION_POPPER:
-                    console.log("OPEN_POSITION_POPPER", OPEN_POSITION_POPPER);
+                    // console.log("OPEN_POSITION_POPPER", OPEN_POSITION_POPPER);
                     return {
                         ...state,
                         isOpen: !state.isOpen,
@@ -109,23 +114,29 @@ class App extends React.Component {
                         rentTypeAnchorEl: null
                     };
                 case INIT_IPFS_UTILS:
-                    console.log(action.ipfsUtils);
+                    // console.log(action.ipfsUtils);
                     return {
                         ...state,
                         ipfsUtils: ipfsUtils
                     };
                 case CHANGE_CURRENT_CITY:
-                    console.log(action.currentCity);
+                    // console.log(action.currentCity);
                     return {
                         ...state,
                         currentCity: action.currentCity
                     };
                 case CHANGE_HOUSE_INFO_BY_CONDITION:
-                    console.log("CHANGE_HOUSE_INFO_BY_CONDITION", action.houseInfoByCondition);
+                    // console.log("CHANGE_HOUSE_INFO_BY_CONDITION", action.houseInfoByCondition);
                     return {
                         ...state,
                         init: false,
                         houseInfoByCondition: action.houseInfoByCondition
+                    };
+                case CHANGE_SHOW_HOUSE_INFO_COUNT:
+                    // console.log(CHANGE_SHOW_HOUSE_INFO_COUNT,action.showHouseInfoCount);
+                    return {
+                        ...state,
+                        showHouseInfoCount:action.showHouseInfoCount
                     };
                 default:
                     return initialState;

@@ -31,7 +31,7 @@ class Pagination extends React.Component {
     }
 
     componentDidMount() {
-        console.log(log, "componentDidMount");
+        // console.log(log, "componentDidMount");
         let {page, pageSize, pageCount, total} = this.props;
         let arr = [];
         for (let i = 1; i <= pageCount; i++) {
@@ -49,14 +49,14 @@ class Pagination extends React.Component {
 
 
     componentWillReceiveProps(nextProps, state) {
-        console.log(log, "shouldComponentUpdate", state.maxPage != nextProps.pageCount, nextProps, state);
+        // console.log(log, "shouldComponentUpdate", state.maxPage != nextProps.pageCount, nextProps, state);
         let {page, pageSize, pageCount, total} = nextProps;
         let arr = [];
         for (let i = 1; i <= pageCount; i++) {
             arr.push(i);
         }
         if (state.maxPage != nextProps.pageCount) {
-            console.log(arr);
+            // console.log(arr);
             this.setState({
                 pageNoArr: arr,
                 maxPage: pageCount,
@@ -128,7 +128,7 @@ class Pagination extends React.Component {
     }
 
     render() {
-        console.log(log, "render", this.state);
+        // console.log(log, "render", this.state);
         const {classes} = this.props;
         const {currentPageNoArr, pageNoStart, pageNoEnd, pageNoArr, currentPageNo, maxPage, total} = this.state;
         return (

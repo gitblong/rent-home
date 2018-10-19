@@ -50,7 +50,7 @@ class Main extends React.Component {
 
     render() {
         const {classes,store} = this.props;
-        console.log(this.props);
+        // console.log(this.props);
         return (
 
                 <div onClick={this.props.onClose}>

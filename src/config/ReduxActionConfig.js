@@ -5,7 +5,8 @@ import {
     CLOSE_POSITION_POPPER,
     OPEN_POSITION_POPPER,
     CHANGE_HOUSE_INFO_BY_CONDITION,
-    CHANGE_CURRENT_CITY
+    CHANGE_CURRENT_CITY,
+    CHANGE_SHOW_HOUSE_INFO_COUNT
 } from '../constants/ActionTypes';
 
 export const changeTextAction = {
@@ -41,5 +42,12 @@ export let initIpfsUtils = (action) => {
     }
 };
 
+export let changeShowHouseInfoCount = (action) => {
+    return {
+
+        type: CHANGE_SHOW_HOUSE_INFO_COUNT,
+        showHouseInfoCount: action
+    }
+};
 
 

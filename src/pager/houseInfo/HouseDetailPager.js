@@ -154,7 +154,7 @@ class HouseDetail extends React.Component {
         this.mapCenter = {longitude: 120.097083, latitude: 30.272038};
         this.amapEvents = {
             created: (mapInstance) => {
-                console.log('高德地图 Map 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
+                // console.log('高德地图 Map 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
             },
             click: () => {
 
@@ -163,7 +163,7 @@ class HouseDetail extends React.Component {
         };
         this.markerEvents = {
             created: (markerInstance) => {
-                console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
+                // console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
             },
             click: () => {
 
@@ -175,7 +175,7 @@ class HouseDetail extends React.Component {
         };
         this.infoWindowEvents = {
             created: (infoInstance) => {
-                console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
+                // console.log('高德地图 Marker 实例创建成功；如果你要亲自对实例进行操作，可以从这里开始。比如：');
             },
             click: () => {
 
@@ -189,6 +189,8 @@ class HouseDetail extends React.Component {
         this.markerPosition = {longitude: 120.096933, latitude: 30.272038};
     }
 
+
+
     componentDidMount() {
         let {houseInfoByCondition, location, ipfsUtils} = this.props;
         let search = location.search;
@@ -198,7 +200,7 @@ class HouseDetail extends React.Component {
         let imgArr = [];
         houseInfoByCondition.then(result => {
             let houseInfo = result[id];
-            console.log(log, houseInfo.imageArr);
+            // console.log(log, houseInfo.imageArr);
             houseInfo.imageArr.map((obj, index) => {
                 imgArr.push(ipfsUtils.domain + obj);
             });
@@ -224,7 +226,7 @@ class HouseDetail extends React.Component {
     render() {
         const {classes, location} = this.props;
         const {houseInfo} = this.state;
-        console.log(log, this.state, this.props.location.search);
+        // console.log(log, this.state, this.props.location.search);
         let parsePath = parseLocation(location);
         return (
             <div className={classes.root}>
@@ -282,7 +284,7 @@ class HouseDetail extends React.Component {
                                 </h2>
                                 <div className={classes.equipmentLayout}>
                                     {
-                                        houseInfo.houseEquipment.map((obj,index)=>{
+                                        houseInfo.houseEquipment.map((obj, index) => {
                                             return (
                                                 <Card className={classes.contentCard} key={index}>
                                                     <CardMedia
