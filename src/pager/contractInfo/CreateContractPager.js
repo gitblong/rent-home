@@ -23,6 +23,8 @@ import ImageUploader from 'react-images-upload';
 import rent from '../../statics/images/rent-home.jpg';
 import MapModel from '../../component/MapModel';
 import CreateSelect from '../../component/CreateSelect';
+import IconButton from '@material-ui/core/IconButton';
+import deleteIcon from '../../statics/icon/delete.svg';
 
 const styles = theme => ({
     container: {
@@ -52,8 +54,8 @@ const styles = theme => ({
         backgroundColor: "#fff",
         width: '100%',
         padding: '0px 16px',
-        paddingTop:'16px',
-        paddingBottom:'0px',
+        paddingTop: '16px',
+        paddingBottom: '0px',
         border: `0px solid ${blue[400]}`,
         borderRadius: '20px',
         boxShadow: `0px 0px 10px ${blue[400]}`,
@@ -108,7 +110,7 @@ const styles = theme => ({
             color: grey[800],
             "& select": {
                 // height: '50%',
-                margin:'0px 4px',
+                margin: '0px 4px',
                 // alignSelf: 'center',
                 fontSize: 14,
                 color: grey[600],
@@ -139,8 +141,8 @@ const styles = theme => ({
         display: 'flex',
         alignItem: 'center',
         // paddingLeft: 16,
-        minWidth:'80%',
-        width:'80%',
+        minWidth: '80%',
+        width: '80%',
         flexWrap: 'wrap',
         '&$checked': {
             color: green[500],
@@ -155,10 +157,10 @@ const styles = theme => ({
 
         "& span": {
             width: '19%',
-            lineHeight:'24px',
-            display:'flex',
-            justifyContent:'center',
-            borderLeft:`1px solid ${grey[400]}`
+            lineHeight: '24px',
+            display: 'flex',
+            justifyContent: 'center',
+            borderLeft: `1px solid ${grey[400]}`
         },
         "& span input": {
             padding: 0,
@@ -172,11 +174,42 @@ const styles = theme => ({
             height: "24px",
             boxSizing: "border-box",
             fontSize: "14px",
-            textAlign:'right',
-            paddingRight:'8px'
+            textAlign: 'right',
+            paddingRight: '8px'
         },
     },
 
+    addInput: {
+        "& input[type=text]": {
+            background: "#fdfeff",
+            // border: `none`,
+            borderRadius: "4px",
+            width: "37%",
+            height: "24px",
+            boxSizing: "border-box",
+            fontSize: "14px",
+            textAlign: 'right',
+            paddingRight: '8px',
+            marginBottom: 8,
+            marginLeft: 4
+        },
+
+    },
+    iconButton: {
+        // "& button":{
+            padding:4,
+            color: '#fff',
+            minWidth: 15,
+            fontSize: 14,
+            alignSelf: 'center',
+            marginTop: -5,
+            marginBottom: 0,
+            backgroundColor: 'none',
+        top:2,
+        position:'relative',
+        display:'inline-block'
+        // }
+    }
 });
 
 const currencies = [
@@ -288,7 +321,11 @@ class CreateContractPager extends React.Component {
         pictures: [],
         openModal: false,
         imgExtension: ['.jpg', '.gif', '.png', '.gif'],
-        maxFileSize: 1020 * 5
+        maxFileSize: 1020 * 5,
+        pledgeTypeArr: [{
+            pledgeTypeName: "",
+            pledgeFee: "",
+        }]
     };
 
     constructor() {
@@ -311,20 +348,54 @@ class CreateContractPager extends React.Component {
     handleChange = event => {
         this.setState({selectedValue: event.target.value});
     };
-    handleOpen = ()=> {
+    handleOpen = () => {
         this.setState({
             openModal: true
         })
     }
 
-    handleClose = ()=> {
+    handleClose = () => {
         this.setState({
             openModal: false
         })
     }
+    changePlegeFee = (index, e) => {
+        console.log(index, e.target.value);
+        let pledgeTypeArr = this.state.pledgeTypeArr;
+        pledgeTypeArr[index].pledgeFee = e.target.value;
+        this.setState({
+            pledgeTypeArr
+        })
+    }
+    changePlegeType = (index, e) => {
+        console.log(index, e)
+        let pledgeTypeArr = this.state.pledgeTypeArr;
+        pledgeTypeArr[index].pledgeTypeName = e.target.value;
+        this.setState({
+            pledgeTypeArr
+        })
+    };
+    addPlegeTypeArr = () => {
+        let pledgeTypeArr = this.state.pledgeTypeArr;
+        pledgeTypeArr.push({
+            pledgeTypeName: "",
+            pledgeFee: "",
+        })
+        this.setState({
+            pledgeTypeArr
+        });
+    };
+    deletePledgeArr = (index, e) => {
+        const pledgeTypeArr = this.state.pledgeTypeArr;
+        pledgeTypeArr.splice(index, 1);
+        this.setState({
+            pledgeTypeArr
+        })
+    };
+
 
     render() {
-
+        console.log(this.state.pledgeTypeArr)
         const {classes, location} = this.props;
         const {imgExtension, maxFileSize} = this.state
         return (
@@ -341,26 +412,28 @@ class CreateContractPager extends React.Component {
                                 <tr>
                                     <td width="100px">房源信息：</td>
                                     <td width="250px">
-                                        <input type="text" />
+                                        <input type="text"/>
                                     </td>
+                                    <td width="100px">承租人公钥：</td>
+                                    <td><input type="text"/></td>
                                 </tr>
                                 <tr>
                                     <td width="100px">房东姓名：</td>
-                                    <td width="250px"><input type="text" /></td>
-                                    <td width="100px">房东手机号:</td>
-                                    <td ><input type="text" /></td>
+                                    <td width="250px"><input type="text"/></td>
+                                    <td width="100px">承租人姓名：</td>
+                                    <td><input type="text"/></td>
                                 </tr>
                                 <tr>
-                                    <td width="100px">承租人姓名：</td>
-                                    <td width="250px"><input type="text" /></td>
+                                    <td width="100px">房东手机号:</td>
+                                    <td width="250px"><input type="text"/></td>
                                     <td width="100px">承租人手机:</td>
-                                    <td  ><input type="text" /></td>
+                                    <td><input type="text"/></td>
                                 </tr>
                                 <tr>
                                     <td width="120px">房东身份证号码：</td>
-                                    <td width="250px"><input type="text" /></td>
+                                    <td width="250px"><input type="text"/></td>
                                     <td width="120px">承租人身份证号码:</td>
-                                    <td width="250px"><input type="text" /></td>
+                                    <td width="250px"><input type="text"/></td>
                                 </tr>
 
                             </table>
@@ -374,41 +447,84 @@ class CreateContractPager extends React.Component {
                                     <td width="100px">退房日期:</td>
                                     <td width="250px"><input type="date"/></td>
                                 </tr>
-
+                                <tr>
+                                    <td width="100px">租期：</td>
+                                    <td width="200px">
+                                        <div className={classes.divInput}><input type="text"/><span>个月</span></div>
+                                    </td>
+                                    <td width="120px">付款方式:</td>
+                                    <td>押<select>
+                                        <option>一</option>
+                                        <option>二</option>
+                                    </select>付<select>
+                                        <option>一</option>
+                                        <option>二</option>
+                                    </select></td>
+                                </tr>
                                 <tr>
                                     <td width="100px">入住时水表：</td>
-                                    <td width="250px"><div className={classes.divInput}><input type="text"/><span>吨</span></div></td>
+                                    <td width="250px">
+                                        <div className={classes.divInput}><input type="text"/><span>吨</span></div>
+                                    </td>
                                     <td width="100px">入住时电表:</td>
-                                    <td><div className={classes.divInput}><input type="text"/><span>度</span></div></td>
+                                    <td>
+                                        <div className={classes.divInput}><input type="text"/><span>度</span></div>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td width="100px">水费：</td>
-                                    <td width="250px"><div className={classes.divInput}><input type="text" /><span>元/吨</span></div></td>
+                                    <td width="250px">
+                                        <div className={classes.divInput}><input type="text"/><span>元/吨</span></div>
+                                    </td>
                                     <td width="100px">电费:</td>
-                                    <td><div className={classes.divInput}><input type="text" /><span>元/度</span></div></td>
+                                    <td>
+                                        <div className={classes.divInput}><input type="text"/><span>元/度</span></div>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td width="100px">租金：</td>
-                                    <td width="250px"><div className={classes.divInput}><input type="text" /><span>元/月</span></div></td>
+                                    <td width="250px">
+                                        <div className={classes.divInput}><input type="text"/><span>元/月</span></div>
+                                    </td>
                                     <td width="100px">收租日期:</td>
                                     <td><div className={classes.divInput}><input placeholder="每月几号" type="text"/><span>号</span></div></td>
+                                    {/*<td width="120px">押金总额：</td>*/}
+
                                 </tr>
+
                                 <tr>
-                                    <td width="100px">租期：</td>
-                                    <td width="200px"><div className={classes.divInput}><input type="text" /><span>个月</span></div></td>
-                                    <td width="100px">开始收租日:</td>
-                                    <td><input type="date"/></td>
-                                </tr>
-                                <tr>
-                                    <td width="120px">房屋押金：</td>
-                                    <td width="200px"><div className={classes.divInput}><input type="text" /><span>元</span></div></td>
-                                    <td width="120px">付款方式:</td>
-                                    <td>押<select><option>一</option><option>二</option></select>付<select><option>一</option><option>二</option></select></td>
-                                </tr>
-                                <tr>
-                                    <td>其它押金费用</td>
-                                    <td colSpan="3">
-                                        <CreateSelect/>
+                                    <td style={{verticalAlign: 'top'}}>押金费用:</td>
+                                    <td width="250px" className={classes.addInput}>
+                                        {
+                                            this.state.pledgeTypeArr.map((obj, index) => {
+                                                return (
+                                                    <div><input style={{marginLeft:0}} name="type" value={obj.pledgeTypeName} onChange={e => {
+                                                        this.changePlegeType(index, e)
+                                                    }} type="text"/> -
+                                                        <input value={obj.pledgeFee} name="fee" onChange={e => {
+                                                            this.changePlegeFee(index, e)
+                                                        }} type="text"
+                                                               style={{textAlign: 'left', paddingLeft: 8}}/>
+                                                        <div className={classes.iconButton}>
+                                                            <img
+                                                                onClick={e=>{this.deletePledgeArr(index,e)}}
+                                                            src={deleteIcon}/>
+                                                        </div><br/></div>)
+                                            })
+                                        }
+
+                                    </td>
+                                    <td style={{verticalAlign: 'top'}}><Button onClick={this.addPlegeTypeArr} style={{
+                                        border: `1px solid ${blue[400]}`,
+                                        minHeight: 25,
+                                        minWidth: 40,
+                                        width: 40,
+                                        height: 27,
+                                        marginTop: 0,
+                                        marginBottom: 0
+                                    }}>添加</Button></td>
+                                    <td width="100px" style={{verticalAlign: 'top'}}>
+                                        <div className={classes.divInput}><input type="text" placeholder="押金总额"/><span>元</span></div>
                                     </td>
                                 </tr>
                             </table>

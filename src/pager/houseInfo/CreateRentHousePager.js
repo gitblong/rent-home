@@ -443,7 +443,12 @@ class TextFields extends React.Component {
 
         ipfsUtils.addToIpfs([Buffer.from(JSON.stringify(detailInfo), 'utf-8')]).then(result => {
             console.log(result);
-            ipfsUtils.addHashToHouseInfoContracts(result);
+            ipfsUtils.addHashToHouseInfoContracts(result).then(result=>{
+                if (result.status) {
+                    alert("提交成功");
+                }
+            });
+
         })
     };
     handleConfirm = locationInfo => {
