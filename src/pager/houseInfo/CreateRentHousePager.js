@@ -19,8 +19,6 @@ import {isEmpty} from "../../Utils/util";
 // import {addHouseInfo}from '../../smart-contract-ipfs/HouseInfoContract';
 
 //
-// console.log(addHouseInfo("test"));
-// console.log(window.drizzle, window.drizzleState);
 
 
 const styles = theme => ({
@@ -340,7 +338,6 @@ class TextFields extends React.Component {
             this.state.pictureBuffers.map((obj, index) => {
                 this.props.ipfsUtils
                     .addToIpfs(Buffer.from(obj.result)).then(result => {
-                    console.log(result);
                     imgHashArr.push(result);
                     // this.setState({
                     //     imgHashArr: imgHashArr
@@ -368,7 +365,6 @@ class TextFields extends React.Component {
     };
     handleSave = () => {
         let {drizzle, ipfsUtils, drizzleState} = this.props;
-        console.log(drizzleState);
         detailInfo.houseType = initialHouseInfo.houseType[this.state.houseTypeSelectedValue];
         detailInfo.rentType = initialHouseInfo.rentType[this.state.rentTypeSelectedValue];
         detailInfo.isOwnLiftType = initialHouseInfo.isOwnLiftType[this.state.isOwnLiftTypeSelectedValue];
@@ -439,10 +435,8 @@ class TextFields extends React.Component {
             alert("位置不在商圈服务范围");
             return;
         }
-        console.log('details', detailInfo);
 
         ipfsUtils.addToIpfs([Buffer.from(JSON.stringify(detailInfo), 'utf-8')]).then(result => {
-            console.log(result);
             ipfsUtils.addHashToHouseInfoContracts(result).then(result=>{
                 if (result.status) {
                     alert("提交成功");
@@ -459,8 +453,6 @@ class TextFields extends React.Component {
     };
 
     render() {
-        console.log(this.state);
-        console.log(this.state, this.props);
         const {classes, location} = this.props;
         const {imgExtension, maxFileSize} = this.state;
         return (

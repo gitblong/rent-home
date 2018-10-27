@@ -21,7 +21,6 @@ export class IPFSUtils {
 
     getShowHouseInfoCount = () => {
         return new Promise(resolve => {
-
             this.houseInfoContract.methods.showHouseInfoCount().call()
                 .then(result => {
                     resolve(result);

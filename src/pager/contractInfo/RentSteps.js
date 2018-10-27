@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import blue from '@material-ui/core/colors/blue';
 import grey from '@material-ui/core/colors/grey';
-import TapContractContainer from './TapContractContainer';
+import TapContractContainer from './TapActiveContractContainer';
 import TapWithdrawDepositContainer from './TapWithdrawDepositContainer';
 import TapPayDepositContainer from './TapPayDepositContainer';
 import TapRentContainer from './TapRentContainer';

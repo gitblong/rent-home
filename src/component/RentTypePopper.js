@@ -54,8 +54,6 @@ const styles = theme => ({
         cursor: "pointer"
     },
 });
-const log = "RentTypePopper-------------------------";
-
 class RentTypePopper extends React.Component {
     constructor(props) {
         super(props);
@@ -74,7 +72,6 @@ class RentTypePopper extends React.Component {
 
     render() {
         const {classes, anchorEl, open, clickPopperId} = this.props;
-        console.log(log, this.state);
         const citys = this.state.rentTypes;
         return (
             <div>

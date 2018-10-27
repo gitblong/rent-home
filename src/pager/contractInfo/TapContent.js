@@ -11,7 +11,7 @@ import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import blue from "@material-ui/core/colors/blue";
 import grey from "@material-ui/core/colors/grey";
-import TapContractContainer from './TapContractContainer';
+import TapContractContainer from './TapActiveContractContainer';
 import TapDepositContainer from './TapWithdrawDepositContainer';
 import TapRentContainer from './TapRentContainer';
 import HorizontalNonLinearAlternativeLabelStepper from './ContractSteps';

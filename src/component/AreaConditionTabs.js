@@ -134,7 +134,6 @@ class CustomizedTabs extends React.Component {
     }
 
     updateAreaData = (props) => {
-        console.log(props)
         let {currentCity} = props;
         let areasData = [];
         areas.map((obj, index) => {
@@ -172,10 +171,8 @@ class CustomizedTabs extends React.Component {
                 buttons[ind].className = btnClassName;
             }
         });
-        console.log(this.props)
         allHouseInfoData.then(result => {
             let houseInfoByCondition1 = ipfsUtils.getHouseInfoByCondition(result, currentCity.code, this.state.data[index].code);
-            console.log(houseInfoByCondition1)
             changeHouseInfoByCondition(houseInfoByCondition1);
         })
 
@@ -183,7 +180,6 @@ class CustomizedTabs extends React.Component {
 
     render() {
         const {classes, hiddenTitle, conditionData, tabsId} = this.props;
-        console.log(log, this.state);
         let data = new Array();
         if (conditionData != undefined) {
             data = conditionData;

@@ -11,10 +11,13 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import blue from '@material-ui/core/colors/blue';
 import grey from '@material-ui/core/colors/grey';
-import TapContractContainer from './TapContractContainer';
+import TapActiveContractContainer from './TapActiveContractContainer';
+import TapSignatureContractContainer from './TapSignatureContractContainer';
 import TapWithdrawDepositContainer from './TapWithdrawDepositContainer';
 import TapPayDepositContainer from './TapPayDepositContainer';
 import TapRentContainer from './TapRentContainer';
+import TapWithdrawActiveFeeContainer from './TapWithdrawActiveFeeContainer';
+
 const styles = theme => ({
     root: {
         width: '100%',
@@ -38,28 +41,26 @@ const styles = theme => ({
 });
 
 function getSteps() {
-    return ['签署租赁协议', '支付押金', '已激活租赁协议', '退还押金', '已完成租赁协议'];
-}
-
-function getStepContent(step) {
-    switch (step) {
-        case 0:
-            return 'Step 1: Select campaign settings...';
-        case 1:
-            return 'Step 2: What is an ad group anyways?';
-        case 2:
-            return 'Step 3: This is the bit I really care about!';
-        default:
-            return 'Unknown step';
-    }
+    return ['激活合同', '签署租赁协议', '支付押金', '租赁协议已生效', '退还押金', '已完成租赁协议'];
 }
 
 class ContractSteps extends React.Component {
-    state = {
-        activeStep: 2,
-        completed: new Set(),
-        skipped: new Set(),
-    };
+
+
+    constructor(props) {
+        super(props);
+        let completed = new Set();
+        getSteps().map((obj, index) => {
+            if (index < parseInt(props.contractInfo.status)) {
+                completed.add(index);
+            }
+        });
+        this.state = {
+            activeStep: parseInt(props.contractInfo.status),
+            completed: completed,
+            skipped: new Set(),
+        };
+    }
 
     totalSteps = () => {
         return getSteps().length;
@@ -160,20 +161,15 @@ class ContractSteps extends React.Component {
     }
 
     render() {
-        const {classes} = this.props;
+        const {classes, contractInfo, rentContract,rentContractUtils,rentContractIndex,setBalance} = this.props;
         const steps = getSteps();
         const {activeStep} = this.state;
-
         return (
             <div className={classes.root}>
                 <Stepper alternativeLabel nonLinear activeStep={activeStep}>
                     {steps.map((label, index) => {
                         const props = {};
                         const buttonProps = {};
-                        if (this.isStepOptional(index)) {
-                            {/*buttonProps.optional = <Typography variant="caption">Optional</Typography>;*/
-                            }
-                        }
                         if (this.isStepSkipped(index)) {
                             props.completed = false;
                         }
@@ -191,12 +187,80 @@ class ContractSteps extends React.Component {
                     })}
                 </Stepper>
                 <div>
-                    {activeStep === 0 && <TapContractContainer>{steps[activeStep].label}</TapContractContainer>}
-                    {activeStep === 1 && <TapPayDepositContainer>{steps[activeStep].label}</TapPayDepositContainer>}
-                    {activeStep === 2 && <TapRentContainer>{steps[activeStep].label}</TapRentContainer>}
-                    {activeStep === 3 && <TapWithdrawDepositContainer>{steps[activeStep].label}</TapWithdrawDepositContainer>}
-                    {activeStep === 4 && <TapRentContainer>{steps[activeStep].label}</TapRentContainer>}
-
+                    {
+                        activeStep == 0 &&
+                        <TapActiveContractContainer
+                            rentContract={rentContract}
+                            contractInfo={contractInfo}
+                            rentContractUtils={rentContractUtils}
+                            handleComplete={this.handleComplete}
+                            setBalance={setBalance}
+                            rentContractIndex={rentContractIndex}
+                        >
+                            {steps[activeStep].label}
+                        </TapActiveContractContainer>
+                    }
+                    {
+                        activeStep == 1 &&
+                        <TapSignatureContractContainer
+                            rentContract={rentContract}
+                            contractInfo={contractInfo}
+                            rentContractUtils={rentContractUtils}
+                            handleComplete={this.handleComplete}
+                            setBalance={setBalance}
+                            rentContractIndex={rentContractIndex}
+                        >
+                            {steps[activeStep].label}
+                        </TapSignatureContractContainer>
+                    }
+                    {
+                        activeStep == 2 &&
+                        <TapPayDepositContainer
+                            rentContract={rentContract}
+                            contractInfo={contractInfo}
+                            rentContractUtils={rentContractUtils}
+                            handleComplete={this.handleComplete}
+                            setBalance={setBalance}
+                            rentContractIndex={rentContractIndex}>
+                            {steps[activeStep].label}
+                        </TapPayDepositContainer>
+                    }
+                    {
+                        activeStep == 3 &&
+                        <TapRentContainer
+                            rentContract={rentContract}
+                            contractInfo={contractInfo}
+                            rentContractUtils={rentContractUtils}
+                            handleComplete={this.handleComplete}
+                            setBalance={setBalance}
+                            rentContractIndex={rentContractIndex}>
+                            {steps[activeStep].label}
+                        </TapRentContainer>
+                    }
+                    {
+                        activeStep == 4 &&
+                        <TapWithdrawDepositContainer
+                            rentContract={rentContract}
+                            contractInfo={contractInfo}
+                            rentContractUtils={rentContractUtils}
+                            handleComplete={this.handleComplete}
+                            setBalance={setBalance}
+                            rentContractIndex={rentContractIndex}>
+                            {steps[activeStep].label}
+                        </TapWithdrawDepositContainer>
+                    }
+                    {
+                        activeStep == 5 &&
+                        <TapWithdrawActiveFeeContainer
+                            rentContract={rentContract}
+                            contractInfo={contractInfo}
+                            rentContractUtils={rentContractUtils}
+                            handleComplete={this.handleComplete}
+                            setBalance={setBalance}
+                            rentContractIndex={rentContractIndex}>
+                            {steps[activeStep].label}
+                        </TapWithdrawActiveFeeContainer>
+                    }
                 </div>
             </div>
         );

@@ -1,30 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 import ToolBar from '../../component/ToolBarTop';
 import grey from '@material-ui/core/colors/grey';
 import blue from '@material-ui/core/colors/blue';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 import green from '@material-ui/core/colors/green';
 import Button from '@material-ui/core/Button';
-import Checkbox from '@material-ui/core/Checkbox'
-import ImageUploader from 'react-images-upload';
-import rent from '../../statics/images/rent-home.jpg';
-import MapModel from '../../component/MapModel';
-import CreateSelect from '../../component/CreateSelect';
-import IconButton from '@material-ui/core/IconButton';
 import deleteIcon from '../../statics/icon/delete.svg';
+import {connect} from "react-redux";
+import {MapDispatchToProps, MapStateToProps} from "../../config/ReduxMapToPropsConfig";
 
 const styles = theme => ({
     container: {
@@ -197,135 +182,49 @@ const styles = theme => ({
     },
     iconButton: {
         // "& button":{
-            padding:4,
-            color: '#fff',
-            minWidth: 15,
-            fontSize: 14,
-            alignSelf: 'center',
-            marginTop: -5,
-            marginBottom: 0,
-            backgroundColor: 'none',
-        top:2,
-        position:'relative',
-        display:'inline-block'
+        padding: 4,
+        color: '#fff',
+        minWidth: 15,
+        fontSize: 14,
+        alignSelf: 'center',
+        marginTop: -5,
+        marginBottom: 0,
+        backgroundColor: 'none',
+        top: 2,
+        position: 'relative',
+        display: 'inline-block'
         // }
     }
 });
 
-const currencies = [
-    {
-        value: 'USD',
-        label: '$',
-    },
-    {
-        value: 'EUR',
-        label: '€',
-    },
-    {
-        value: 'BTC',
-        label: '฿',
-    },
-    {
-        value: 'JPY',
-        label: '¥',
-    },
-];
+// label: '¥',
 
 class CreateContractPager extends React.Component {
     state = {
         name: 'Cat in the Hat',
         age: '',
-        multiline: 'Controlled',
-        currency: 'EUR',
         value: 'female',
-        selectedValue: 'a',
-        equipment: [
-            {
-                value: 'ari',
-                name: '空调',
-                checked: true,
-            },
-            {
-                value: 'balcony',
-                name: '阳台',
-                checked: true,
-            },
-            {
-                value: "broadband",
-                name: '宽度',
-                checked: true,
-            },
-            {
-                value: "desk",
-                name: '写字桌',
-                checked: true,
-            },
-            {
-                value: "doubleBeb",
-                name: '双人床',
-                checked: true,
-            },
-            {
-                value: "dresser",
-                name: '梳妆台',
-                checked: true,
-            },
-            {
-                value: "kitchen",
-                name: '厨房',
-                checked: true,
-            },
-            {
-                value: "refrigerator",
-                name: '冰箱',
-                checked: true,
-            },
-            {
-                value: "singleBel",
-                name: '单人床',
-                checked: true,
-            },
-            {
-                value: 'soft',
-                name: '沙发',
-                checked: true,
-            },
-            {
-                value: "toilet",
-                name: '卫生间',
-                checked: true,
-            },
-            {
-                value: 'tv',
-                name: '电视机',
-                checked: true,
-            },
-            {
-                value: 'washing-machine',
-                name: '洗衣机',
-                checked: true,
-            },
-            {
-                value: 'water-heater',
-                name: '热水器',
-                checked: true,
-            },
-            {
-                value: 'window',
-                name: '飘窗',
-                checked: true,
-            },
-
-
-        ],
-        pictures: [],
-        openModal: false,
-        imgExtension: ['.jpg', '.gif', '.png', '.gif'],
-        maxFileSize: 1020 * 5,
         pledgeTypeArr: [{
-            pledgeTypeName: "",
-            pledgeFee: "",
-        }]
+            pledgeTypeName: "1",
+            pledgeFee: "1",
+        }],
+        houseAddress: "1",
+        landlordName: "1",
+        landlordTelephone: "1",
+        landlordIdNumber: "1",
+        tenantPublicKey: "0xcf0c99bfd836737c5d0a291b248a72656aab8ca6",
+        tenantName: "1",
+        tenantTelephone: "1",
+        tenantIdNumber: "1",
+        startTime: "2018-05-01",
+        endTime: "2018-09-01",
+        rentTerm: "1",
+        waterMeter: "1",
+        electricityMeter: "1",
+        waterFee: "1",
+        electricityFee: "1",
+        rentFee: "1",
+        pledgeTotal: "1",
     };
 
     constructor() {
@@ -334,41 +233,14 @@ class CreateContractPager extends React.Component {
         let childNodes = elementsByClassName[0]
     }
 
-    componentWillMount() {
-        let image = new Image(rent);
-        this.onDrop(image);
-    }
-
-    onDrop = (picture) => {
-        this.setState({
-            pictures: this.state.pictures.concat(picture),
-        });
-    }
-
-    handleChange = event => {
-        this.setState({selectedValue: event.target.value});
-    };
-    handleOpen = () => {
-        this.setState({
-            openModal: true
-        })
-    }
-
-    handleClose = () => {
-        this.setState({
-            openModal: false
-        })
-    }
     changePlegeFee = (index, e) => {
-        console.log(index, e.target.value);
         let pledgeTypeArr = this.state.pledgeTypeArr;
-        pledgeTypeArr[index].pledgeFee = e.target.value;
+        pledgeTypeArr[index].pledgeFee = parseInt(e.target.value);
         this.setState({
             pledgeTypeArr
         })
     }
     changePlegeType = (index, e) => {
-        console.log(index, e)
         let pledgeTypeArr = this.state.pledgeTypeArr;
         pledgeTypeArr[index].pledgeTypeName = e.target.value;
         this.setState({
@@ -393,11 +265,61 @@ class CreateContractPager extends React.Component {
         })
     };
 
+    createRentContract = () => {
+        console.log("create", this.props);
+        let {rentContractUtils} = this.props;
+        let pledgeTotal = this.countPledgeTotal();
+        const {
+            houseAddress, landlordName, landlordTelephone, landlordIdNumber,
+            tenantPublicKey, tenantName, tenantTelephone, tenantIdNumber, startTime,
+            endTime, rentTerm, waterMeter, electricityMeter, waterFee, electricityFee,
+            rentFee, pledgeTypeArr
+        } = this.state;
+        let baseInfoObj = {
+            houseAddress,
+            landlordName,
+            landlordTelephone,
+            landlordIdNumber,
+            tenantName,
+            tenantTelephone,
+            tenantIdNumber,
+            tenantPublicKey,
+            pledgeTypeArr
+        };
+        console.log(JSON.stringify(baseInfoObj), baseInfoObj, this.state);
+        rentContractUtils.createRentContract(JSON.stringify(baseInfoObj), tenantPublicKey,
+            new Date(startTime).valueOf(), new Date(endTime).valueOf(), parseInt(rentFee), parseInt(rentTerm),
+            parseInt(waterMeter), parseInt(electricityMeter), parseInt(electricityFee),parseInt(waterFee),
+            pledgeTypeArr, pledgeTotal)
+            .then(result=>{
+                console.log(result);
+
+            });
+    };
+
+    countPledgeTotal = () => {
+        let {pledgeTypeArr} = this.state;
+        let pledgeTotal = 0;
+        pledgeTypeArr.forEach((obj, index) => {
+            if (obj.pledgeFee != undefined && obj.pledgeTypeName != undefined && obj.pledgeTypeName.length > 0 && obj.pledgeFee > 0) {
+                pledgeTotal += parseInt(obj.pledgeFee);
+            }
+        });
+
+        this.setState({
+            pledgeTotal
+        });
+        return pledgeTotal;
+    };
 
     render() {
-        console.log(this.state.pledgeTypeArr)
         const {classes, location} = this.props;
-        const {imgExtension, maxFileSize} = this.state
+        const {
+            houseAddress, landlordName, landlordTelephone, landlordIdNumber,
+            tenantPublicKey, tenantName, tenantTelephone, tenantIdNumber, startTime,
+            endTime, rentTerm, waterMeter, electricityMeter, waterFee, electricityFee,
+            rentFee, pledgeTotal,
+        } = this.state;
         return (
             <form className={classes.container} noValidate autoComplete="off">
                 <ToolBar currentLocation={location} searchHidden={true} className={classes.toolBar}/>
@@ -412,28 +334,53 @@ class CreateContractPager extends React.Component {
                                 <tr>
                                     <td width="100px">房源信息：</td>
                                     <td width="250px">
-                                        <input type="text"/>
+                                        <input value={houseAddress}
+                                               onChange={(e) => {
+                                                   this.setState({houseAddress: e.target.value})
+                                               }} type="text"/>
                                     </td>
                                     <td width="100px">承租人公钥：</td>
-                                    <td><input type="text"/></td>
+                                    <td><input type="text" value={tenantPublicKey}
+                                               onChange={(e) => {
+                                                   this.setState({tenantPublicKey: e.target.value})
+                                               }}/></td>
                                 </tr>
                                 <tr>
                                     <td width="100px">房东姓名：</td>
-                                    <td width="250px"><input type="text"/></td>
+                                    <td width="250px"><input type="text" value={landlordName}
+                                                             onChange={(e) => {
+                                                                 this.setState({landlordName: e.target.value})
+                                                             }}/></td>
                                     <td width="100px">承租人姓名：</td>
-                                    <td><input type="text"/></td>
+                                    <td><input type="text" value={tenantName}
+                                               onChange={(e) => {
+                                                   this.setState({tenantName: e.target.value})
+                                               }}/></td>
                                 </tr>
                                 <tr>
                                     <td width="100px">房东手机号:</td>
-                                    <td width="250px"><input type="text"/></td>
+                                    <td width="250px"><input type="text" value={landlordTelephone}
+                                                             onChange={(e) => {
+                                                                 this.setState({landlordTelephone: e.target.value})
+                                                             }}
+                                    /></td>
                                     <td width="100px">承租人手机:</td>
-                                    <td><input type="text"/></td>
+                                    <td><input type="text" value={tenantTelephone}
+                                               onChange={(e) => {
+                                                   this.setState({tenantTelephone: e.target.value})
+                                               }}/></td>
                                 </tr>
                                 <tr>
                                     <td width="120px">房东身份证号码：</td>
-                                    <td width="250px"><input type="text"/></td>
+                                    <td width="250px"><input value={landlordIdNumber} type="text"
+                                                             onChange={(e) => {
+                                                                 this.setState({landlordIdNumber: e.target.value})
+                                                             }}/></td>
                                     <td width="120px">承租人身份证号码:</td>
-                                    <td width="250px"><input type="text"/></td>
+                                    <td width="250px"><input type="text" value={tenantIdNumber}
+                                                             onChange={(e) => {
+                                                                 this.setState({tenantIdNumber: e.target.value})
+                                                             }}/></td>
                                 </tr>
 
                             </table>
@@ -443,73 +390,106 @@ class CreateContractPager extends React.Component {
                             <table>
                                 <tr>
                                     <td width="120px">起租日期：</td>
-                                    <td width="250px"><input type="date"/></td>
+                                    <td width="250px"><input value={startTime} type="date"
+                                                             onChange={(e) => {
+                                                                 this.setState({startTime: e.target.value})
+                                                             }}/></td>
                                     <td width="100px">退房日期:</td>
-                                    <td width="250px"><input type="date"/></td>
+                                    <td width="250px"><input value={endTime} type="date"
+                                                             onChange={(e) => {
+                                                                 this.setState({endTime: e.target.value})
+                                                             }}/></td>
                                 </tr>
                                 <tr>
+                                    <td width="100px">租金：</td>
+                                    <td width="250px">
+                                        <div className={classes.divInput}>
+                                            <input value={rentFee} type="text"
+                                                   onChange={(e) => {
+                                                       this.setState({rentFee: e.target.value})
+                                                   }}/>
+                                            <span>元/月</span>
+                                        </div>
+                                    </td>
                                     <td width="100px">租期：</td>
                                     <td width="200px">
-                                        <div className={classes.divInput}><input type="text"/><span>个月</span></div>
+                                        <div className={classes.divInput}>
+                                            <input value={rentTerm} type="text"
+                                                   onChange={(e) => {
+                                                       this.setState({rentTerm: e.target.value})
+                                                   }}/>
+                                            <span>个月</span>
+                                        </div>
                                     </td>
-                                    <td width="120px">付款方式:</td>
-                                    <td>押<select>
-                                        <option>一</option>
-                                        <option>二</option>
-                                    </select>付<select>
-                                        <option>一</option>
-                                        <option>二</option>
-                                    </select></td>
+
                                 </tr>
                                 <tr>
                                     <td width="100px">入住时水表：</td>
                                     <td width="250px">
-                                        <div className={classes.divInput}><input type="text"/><span>吨</span></div>
+                                        <div className={classes.divInput}>
+                                            <input value={waterMeter} type="text"
+                                                   onChange={(e) => {
+                                                       this.setState({waterMeter: e.target.value})
+                                                   }}/>
+                                            <span>吨</span>
+                                        </div>
                                     </td>
                                     <td width="100px">入住时电表:</td>
                                     <td>
-                                        <div className={classes.divInput}><input type="text"/><span>度</span></div>
+                                        <div className={classes.divInput}>
+                                            <input value={electricityMeter} type="text"
+                                                   onChange={(e) => {
+                                                       this.setState({electricityMeter: e.target.value})
+                                                   }}/>
+                                            <span>度</span>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td width="100px">水费：</td>
                                     <td width="250px">
-                                        <div className={classes.divInput}><input type="text"/><span>元/吨</span></div>
+                                        <div className={classes.divInput}>
+                                            <input value={waterFee} type="text"
+                                                   onChange={(e) => {
+                                                       this.setState({waterFee: e.target.value})
+                                                   }}/>
+                                            <span>元/吨</span>
+                                        </div>
                                     </td>
                                     <td width="100px">电费:</td>
                                     <td>
-                                        <div className={classes.divInput}><input type="text"/><span>元/度</span></div>
+                                        <div className={classes.divInput}>
+                                            <input value={electricityFee} type="text"
+                                                   onChange={(e) => {
+                                                       this.setState({electricityFee: e.target.value})
+                                                   }}/>
+                                            <span>元/度</span>
+                                        </div>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td width="100px">租金：</td>
-                                    <td width="250px">
-                                        <div className={classes.divInput}><input type="text"/><span>元/月</span></div>
-                                    </td>
-                                    <td width="100px">收租日期:</td>
-                                    <td><div className={classes.divInput}><input placeholder="每月几号" type="text"/><span>号</span></div></td>
-                                    {/*<td width="120px">押金总额：</td>*/}
-
-                                </tr>
-
                                 <tr>
                                     <td style={{verticalAlign: 'top'}}>押金费用:</td>
                                     <td width="250px" className={classes.addInput}>
                                         {
                                             this.state.pledgeTypeArr.map((obj, index) => {
                                                 return (
-                                                    <div><input style={{marginLeft:0}} name="type" value={obj.pledgeTypeName} onChange={e => {
+                                                    <div><input style={{marginLeft: 0}} name="type"
+                                                                value={obj.pledgeTypeName} onChange={e => {
                                                         this.changePlegeType(index, e)
                                                     }} type="text"/> -
                                                         <input value={obj.pledgeFee} name="fee" onChange={e => {
                                                             this.changePlegeFee(index, e)
                                                         }} type="text"
-                                                               style={{textAlign: 'left', paddingLeft: 8}}/>
+                                                               style={{textAlign: 'left', paddingLeft: 8}}
+                                                               placeholder="元"/>
                                                         <div className={classes.iconButton}>
                                                             <img
-                                                                onClick={e=>{this.deletePledgeArr(index,e)}}
-                                                            src={deleteIcon}/>
-                                                        </div><br/></div>)
+                                                                onClick={e => {
+                                                                    this.deletePledgeArr(index, e)
+                                                                }}
+                                                                src={deleteIcon}/>
+                                                        </div>
+                                                        <br/></div>)
                                             })
                                         }
 
@@ -524,12 +504,20 @@ class CreateContractPager extends React.Component {
                                         marginBottom: 0
                                     }}>添加</Button></td>
                                     <td width="100px" style={{verticalAlign: 'top'}}>
-                                        <div className={classes.divInput}><input type="text" placeholder="押金总额"/><span>元</span></div>
+                                        <div className={classes.divInput}>
+                                            <input type="text" value={pledgeTotal} placeholder="押金总额"
+                                                   onChange={(e) => {
+                                                       this.setState({pledgeTotal: e.target.value})
+                                                   }}/>
+                                            <span>元</span>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
                         </div>
-                        <Button>创建合同</Button>
+                        <Button onClick={e => {
+                            this.createRentContract()
+                        }}>创建合同</Button>
                     </div>
                 </div>
             </form>
@@ -541,5 +529,5 @@ class CreateContractPager extends React.Component {
 CreateContractPager.propTypes = {
     classes: PropTypes.object.isRequired,
 };
-
+CreateContractPager = connect(MapStateToProps, MapDispatchToProps)(CreateContractPager);
 export default withStyles(styles)(CreateContractPager);

@@ -84,7 +84,6 @@ const styles = {
 
 
 };
-let log = "Content----------";
 class Content extends React.Component {
     constructor(props) {
         super(props);
@@ -102,9 +101,7 @@ class Content extends React.Component {
     componentDidMount() {
         const {classes, houseInfoByCondition, ipfsUtils} = this.props;
         const {page, pageSize} = this.state;
-        console.log(houseInfoByCondition);
         houseInfoByCondition.then(result => {
-            console.log(result);
             let pageInfo = ipfsUtils.getPageInfo(result, page, pageSize);
             let info = this.state.info;
             if (result == 0) {
@@ -124,7 +121,6 @@ class Content extends React.Component {
         const {classes, houseInfoByCondition, ipfsUtils} = nextProps;
         const {page, pageSize} = this.state;
         houseInfoByCondition.then(result => {
-            console.log(result);
             let pageInfo = ipfsUtils.getPageInfo(result, page, pageSize);
             let info = this.state.info;
             if (result == 0) {
@@ -143,7 +139,6 @@ class Content extends React.Component {
         let {pageSize} = this.state;
         houseInfoByCondition.then(result => {
             let pageInfo = ipfsUtils.getPageInfo(result, value, pageSize);
-            console.log(pageInfo, value);
             this.setState({
                 pageInfo,
                 page: value
@@ -153,7 +148,6 @@ class Content extends React.Component {
     };
 
     render() {
-        console.log("sa-----------?")
         const {classes, ipfsUtils,changeHouseInfoByCondition,houseInfoByCondition,currentCity,allHouseInfoData} = this.props;
         const {loadingInfo, info, pageInfo, page, pageSize} = this.state;
         if (loadingInfo) return <div className={classes.contentLayout}>{info}</div>

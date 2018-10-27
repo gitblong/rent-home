@@ -11,11 +11,14 @@ import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import blue from "@material-ui/core/colors/blue";
 import grey from "@material-ui/core/colors/grey";
-import TapContractContainer from './TapContractContainer';
+import TapContractContainer from './TapActiveContractContainer';
 import TapDepositContainer from './TapWithdrawDepositContainer';
 import TapRentContainer from './TapRentContainer';
 import ContractSteps from './ContractSteps';
 import TapContent from './TapContent';
+import connect from "react-redux/es/connect/connect";
+import {MapDispatchToProps, MapStateToProps} from "../../config/ReduxMapToPropsConfig";
+
 function TabContainer(props) {
     return (
         <Typography component="div" style={{padding: 8 * 3}}>
@@ -23,7 +26,8 @@ function TabContainer(props) {
         </Typography>
     );
 }
-const styles = theme =>({
+
+const styles = theme => ({
     root: {
         width: 1000,
         margin: '0 auto',
@@ -33,7 +37,10 @@ const styles = theme =>({
     tabRoot: {
         flexGrow: 1,
         backgroundColor: grey[200],
-
+        margin: '32px 0px',
+        borderRadius: '5px',
+        border: `solid 1px ${blue[400]}`,
+        boxShadow: `0 0 10px 5px ${blue[200]}`
     },
     appBar: {
         backgroundColor: "#fff",
@@ -72,10 +79,11 @@ const styles = theme =>({
         minHeight: 600,
         backgroundColor: "#f2f5ff"
     },
-    tapContent:{
-        width:'100%'
-    }
+    tapContent: {
+        width: '100%'
+    },
 })
+
 class MyContractsPager extends React.Component {
     constructor(props) {
         super(props);
@@ -83,32 +91,115 @@ class MyContractsPager extends React.Component {
 
     state = {
         value: 2,
+        contractInfoArr: [],
+        rentContractArr: [],
+        balance: 0
     };
+
+    setBalance = (obj, index) => {
+        let {rentContractUtils} = this.props;
+        rentContractUtils.getActiveFee(obj).then(balance => {
+            let balanceArr = this.state.balanceArr;
+            balanceArr[index] = balance;
+            this.setState({
+                balanceArr: balanceArr,
+            });
+        });
+    };
+
+    componentDidMount() {
+        let {rentContractUtils} = this.props;
+
+        rentContractUtils.getUserRentContract()
+            .then(contracts => {
+                let contractInfoArr = [];
+                let balanceArr = []
+                this.setState({
+                    rentContractArr: contracts
+                });
+                contracts.map((obj, index) => {
+                    rentContractUtils.getActiveFee(obj).then(balance => {
+                        balanceArr.push(balance);
+                        if (index == balanceArr.length - 1) {
+                            this.setState({
+                                balanceArr: balanceArr
+                            });
+                        }
+                    });
+                    rentContractUtils.getRentContractInfo(obj)
+                        .then(contractInfo => {
+                            contractInfoArr.push(contractInfo);
+
+                            if (index == contractInfoArr.length - 1) {
+                                this.setState({
+                                    contractInfoArr
+                                });
+                            }
+                        });
+                });
+            });
+
+    }
 
     handleChange = (event, value) => {
         this.setState({value});
     };
 
     render() {
-        const {classes, location} = this.props;
-        const {value} = this.state;
-
+        const {classes, location, rentContractUtils} = this.props;
+        const {value, rentContractArr, contractInfoArr, balanceArr} = this.state;
         return (
             <div className={classes.root}>
-                <ToolBar currentLocation={location} placeText="快速查找我的租赁合同"/>
-                <div className={classes.tabRoot}>
-                    <AppBar position="static" className={classes.appBar}>
-                        <h3 className={classes.appBarTitle}>嘉和花苑,14幢1单元603</h3>
-                    </AppBar>
-                    <ContractSteps className={classes.tapContent}/>
+
+                <div>
+                    <ToolBar currentLocation={location} placeText="快速查找我的租赁合同"/>
+                    {
+                        contractInfoArr.map((obj, index) => {
+                            return (
+                                < div className={classes.tabRoot}>
+                                    <AppBar position="static" className={classes.appBar}>
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <h3 width="50%"
+                                                        className={classes.appBarTitle}>{obj.baseInfoJson.houseAddress}</h3>
+                                                </td>
+                                                <td>
+                                                    <h3 width="50%" className={classes.appBarTitle}
+                                                        style={{float: "right"}}>当前合同存储的以太币为:{balanceArr[index]} Wei</h3>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </AppBar>
+                                    <ContractSteps
+                                        rentContract={rentContractArr[index]}
+                                        contractInfo={obj}
+                                        rentContractUtils={rentContractUtils}
+                                        className={classes.tapContent}
+                                        rentContractIndex={index}
+                                        setBalance={this.setBalance}
+                                    />
+                                </div>
+                            );
+                        })
+
+                    }
                 </div>
+
+
             </div>
-        )
+        );
     }
 }
 
-MyContractsPager.propTypes = {
+MyContractsPager
+    .propTypes = {
     classes: PropTypes.object.isRequired,
 }
+MyContractsPager = connect(MapStateToProps, MapDispatchToProps)(MyContractsPager);
+export default withStyles(styles)
 
-export default withStyles(styles)(MyContractsPager);
+(
+    MyContractsPager
+)
+;

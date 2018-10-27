@@ -10,7 +10,8 @@ import blue from '@material-ui/core/colors/blue';
 import Button from '@material-ui/core/Button';
 import Table from 'rc-table';
 import 'rc-table/assets/index.css';
-const styles = theme =>({
+
+const styles = theme => ({
     root: {
         with: '100%',
         marginTop: 8,
@@ -59,17 +60,15 @@ const styles = theme =>({
                 border: `1px solid ${blue[400]}`
             }
         },
-        "& td[class= ]":{
-          padding:8
+        "& tr th": {
+            textAlign: 'center',
         },
-        // "& table tr td": {
-        //     padding: '8px 0',
-        //     fontSize: '14px',
-        //     color: grey[800],
-        //     "& input": {
-        //         height: 25
-        //     }
-        // },
+        "& tr td": {
+            textAlign: 'center',
+        },
+        "& td[class= ]": {
+            padding: 8
+        },
         borderBottom: `1px dashed ${grey[400]}`,
     },
 });
@@ -77,20 +76,23 @@ const styles = theme =>({
 function onExpand(expanded, record) {
     console.log('onExpand', expanded, record);
 }
+
 class TapPayDepositContainer extends React.Component {
-    render() {
-        const {classes} = this.props;
+
+    constructor(props) {
+        super(props);
+        let {contractInfo} = props;
         const columns = [
             {
                 title: '押金条目',
-                dataIndex: 'depositItem',
-                key: 'depositItem',
+                dataIndex: 'pledgeTypeName',
+                key: 'pledgeTypeName',
                 width: 100,
             },
             {
                 title: '押金金额',
-                dataIndex: 'depositPrice',
-                key: 'depositPrice',
+                dataIndex: 'pledgeFee',
+                key: 'pledgeFee',
                 width: 100,
             },
             {
@@ -106,43 +108,66 @@ class TapPayDepositContainer extends React.Component {
                 width: 150,
             }
         ];
+        this.state = {
+            columns,
+            data: []
+        }
+    }
 
-        const data = [
-            {
-                key: 1,
-                depositItem: '总押金',
-                depositPrice: '1900元',
-                createDate: '2016-01-01',
-                payDate:'2016-01-02',
-                children: [
-                    {
-                        depositItem: '房屋押金',
-                        depositPrice: '1800元',
-                    },
-                    {
-                        depositItem: '门卡押金',
-                        depositPrice: '50元',
-                    },
-                    {
-                        depositItem: '钥匙押金',
-                        depositPrice: '50元',
-                    }
-                ],
-            },
-        ];
+    componentDidMount() {
+        let {contractInfo} = this.props;
+        let arr = JSON.parse(JSON.stringify(contractInfo.baseInfoJson.pledgeTypeArr));
+
+        arr.map((obj, index) => {
+            obj.pledgeFee = obj.pledgeFee + ' wei';
+        });
+        this.setState({
+            data: [
+                {
+                    key: 1,
+                    pledgeTypeName: '总押金',
+                    pledgeFee: `${contractInfo.pledgeTotal} wei`,
+                    createDate: `${new Date(contractInfo.startTime).getFullYear()} 年 ${new Date(contractInfo.startTime).getMonth()} 月 ${new Date(contractInfo.startTime).getDay()} 日`,
+                    payDate: `${new Date(contractInfo.startTime).getFullYear()} 年 ${new Date(contractInfo.startTime).getMonth()} 月 ${new Date(contractInfo.startTime).getDay()} 日`,
+                    children: arr
+                },
+            ]
+        })
+    }
+
+    payPledge = () => {
+        let {rentContract, rentContractUtils, handleComplete, rentContractIndex, setBalance, contractInfo} = this.props;
+        rentContractUtils.payPledge(rentContract, contractInfo.pledgeTotal)
+            .then(result => {
+                console.log(result);
+                let success = result.events.ContractStatusEvent[1].returnValues[2];
+                if (success) {
+                    setBalance(rentContract, rentContractIndex);
+                    handleComplete();
+                }
+            });
+    };
+
+    render() {
+        const {classes} = this.props;
+        let {columns, data} = this.state;
+
+
         return (
             <div className={classes.root}>
                 <h3>
                     待支付押金明细
                 </h3>
                 <div className={classes.content}>
-                    <Table  defaultExpandAllRows={true} columns={columns} data={data} indentSize={30} onExpand={onExpand}/>
+                    <Table defaultExpandAllRows={true} columns={columns} data={data} indentSize={30}
+                           onExpand={onExpand}/>
                 </div>
-                <Button>支付押金</Button>
+                <Button onClick={e => this.payPledge()}>支付押金</Button>
             </div>
         )
     }
 }
+
 TapPayDepositContainer.propTypes = {
     classes: PropTypes.object.isRequired
 }

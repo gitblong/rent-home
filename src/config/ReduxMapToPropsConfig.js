@@ -23,7 +23,9 @@ export function MapStateToProps(state) {
         init: state.init,
         houseInfoByCondition: state.houseInfoByCondition,
         currentCity: state.currentCity,
-        showHouseInfoCount:state.showHouseInfoCount
+        showHouseInfoCount:state.showHouseInfoCount,
+        rentContractUtils: state.rentContractUtils,
+        rentContractAbi:state.rentContractAbi
     }
 }
 

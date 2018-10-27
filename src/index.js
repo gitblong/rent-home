@@ -16,14 +16,17 @@ import {
 
 import HouseInfo from "./contracts/HouseInfo.json";
 import ArrayStorage from "./contracts/ArrayStorage.json";
+import RentContractProducer from './contracts/RentContractProducter.json';
+import RentContract from './contracts/RentContract.json';
 import {Drizzle, generateStore} from "drizzle";
 import {IPFSUtils} from "./smart-contract-ipfs/IPFSUtils";
+import {RentContractUtil} from "./smart-contract-ipfs/RentContractUtil";
 
 require('./styles/map.css');
 require('./styles/UploadImage.css');
 require('./styles/pagination.css');
 
-const options = {contracts: [HouseInfo,ArrayStorage]};
+const options = {contracts: [HouseInfo,ArrayStorage,RentContractProducer]};
 const drizzleStore = generateStore(options);
 const drizzle = new Drizzle(options, drizzleStore);
 
@@ -65,6 +68,7 @@ class App extends React.Component {
 
     initReducer = (drizzle => {
         let ipfsUtils = new IPFSUtils(ipfs, drizzle);
+        let rentContractUtils = new RentContractUtil(drizzle,RentContract.abi);
         let allHouseInfoData = ipfsUtils.init();
         // console.log("index------",allHouseInfoData);
         let houseInfoByCondition = new Promise(resolve => {
@@ -73,6 +77,7 @@ class App extends React.Component {
                 resolve(houseInfoByCondition);
             });
         });
+
         let showHouseInfoCount = ipfsUtils.getShowHouseInfoCount();
         // console.log(houseInfoByCondition);
         const initialState = {
@@ -86,8 +91,9 @@ class App extends React.Component {
             allHouseInfoData,
             houseInfoByCondition,
             ipfsUtils,
-            showHouseInfoCount:new Promise(resolve => resolve(0))
-
+            showHouseInfoCount:new Promise(resolve => resolve(0)),
+            rentContractUtils,
+            rentContractAbi: RentContract.abi
         };
         const reducer = (state = initialState, action, option) => {
             switch (action.type) {

@@ -10,7 +10,7 @@ import blue from '@material-ui/core/colors/blue';
 import Button from '@material-ui/core/Button';
 
 
-const styles = theme =>({
+const styles = theme => ({
     root: {
         with: '100%',
         marginTop: 8,
@@ -61,9 +61,114 @@ const styles = theme =>({
 
 
 })
+
 class TapWithdrawDepositContainer extends React.Component {
+    state = {
+        pledgeStatus: 0,
+        amount: parseInt(this.props.contractInfo.pledgeTotal),
+        pledgeCash: 0
+    };
+
+    componentDidMount() {
+        let {rentContract, rentContractUtils} = this.props;
+        rentContractUtils.getPledgeStatus(rentContract)
+            .then(result => {
+                this.setState({
+                    pledgeStatus: result
+                })
+            });
+        this.getWithDrawPledgeFeeByUserRole();
+    }
+
+    getWithDrawPledgeFeeByUserRole = () => {
+        let {rentContractUtils, rentContract, contractInfo} = this.props;
+        const userRole = rentContractUtils.getUserRole(contractInfo);
+        if (userRole == 'landlord') {
+            rentContractUtils.withDrawCashToLandlord(rentContract)
+                .then(result => {
+                    this.setState({
+
+                        pledgeCash: result
+                    })
+                });
+        } else if (userRole == 'tenant') {
+            rentContractUtils.withDrawCashToTenant(rentContract)
+                .then(result => {
+                    this.setState({
+                        pledgeCash: result
+                    });
+                })
+        }
+    };
+
+    changeAmounts = (amount) => {
+        this.setState({
+            amount: parseInt(amount.target.value)
+        })
+    };
+
+    judgeWithDrawalPledge = () => {
+        let {amount} = this.state;
+        let {rentContractUtils, rentContract} = this.props;
+        rentContractUtils.judgeWithDrawalPledge(rentContract, amount)
+            .then(result => {
+                let success = result.events.PledgeWithdrawalStatusEvent.returnValues[2];
+                if (success) {
+                    this.setState({
+                        pledgeStatus: result.events.PledgeWithdrawalStatusEvent.returnValues[1]
+                    })
+                }
+            });
+    };
+
+    isAgree = (agree) => {
+        let {rentContractUtils, rentContract, setBalance, rentContractIndex,handleComplete} = this.props;
+        rentContractUtils.isAgree(rentContract, agree)
+            .then(result => {
+                console.log(result);
+                const success = result.events.PledgeWithdrawalStatusEvent.returnValues[2];
+                if (success) {
+                    this.setState({
+                        pledgeStatus: result.events.PledgeWithdrawalStatusEvent.returnValues[1]
+                    });
+                    handleComplete();
+                    setBalance(rentContract, rentContractIndex);
+                }
+            });
+        this.getWithDrawPledgeFeeByUserRole();
+    };
+
+    widrawalPledge = () => {
+        let {rentContractUtils, rentContract, contractInfo,setBalance,rentContractIndex} = this.props;
+        const userRole = rentContractUtils.getUserRole(contractInfo);
+        if (userRole == 'landlord') {
+            rentContractUtils.withdrawPledgeToLandlord(rentContract)
+                .then(result => {
+                    console.log("landlord", result);
+                    let success = result.events.PledgeWithdrawalEvent.returnValues[2];
+                    if (success) {
+                        this.setState({
+                            amount: 0
+                        })
+                    }
+                });
+        } else if (userRole == 'tenant') {
+            rentContractUtils.withdrawPledgeToTenant(rentContract)
+                .then(result => {
+                    console.log("tenant",result);
+                    let success = result.events.PledgeWithdrawalEvent.returnValues[2];
+                    if (success) {
+                        this.setState({
+                            amount: 0
+                        })
+                    }
+                });
+        }
+    };
+
     render() {
-        const {classes} = this.props;
+        const {classes, contractInfo} = this.props;
+        const {pledgeStatus, amount, pledgeCash} = this.state;
         return (
             <div className={classes.root}>
                 <h3>
@@ -73,27 +178,76 @@ class TapWithdrawDepositContainer extends React.Component {
                     <table>
                         <tr>
                             <td colSpan="2">
-                                已支付的押金总额为1Eth，请在以下输入栏中注明需要扣除的押金金额(以太)<br/>
+                                返回给租客多少以太币,双方达成一致即可退还押金<br/>
                             </td>
                         </tr>
                         <tr>
-                            <td width="150px">从押金扣除金额数:</td>
-                            <td><input/></td>
-                        </tr>
-                        <tr>
-                            <td width="100px">扣除原因:</td>
-                            <td><input/></td>
-
-
+                            <td width="150px">退还押金数(wei):</td>
+                            <td width="400px">
+                                {
+                                    pledgeStatus == 0 ?
+                                        <input style={{width: '100%'}}
+                                               onChange={e => {
+                                                   this.changeAmounts(e)
+                                               }}
+                                               placeholder={'当前合同押金为:' + amount}
+                                               value={amount}
+                                        />
+                                        : pledgeStatus == 1 ?
+                                        <div>
+                                            <input style={{width: '100%'}}
+                                                   disabled
+                                                   value={amount}
+                                            />
+                                        </div>
+                                        : pledgeStatus == 2 ?
+                                            <div style={{width: '100%'}}>
+                                                <input
+                                                    onChange={e => {
+                                                        this.changeAmounts(e)
+                                                    }}
+                                                    placeholder={'当前合同押金为:' + amount}
+                                                    value={amount}
+                                                />
+                                                <span style={{color: 'red', marginLeft: 16}}>
+                                                    租客不同意，请重新填写以太金额
+                                                </span>
+                                            </div>
+                                            : pledgeStatus == 3 ?
+                                                <div>
+                                                    <input style={{width: '100%'}}
+                                                           onChange={e => {
+                                                               this.changeAmounts()
+                                                           }}
+                                                           disabled
+                                                           value={pledgeCash}
+                                                    />
+                                                </div> : ""
+                                }
+                            </td>
                         </tr>
                     </table>
 
                 </div>
-                <Button>确认扣除</Button>
+                {
+
+                    pledgeStatus == 0 || pledgeStatus == 2 ?
+                        <Button onClick={e => this.judgeWithDrawalPledge()}>确认扣除</Button>
+                        : pledgeStatus == 1 ?
+                        <div style={{margin: '0 auto'}}>
+                            <Button onClick={e => this.isAgree(3)}>同意</Button> <Button
+                            onClick={e => this.isAgree(2)}>不同意 </Button>
+                        </div>
+                        : pledgeStatus == 3 ?
+                            <Button onClick={e => this.widrawalPledge()}>取出押金</Button>
+                            : ""
+                }
+
             </div>
-        )
+        );
     }
 }
+
 TapWithdrawDepositContainer.propTypes = {
     classes: PropTypes.object.isRequired
 }
