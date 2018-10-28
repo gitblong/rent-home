@@ -130,7 +130,7 @@ class MyContractsPager extends React.Component {
                         .then(contractInfo => {
                             contractInfoArr.push(contractInfo);
 
-                            if (index == contractInfoArr.length - 1) {
+                            if (contracts.length == contractInfoArr.length) {
                                 this.setState({
                                     contractInfoArr
                                 });
