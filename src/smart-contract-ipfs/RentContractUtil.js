@@ -11,6 +11,13 @@ export class RentContractUtil {
         this.rentContractAbi = rentContractAbi;
     }
 
+    generateMeter = (rentContract, stage, waterMeter, electricticyMeter) => {
+        console.log(rentContract, stage, waterMeter, electricticyMeter);
+        return rentContract.methods.generateMeter(stage, waterMeter * 10, electricticyMeter * 10).send({
+            from: this.drizzleState.accounts[0],
+        });
+    };
+
     getActiveFee = (rentContract) => {
         return rentContract.methods.activeFee().call()
     };
@@ -82,7 +89,7 @@ export class RentContractUtil {
                     console.log(typeof result);
                     let arr = [];
                     const count = parseInt(result) + 1;
-                    console.log("count",count);
+                    console.log("count", count);
                     for (let i = 0; i < count; i++) {
                         rentContract.methods.getRentPamentInfo(i).call()
                             .then(rentInfo => {
@@ -103,7 +110,7 @@ export class RentContractUtil {
         console.log(createDate);
         let waterInfoArr = rentPamentInfo[1];
         let waterInfo = {
-            fee: waterInfoArr[0] / 100,
+            fee: waterInfoArr[0] / 1000,
             lastMonthMeter: waterInfoArr[1] / 10,
             currentMonthMeter: waterInfoArr[2] / 10,
             currentMothUse: waterInfoArr[3] / 10,
@@ -111,17 +118,24 @@ export class RentContractUtil {
 
         let electricityInfoArr = rentPamentInfo[2];
         let electricityInfo = {
-            fee: electricityInfoArr[0] / 100,
+            fee: electricityInfoArr[0] / 1000,
             lastMonthMeter: electricityInfoArr[1] / 10,
             currentMonthMeter: electricityInfoArr[2] / 10,
             currentMothUse: electricityInfoArr[3] / 10
         };
         let status = rentPamentInfo[3];
-        let rentFee = rentFeeTotal / 100;
+        rentFeeTotal = rentFeeTotal / 100;
         let currentStage = rentPamentInfo[4];
         return {
-            rentFee, ethRentFeeTotal, createDate:parseInt(createDate)*1000, paymentDate:parseInt(paymentDate)*1000, rentFeeCash,
-            waterInfo, electricityInfo, status, currentStage
+            rentFeeTotal,
+            ethRentFeeTotal,
+            createDate: parseInt(createDate) * 1000,
+            paymentDate: parseInt(paymentDate) * 1000,
+            rentFeeCash,
+            waterInfo,
+            electricityInfo,
+            status,
+            currentStage
         }
     });
 
@@ -181,8 +195,8 @@ export class RentContractUtil {
         let currentStage = contractInfo[4][12];
         return {
             tenantPublicKey, landlordPublicKey, baseInfoJson, status,
-            startTime: parseInt(startTime)*1000,
-            endTime: parseInt(endTime)*1000,
+            startTime: parseInt(startTime) * 1000,
+            endTime: parseInt(endTime) * 1000,
             rentTerm,
             waterMeter: waterMeter / 10,
             waterFee: waterFee / 100,
@@ -233,16 +247,12 @@ export class RentContractUtil {
         })
     };
 
-    parseBytesToJsonObject = (bytesString) => {
-        const hexToUtf8 = this.web3.utils.hexToUtf8(bytesString);
-        return JSON.parse(hexToUtf8);
-    };
-
     getUserRole = (contractInfo) => {
         if (this.drizzleState.accounts[0] == contractInfo.tenantPublicKey) {
             return 'tenant';
-        }else if (this.drizzleState.accounts[0] == contractInfo.landlordPublicKey) {
+        } else if (this.drizzleState.accounts[0] == contractInfo.landlordPublicKey) {
             return 'landlord';
         }
     }
+
 }

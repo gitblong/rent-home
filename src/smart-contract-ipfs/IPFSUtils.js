@@ -161,7 +161,6 @@ export class IPFSUtils {
     init = () => {
         return new Promise((resolve, reject) => {
             let obj;
-            //TODO
             this.houseInfoContract.methods.showHouseInfoCount().call()
                 .then(result => {
                     if (result <= 0) {

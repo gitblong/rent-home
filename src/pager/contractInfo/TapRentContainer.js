@@ -140,8 +140,13 @@ class TapRentContainer extends React.Component {
         this.state = {
             columns: columns,
             data: [],
-            contractInfo: props.contractInfo
-        }
+            contractInfo: props.contractInfo,
+            contractInfoArr: []
+        };
+    }
+
+    componentDidMount() {
+
     }
 
     getCurrentOperation() {
@@ -199,13 +204,31 @@ class TapRentContainer extends React.Component {
         } else if (userRole == 'tenant') {
             return obj.ethRentFeeTotal;
         }
-    }
+    };
 
     handlerOperation = (key, _index, obj,) => {
-        let {rentContractUtils, rentContract,} = this.props;
+        let {rentContractUtils, rentContract, contractInfo} = this.props;
+        let {data, contractInfoArr} = this.state;
         switch (key) {
             case 0:
-
+                const waterMeter = contractInfoArr[_index].waterInfo.currentMonthMeter;
+                const electricticyMeter = contractInfoArr[_index].electricityInfo.currentMonthMeter;
+                if (waterMeter != 0 && electricticyMeter != 0) {
+                    rentContractUtils.generateMeter(rentContract, _index, waterMeter, electricticyMeter)
+                        .then(result => {
+                            console.log(result);
+                        });
+                } else {
+                    console.log("不能为0");
+                }
+                break;
+            case 1:
+            //     const {rentContractUtils, rentContract} = this.props;
+            //     console.log("rent",rentContract);
+            //     // if (!rentContract) {
+            //
+            //     rentContractUtils.getStep(rentContract);
+            // // }
                 break;
             case 2:
                 rentContractUtils.withdrawRentFee(rentContract, _index)
@@ -255,6 +278,63 @@ class TapRentContainer extends React.Component {
         }
     };
 
+
+    changeWaterMeter = (e, obj, index) => {
+        const data = this.state.data;
+        const children = data[index].children;
+        let {contractInfo} = this.props;
+        const waterInfo = obj.waterInfo;
+        const currentMonthMeter = e.target.value;
+        waterInfo.currentMonthMeter = currentMonthMeter;
+        const currentMothUse = currentMonthMeter - waterInfo.lastMonthMeter;
+        waterInfo.currentMothUse = currentMothUse;
+        waterInfo.fee = currentMothUse * contractInfo.waterFee;
+
+        children[1].depositPrice = `${obj.waterInfo.fee}元`;
+        children[1].previousNumber = `${obj.waterInfo.lastMonthMeter}`;
+        children[1].currentNumber = <input value={obj.waterInfo.currentMonthMeter}
+                                           onChange={e => {
+                                               this.changeWaterMeter(e, obj, index)
+                                           }}/>;
+        children[1].dosage = `${obj.waterInfo.currentMothUse}度`;
+        data[index].depositPrice = `${contractInfo.rentFee + obj.waterInfo.fee}元`;
+        this.setState({
+            data
+        })
+    };
+
+    changeElectricityMeter = (e, obj, index) => {
+        const data = this.state.data;
+        const children = data[index].children;
+        let {contractInfo} = this.props;
+        const electricityInfo = obj.electricityInfo;
+        const currentMonthMeter = e.target.value;
+        const currentMothUse = currentMonthMeter - electricityInfo.lastMonthMeter;
+        electricityInfo.currentMonthMeter = currentMonthMeter;
+        electricityInfo.currentMothUse = currentMothUse;
+        electricityInfo.fee = currentMothUse * contractInfo.electricityFee;
+        children[2].depositPrice = `${obj.electricityInfo.fee}元`;
+        children[2].previousNumber = `${obj.electricityInfo.lastMonthMeter}`;
+        children[2].currentNumber = <input value={obj.electricityInfo.currentMonthMeter}
+                                           onChange={e => {
+                                               this.changeElectricityMeter(e, obj, index)
+                                           }}/>;
+        children[2].dosage = `${obj.electricityInfo.currentMothUse}度`;
+        data[index].depositPrice = `${contractInfo.rentFee + obj.electricityInfo.fee}元`;
+        data[index].children = children;
+        console.log("data", data);
+        this.setState({
+            data
+        })
+    };
+
+    isDisable = (obj) => {
+        let {rentContractUtils, contractInfo} = this.props;
+        const userRole = rentContractUtils.getUserRole(contractInfo);
+        return obj.status != 0 ? true : userRole == "landlord" ? false : true;
+    };
+
+
     getRentPamentInfo = () => {
 
         let {rentContractUtils, rentContract, contractInfo} = this.props;
@@ -268,7 +348,7 @@ class TapRentContainer extends React.Component {
                     let rentPaymentInfo = {
                         key: index,
                         depositItem: `第 ${index + 1} 期应缴租金`,
-                        depositPrice: `${obj.rentFee}元`,
+                        depositPrice: `${obj.rentFeeTotal}元`,
                         previousNumber: '',
                         currentNumber: '',
                         dosage: '',
@@ -290,14 +370,22 @@ class TapRentContainer extends React.Component {
                                 depositItem: '本月水费',
                                 depositPrice: `${obj.waterInfo.fee}元`,
                                 previousNumber: `${obj.waterInfo.lastMonthMeter}`,
-                                currentNumber: `${obj.waterInfo.currentMonthMeter}`,
+                                currentNumber: <input value={obj.waterInfo.currentMonthMeter}
+                                                      disabled={this.isDisable(obj)}
+                                                      onChange={e => {
+                                                          this.changeWaterMeter(e, obj, index)
+                                                      }}/>,
                                 dosage: `${obj.waterInfo.currentMothUse}吨`
                             },
                             {
                                 depositItem: '本月电费',
                                 depositPrice: `${obj.electricityInfo.fee}元`,
                                 previousNumber: `${obj.electricityInfo.lastMonthMeter}`,
-                                currentNumber: `${obj.electricityInfo.currentMonthMeter}`,
+                                currentNumber: <input value={obj.waterInfo.currentMonthMeter}
+                                                      disabled={this.isDisable(obj)}
+                                                      onChange={e => {
+                                                          this.changeElectricityMeter(e, obj, index)
+                                                      }}/>,
                                 dosage: `${obj.electricityInfo.currentMothUse}度`
                             }
                         ],
@@ -306,7 +394,8 @@ class TapRentContainer extends React.Component {
                     arr.push(rentPaymentInfo);
                     if (arr.length - 1 == index) {
                         this.setState({
-                            data: arr
+                            data: arr,
+                            contractInfoArr: result
                         })
                     }
                 });

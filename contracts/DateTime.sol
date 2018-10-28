@@ -251,14 +251,6 @@ contract DateTime {
         _day = day;
         _month = month;
         _year = year;
-        // TODO
-        // if (currentStage < rentTerm - 1) {
-        //     bytes32 dateId = oraclize_query(60 * 2, "URL", "json(http://api.k780.com:88/?app=life.time&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json).result.timestamp", oraclizeGas * 2);
-        //     oraclizeNextStage[dateId] = true;
-        //     nextPayRentDate = toTimestamp(year, month, day);
-        // } else {
-        //     nextPayRentDate = 0;
-        // }
     }
 
 }

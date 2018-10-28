@@ -41,9 +41,9 @@ contract RentContract is usingOraclize, DateTime {
     mapping(uint => RentPamentInfo) public rentPaymentInfoMapping;
 
     //oraclize 时间查询ID列表
-    mapping(bytes32 => bool) public oraclizeDateValidIds;
+    mapping(bytes32 => OraclizeInfo) public oraclizeDateValidIds;
     //oraclize 价格查询ID列表
-    mapping(bytes32 => bool) public oraclizePriceValidIds;
+    mapping(bytes32 => OraclizeInfo) public oraclizePriceValidIds;
     //oraclize 下一个期租金账单生成，查询ID列表
     mapping(bytes32 => bool) public oraclizeNextStage;
 
@@ -82,7 +82,7 @@ contract RentContract is usingOraclize, DateTime {
     uint public activeFee;
     uint needActiveFee;
 
-    //押金 TODO
+    //押金
     uint public pledgeCash;
     //当前租金第几期
     uint public currentStage;
@@ -96,6 +96,8 @@ contract RentContract is usingOraclize, DateTime {
     uint public withDrawCashToTenant;
     //当前退回的押金确认状态
     PledgeConfirm public pledgeStatus = PledgeConfirm.CREATED;
+    //
+    RentPamentInfo rentPaymentInit;
     //租赁期间，产生的租金明细
     struct RentPamentInfo {
         RentFeeStatus status;
@@ -117,16 +119,15 @@ contract RentContract is usingOraclize, DateTime {
         uint currentMothUse;
     }
 
-    //签名事件
-    event SignatureEvent(address, bool, string);
-    //支付押金的事件->支付押金时调用
-    event PayPledgeEvent(address, uint, bool, string);
-    //支付租金事件->支付租金时调用
-    event PayRentEvent(address, uint, bool, string);
+    struct OraclizeInfo {
+        bool success;
+        uint stage;
+    }
+
     //支付到合同回调函数的事件
     event PayEtherEvent(address, uint, bool, string);
     //Oricalize的响应->查询成功之后调用
-    event OricalizeResponseEvent(bytes32, string, bool);
+    //    event OricalizeResponseEvent(bytes32, string, bool);
     //Oricalize的日志->账户余额不足时调用
     event OricalizeLogEvent(address, uint, uint, string);
     //房东取回租金时触发
@@ -174,6 +175,28 @@ contract RentContract is usingOraclize, DateTime {
         startTime = _startTime;
         currentStage = 0;
         needActiveFee = _rentTerm * oraclizeGas * gasPrice * 4;
+        rentPaymentInit = RentPamentInfo({
+            status : RentFeeStatus.UN_PAY_RENT_FEE,
+            rentFeeTotal : rentFee,
+            createDate : 0,
+            paymentDate : 0,
+            waterMeterInfo : MeterInfo({
+                fee : 0,
+                lastMonthMeter : waterMeter,
+                currentMonthMeter : waterMeter,
+                currentMothUse : 0
+                }),
+            electricityMeterInfo : MeterInfo({
+                fee : 0,
+                lastMonthMeter : electricityMeter,
+                currentMonthMeter : electricityMeter,
+                currentMothUse : 0
+                }),
+            processed : false,
+            ethRentFeeTotal : 0,
+            oraclizeFee : 0,
+            rentFeeCash : 0
+            });
     }
 
     //获取租赁协议的信息
@@ -223,12 +246,12 @@ contract RentContract is usingOraclize, DateTime {
     function signatrueContractByTenant()
     onlyTenant
     atStage(RentContractStatus.SIGNATURE_CONTRACT)
-    payable public{
+    payable public {
         status = RentContractStatus.PAYING_PLEDGE;
         emit ContractStatusEvent(msg.sender, status, true, "签名成功");
     }
 
-    //支付押金，仅租客操作，且当前阶段为PAYING_PLEDGE TODO
+    //支付押金，仅租客操作，且当前阶段为PAYING_PLEDGE
     function payPledge()
     onlyTenant
     atStage(RentContractStatus.PAYING_PLEDGE)
@@ -254,63 +277,26 @@ contract RentContract is usingOraclize, DateTime {
     function addRentPamentInfo() internal {
         //若为第一期，则直接进行第一期租金的账单明细生成，即更新当前的 以太币/人民币汇率
         if (currentStage == 0) {
-            rentPaymentInfoMapping[currentStage] = RentPamentInfo({
-                status : RentFeeStatus.UN_PAY_RENT_FEE,
-                rentFeeTotal : rentFee,
-                createDate : 0,
-                paymentDate : 0,
-                waterMeterInfo : MeterInfo({
-                    fee : 0,
-                    lastMonthMeter : waterMeter,
-                    currentMonthMeter : waterMeter,
-                    currentMothUse : 0
-                    }),
-                electricityMeterInfo : MeterInfo({
-                    fee : 0,
-                    lastMonthMeter : electricityMeter,
-                    currentMonthMeter : electricityMeter,
-                    currentMothUse : 0
-                    }),
-                processed : false,
-                ethRentFeeTotal : 0,
-                oraclizeFee : 0,
-                rentFeeCash : 0
-                });
-            updatePrice();
+            rentPaymentInfoMapping[currentStage] = rentPaymentInit;
+            updatePrice(0);
         } else {
-            rentPaymentInfoMapping[currentStage] = RentPamentInfo({
-                status : RentFeeStatus.UN_ADD_METER,
-                rentFeeTotal : rentFee,
-                createDate : 0,
-                paymentDate : 0,
-                waterMeterInfo : MeterInfo({
-                    fee : 0,
-                    lastMonthMeter : rentPaymentInfoMapping[currentStage - 1].waterMeterInfo.lastMonthMeter,
-                    currentMonthMeter : 0,
-                    currentMothUse : 0
-                    }),
-                electricityMeterInfo : MeterInfo({
-                    fee : 0,
-                    lastMonthMeter : rentPaymentInfoMapping[currentStage - 1].electricityMeterInfo.lastMonthMeter,
-                    currentMonthMeter : 0,
-                    currentMothUse : 0
-                    }),
-                processed : false,
-                ethRentFeeTotal : 0,
-                oraclizeFee : 0,
-                rentFeeCash : 0
-                });
+            rentPaymentInit.status = RentFeeStatus.UN_ADD_METER;
+            rentPaymentInit.waterMeterInfo.lastMonthMeter = rentPaymentInfoMapping[currentStage - 1].waterMeterInfo.lastMonthMeter;
+            rentPaymentInit.waterMeterInfo.currentMonthMeter = 0;
+            rentPaymentInit.waterMeterInfo.lastMonthMeter = rentPaymentInfoMapping[currentStage - 1].electricityMeterInfo.lastMonthMeter;
+            rentPaymentInit.waterMeterInfo.currentMonthMeter = 0;
+            rentPaymentInfoMapping[currentStage] = rentPaymentInit;
         }
 
     }
 
     //生成水表，电表   明细
-    function generateMeter(uint _currentWaterMeter, uint _currentElectricityMeter)
+    function generateMeter(uint _stage, uint _currentWaterMeter, uint _currentElectricityMeter)
     onlyRentContractParticipator
     isOwnCash(4)
     public {
-        RentPamentInfo storage currentPaymentInfo = rentPaymentInfoMapping[currentStage];
-        RentPamentInfo storage prevPamentInfo = rentPaymentInfoMapping[currentStage - 1];
+        RentPamentInfo storage currentPaymentInfo = rentPaymentInfoMapping[_stage];
+        RentPamentInfo storage prevPamentInfo = rentPaymentInfoMapping[_stage - 1];
         MeterInfo storage prevWaterMeterInfo = prevPamentInfo.waterMeterInfo;
         MeterInfo storage preElectricMeterInfo = prevPamentInfo.electricityMeterInfo;
         uint waterMeterCount = _currentWaterMeter - prevWaterMeterInfo.lastMonthMeter;
@@ -324,10 +310,10 @@ contract RentContract is usingOraclize, DateTime {
         currentPaymentInfo.electricityMeterInfo.fee = electricMeterCount * electricityFee;
         currentPaymentInfo.electricityMeterInfo.currentMothUse = electricMeterCount;
         currentPaymentInfo.status = RentFeeStatus.UN_PAY_RENT_FEE;
-        rentPaymentInfoMapping[currentStage] = currentPaymentInfo;
+        rentPaymentInfoMapping[_stage] = currentPaymentInfo;
 
         //水表电表录入之后就可以，查询当期那的人民币汇率，并计算出本期应交的租金的以太币
-        updatePrice();
+        updatePrice(_stage);
     }
 
     //获取租赁期间的租金明细信息
@@ -345,7 +331,7 @@ contract RentContract is usingOraclize, DateTime {
         _status = info.status;
     }
 
-    //支付租金，仅租客操作，且当前阶段为PAYING_RENT  TODO
+    //支付租金，仅租客操作，且当前阶段为PAYING_RENT
     function payRentFee(uint _stage)
     onlyTenant
     atRentFeeStage(_stage, RentFeeStatus.UN_PAY_RENT_FEE)
@@ -504,55 +490,61 @@ contract RentContract is usingOraclize, DateTime {
         }
     }
 
+    OraclizeInfo oraclizeInfo;
     //更细当前以太币 对应 的人名币价格，以及当前时间
-    function updatePrice()
+    function updatePrice(uint _stage)
     internal {
         bytes32 priceId = oraclize_query(oraclizeType, priceUrl, oraclizeGas);
         bytes32 dateId = oraclize_query(oraclizeType, dateUrl, oraclizeGas);
-        oraclizePriceValidIds[priceId] = true;
-        oraclizeDateValidIds[dateId] = true;
+        oraclizeInfo = OraclizeInfo({
+            success : true,
+            stage : _stage
+            });
+        oraclizePriceValidIds[priceId] = oraclizeInfo;
+        oraclizeDateValidIds[dateId] = oraclizeInfo;
     }
 
     //oraclize回调函数
     uint public flagCallback = 0;
 
     function __callback(bytes32 _myid, string _result) public {
-        if (oraclizePriceValidIds[_myid]) {
-            uint _waterFee = rentPaymentInfoMapping[currentStage].waterMeterInfo.fee;
-            uint _electricityFee = rentPaymentInfoMapping[currentStage].electricityMeterInfo.fee;
+        if (oraclizePriceValidIds[_myid].success) {
+            uint _waterFee = rentPaymentInfoMapping[oraclizePriceValidIds[_myid].stage].waterMeterInfo.fee;
+            uint _electricityFee = rentPaymentInfoMapping[oraclizePriceValidIds[_myid].stage].electricityMeterInfo.fee;
             uint total = rentFee + (_waterFee + _electricityFee) / 10;
             uint price = parseInt(_result, 2);
             //保存人民币到分
             uint eth = 1 ether;
             uint totalFee = eth * total / price;
+            rentPaymentInfoMapping[oraclizePriceValidIds[_myid].stage].ethRentFeeTotal = totalFee;
+            rentPaymentInfoMapping[oraclizePriceValidIds[_myid].stage].rentFeeTotal = total;
+            flagCallback = flagCallback + 1;
+            activeFee -= gasPrice * oraclizeGas;
             delete oraclizePriceValidIds[_myid];
-            rentPaymentInfoMapping[currentStage].ethRentFeeTotal = totalFee;
+        } else if (oraclizeDateValidIds[_myid].success) {
+            rentPaymentInfoMapping[oraclizeDateValidIds[_myid].stage].createDate = parseInt(_result);
             flagCallback = flagCallback + 1;
             activeFee -= gasPrice * oraclizeGas;
-        } else if (oraclizeDateValidIds[_myid]) {
             delete oraclizeDateValidIds[_myid];
-            rentPaymentInfoMapping[currentStage].createDate = parseInt(_result);
-            flagCallback = flagCallback + 1;
-            activeFee -= gasPrice * oraclizeGas;
         } else if (oraclizeNextStage[_myid]) {
             //oraclize的延迟执行后执行 新增的租金明细，同时改变当前的租期
-            delete oraclizeNextStage[_myid];
             currentStage = currentStage + 1;
             addRentPamentInfo();
             activeFee -= gasPrice * oraclizeGas * 2;
-            emit OricalizeResponseEvent(_myid, _result, true);
+            delete oraclizeNextStage[_myid];
+            //            emit OricalizeResponseEvent(_myid, _result, true);
         } else {
             revert();
         }
         if (flagCallback % 2 == 0) {
             //修改账单的状态
-//            rentPaymentInfoMapping[currentStage].status = RentFeeStatus.UN_PAY_RENT_FEE;
+            //            rentPaymentInfoMapping[currentStage].status = RentFeeStatus.UN_PAY_RENT_FEE;
             rentPaymentInfoMapping[currentStage].processed = true;
             //创建完成  跟新下一阶段的时间   并通过oraclize的延迟查询操作，能够延迟到下个月租金账单的生成
             nextStageTime();
             emit RentFeeStatusEvent(msg.sender, rentPaymentInfoMapping[currentStage].status,
                 true, rentPaymentInfoMapping[currentStage].rentFeeCash, "已抄表");
-            emit OricalizeResponseEvent(_myid, _result, true);
+            //            emit OricalizeResponseEvent(_myid, _result, true);
         }
     }
 
@@ -562,6 +554,7 @@ contract RentContract is usingOraclize, DateTime {
     //获取下一阶段时间
     function nextStageTime() internal
     onlyRentContractParticipator {
+
         uint8 day = payRentDate;
         uint16 year = getYear(nextPayRentDate);
         uint8 month = getMonth(nextPayRentDate);
@@ -593,9 +586,8 @@ contract RentContract is usingOraclize, DateTime {
         } else {
             time = 60 * 60 * 24 * 31;
         }
-        // TODO
         if (currentStage < rentTerm - 1) {
-            bytes32 dateId = oraclize_query(60, oraclizeType, dateUrl, oraclizeGas * 2);
+            bytes32 dateId = oraclize_query(time, oraclizeType, dateUrl, oraclizeGas * 2);
             oraclizeNextStage[dateId] = true;
             nextPayRentDate = toTimestamp(year, month, day);
         } else {
@@ -659,13 +651,6 @@ contract RentContract is usingOraclize, DateTime {
             revert();
         }
 
-    }
-
-    //获取合同当前余额
-    address s = address(this);
-
-    function getBalance() public view returns (uint) {
-        return s.balance;
     }
 
 }
