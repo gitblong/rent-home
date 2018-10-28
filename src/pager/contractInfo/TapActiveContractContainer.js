@@ -81,6 +81,7 @@ class TapActiveContractContainer extends React.Component {
 
         this.state = {
             pledgeString: "",
+            contractInfo: props.contractInfo
         }
     }
 
@@ -101,7 +102,8 @@ class TapActiveContractContainer extends React.Component {
 
 
     activeContract = () => {
-        let {rentContract, handleComplete, contractInfo, rentContractUtils, rentContractIndex, setBalance} = this.props;
+        let {rentContract, handleComplete, rentContractUtils, rentContractIndex, setBalance} = this.props;
+        let contractInfo = this.state.contractInfo;
         rentContractUtils.activeContract(rentContract, contractInfo.needActiveFee)
             .then(result => {
                 console.log(result);
@@ -109,6 +111,10 @@ class TapActiveContractContainer extends React.Component {
                 if (success) {
                     handleComplete();
                     setBalance(rentContract, rentContractIndex);
+                    contractInfo.status = 1;
+                    this.setState({
+                        contractInfo: contractInfo
+                    })
                 }
             }).catch(err => {
             console.log(err);
@@ -116,8 +122,8 @@ class TapActiveContractContainer extends React.Component {
     };
 
     render() {
-        const {classes, contractInfo} = this.props;
-        const {pledgeString} = this.state;
+        const {classes,} = this.props;
+        const {pledgeString, contractInfo} = this.state;
         return (
             <div className={classes.root}>
                 <h3>基本信息</h3>
@@ -191,10 +197,17 @@ class TapActiveContractContainer extends React.Component {
                         </tr>
                     </table>
                 </div>
-                <span style={{textAlign: 'center', width: '100%'}}>
+                {
+                    contractInfo.status > 0 ?
+                        <span style={{textAlign: 'center', width: '100%', padding: 16}}>已激活</span> :
+                        <span style={{textAlign: 'center', width: '100%'}}>
                     由于oraclize的花费需要向合同支付基础的金额，根据合同的租期相关信息，该合同需要有 {contractInfo.needActiveFee} Wei 的以太币
                 </span>
-                <Button onClick={e => this.activeContract()}>激活合同</Button>
+                }
+                {
+                    contractInfo.status > 0 ? "" :
+                        <Button onClick={e => this.activeContract()}>激活合同</Button>
+                }
             </div>
         )
     }

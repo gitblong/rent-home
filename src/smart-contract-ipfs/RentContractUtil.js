@@ -79,15 +79,16 @@ export class RentContractUtil {
         return new Promise(resolve => {
             rentContract.methods.currentStage().call()
                 .then(result => {
+                    console.log(typeof result);
                     let arr = [];
-                    const count = result + 1;
-                    console.log(count);
+                    const count = parseInt(result) + 1;
+                    console.log("count",count);
                     for (let i = 0; i < count; i++) {
                         rentContract.methods.getRentPamentInfo(i).call()
                             .then(rentInfo => {
-                                console.log(arr);
                                 arr.push(this.parseRentPaymentInfoToObject(rentInfo));
                                 if (arr.length == count) {
+                                    console.log(arr);
                                     resolve(arr);
                                 }
                             })
@@ -99,6 +100,7 @@ export class RentContractUtil {
     parseRentPaymentInfoToObject = (rentPamentInfo => {
         let rentFeeInfo = rentPamentInfo[0];
         let [rentFeeTotal, ethRentFeeTotal, createDate, paymentDate, rentFeeCash] = rentFeeInfo;
+        console.log(createDate);
         let waterInfoArr = rentPamentInfo[1];
         let waterInfo = {
             fee: waterInfoArr[0] / 100,
@@ -118,7 +120,7 @@ export class RentContractUtil {
         let rentFee = rentFeeTotal / 100;
         let currentStage = rentPamentInfo[4];
         return {
-            rentFee, ethRentFeeTotal, createDate, paymentDate:parseInt(paymentDate), rentFeeCash,
+            rentFee, ethRentFeeTotal, createDate:parseInt(createDate)*1000, paymentDate:parseInt(paymentDate)*1000, rentFeeCash,
             waterInfo, electricityInfo, status, currentStage
         }
     });
@@ -179,8 +181,8 @@ export class RentContractUtil {
         let currentStage = contractInfo[4][12];
         return {
             tenantPublicKey, landlordPublicKey, baseInfoJson, status,
-            startTime: parseInt(startTime),
-            endTime: parseInt(endTime),
+            startTime: parseInt(startTime)*1000,
+            endTime: parseInt(endTime)*1000,
             rentTerm,
             waterMeter: waterMeter / 10,
             waterFee: waterFee / 100,

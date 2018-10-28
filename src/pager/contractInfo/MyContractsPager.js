@@ -93,6 +93,7 @@ class MyContractsPager extends React.Component {
         value: 2,
         contractInfoArr: [],
         rentContractArr: [],
+        balanceArr:[],
         balance: 0
     };
 

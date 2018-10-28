@@ -89,12 +89,14 @@ class TapContractContainer extends React.Component {
         });
         this.state = {
             pledgeString,
-            balance: 0
+            balance: 0,
+            contractInfo: props.contractInfo
         }
     }
 
     signatureContract = () => {
         let {rentContract, handleComplete, rentContractUtils, rentContractIndex, setBalance} = this.props;
+        let contractInfo = this.state.contractInfo;
         rentContractUtils.signatrueContractByTenant(rentContract)
             .then(result => {
                 console.log(result);
@@ -102,6 +104,10 @@ class TapContractContainer extends React.Component {
                 if (success) {
                     handleComplete();
                     setBalance(rentContract, rentContractIndex);
+                    contractInfo.status = 2;
+                    this.setState({
+                        contractInfo
+                    })
                 }
             }).catch(err => {
             console.log(err);
@@ -109,8 +115,8 @@ class TapContractContainer extends React.Component {
     };
 
     render() {
-        const {classes, contractInfo} = this.props;
-        const {pledgeString} = this.state;
+        const {classes,} = this.props;
+        const {pledgeString, contractInfo} = this.state;
         console.log(contractInfo);
         console.log("state", this.state);
         return (
@@ -186,10 +192,17 @@ class TapContractContainer extends React.Component {
                         </tr>
                     </table>
                 </div>
-                <span style={{textAlign: 'center', width: '100%'}}>
+                {
+                    contractInfo.status > 1 ?
+                        <span style={{textAlign: 'center', width: '100%', padding: 16}}>已签订合约</span> :
+                        <span style={{textAlign: 'center', width: '100%'}}>
                     承租人确认租赁合约
                 </span>
-                <Button onClick={e => this.signatureContract()}>签订合同</Button>
+                }
+                {
+                    contractInfo.status > 1 ? "" :
+                        < Button onClick={e => this.signatureContract()}>签订合同</Button>
+                }
             </div>
         )
     }

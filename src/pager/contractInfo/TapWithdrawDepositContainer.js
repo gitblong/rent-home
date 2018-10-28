@@ -148,7 +148,7 @@ class TapWithdrawDepositContainer extends React.Component {
                     let success = result.events.PledgeWithdrawalEvent.returnValues[2];
                     if (success) {
                         this.setState({
-                            amount: 0
+                            pledgeCash: 0
                         })
                     }
                 });
@@ -159,7 +159,7 @@ class TapWithdrawDepositContainer extends React.Component {
                     let success = result.events.PledgeWithdrawalEvent.returnValues[2];
                     if (success) {
                         this.setState({
-                            amount: 0
+                            pledgeCash: 0
                         })
                     }
                 });

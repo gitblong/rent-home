@@ -110,7 +110,8 @@ class TapPayDepositContainer extends React.Component {
         ];
         this.state = {
             columns,
-            data: []
+            data: [],
+            contractInfo: props.contractInfo
         }
     }
 
@@ -136,21 +137,26 @@ class TapPayDepositContainer extends React.Component {
     }
 
     payPledge = () => {
-        let {rentContract, rentContractUtils, handleComplete, rentContractIndex, setBalance, contractInfo} = this.props;
+        let {rentContract, rentContractUtils, handleComplete, rentContractIndex, setBalance} = this.props;
+        let {contractInfo} = this.state;
         rentContractUtils.payPledge(rentContract, contractInfo.pledgeTotal)
             .then(result => {
                 console.log(result);
-                let success = result.events.ContractStatusEvent[1].returnValues[2];
+                let success = result.events.ContractStatusEvent.returnValues[2];
                 if (success) {
                     setBalance(rentContract, rentContractIndex);
                     handleComplete();
+                    contractInfo.status = 3;
+                    this.setState({
+                        contractInfo
+                    })
                 }
             });
     };
 
     render() {
         const {classes} = this.props;
-        let {columns, data} = this.state;
+        let {columns, data, contractInfo} = this.state;
 
 
         return (
@@ -162,7 +168,11 @@ class TapPayDepositContainer extends React.Component {
                     <Table defaultExpandAllRows={true} columns={columns} data={data} indentSize={30}
                            onExpand={onExpand}/>
                 </div>
-                <Button onClick={e => this.payPledge()}>支付押金</Button>
+                {
+                    contractInfo.status > 2 ?
+                        <span style={{textAlign: 'center', width: '100%', padding: 16}}>已支付押金</span> :
+                        <Button onClick={e => this.payPledge()}>支付押金</Button>
+                }
             </div>
         )
     }

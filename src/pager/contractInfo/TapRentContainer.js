@@ -119,7 +119,7 @@ class TapRentContainer extends React.Component {
                 width: 120,
             },
             {
-                title: '收款日期',
+                title: '支付日期',
                 dataIndex: 'payDate',
                 key: 'payDate',
                 width: 120,
@@ -140,7 +140,7 @@ class TapRentContainer extends React.Component {
         this.state = {
             columns: columns,
             data: [],
-            contractInfo:props.contractInfo
+            contractInfo: props.contractInfo
         }
     }
 
@@ -216,7 +216,7 @@ class TapRentContainer extends React.Component {
                         if (success) {
                             let data = this.state.data;
                             let obj = data[_index];
-                            obj.ethRentFeeTotal = this.getEthereumFee(obj);
+                            obj.ethRentFeeTotal = 0;
                             obj.operation = <Button
                                 onClick={e => {
                                     this.handlerOperation(this.getCurrentOperation()[rentFeeStatus].key, _index, obj)
@@ -238,7 +238,8 @@ class TapRentContainer extends React.Component {
                         if (success) {
                             let data = this.state.data;
                             let obj = data[_index];
-                            obj.ethRentFeeTotal = this.getEthereumFee(obj);
+                            obj.payRentDate = `${new Date().getFullYear()}年${new Date().getMonth()}月${new Date().getDate()}日`;
+                            obj.ethRentFeeTotal = 0;
                             obj.operation = <Button
                                 onClick={e => {
                                     this.handlerOperation(this.getCurrentOperation()[rentFeeStatus].key, _index, obj)
@@ -266,13 +267,13 @@ class TapRentContainer extends React.Component {
                 result.map((obj, index) => {
                     let rentPaymentInfo = {
                         key: index,
-                        depositItem: '第一期应缴租金',
+                        depositItem: `第 ${index + 1} 期应缴租金`,
                         depositPrice: `${obj.rentFee}元`,
                         previousNumber: '',
                         currentNumber: '',
                         dosage: '',
-                        createDate: `${new Date(parseInt(obj.createDate)).getFullYear()}年${new Date(parseInt(obj.createDate)).getMonth()}月${new Date(parseInt(obj.createDate)).getDay()}日`,
-                        payDate: obj.paymentDate != 0 ? `${new Date(obj.paymentDate).getFullYear()}年${new Date(obj.paymentDate).getMonth()}月${new Date(obj.paymentDate).getDay()}日` : '',
+                        createDate: obj.createDate != 0 ? `${new Date(parseInt(obj.createDate)).getFullYear()}年${new Date(parseInt(obj.createDate)).getMonth()}月${new Date(parseInt(obj.createDate)).getDate()}日` : "",
+                        payDate: obj.paymentDate != 0 ? `${new Date(obj.paymentDate).getFullYear()}年${new Date(obj.paymentDate).getMonth()}月${new Date(obj.paymentDate).getDate()}日` : '',
                         ethRentFeeTotal: this.getEthereumFee(obj),
                         operation: <Button onClick={e => {
                             this.handlerOperation(operation[obj.status].key, index, obj)
@@ -297,7 +298,7 @@ class TapRentContainer extends React.Component {
                                 depositPrice: `${obj.electricityInfo.fee}元`,
                                 previousNumber: `${obj.electricityInfo.lastMonthMeter}`,
                                 currentNumber: `${obj.electricityInfo.currentMonthMeter}`,
-                                dosage: `${obj.electricityInfo.currentMothUse}吨`
+                                dosage: `${obj.electricityInfo.currentMothUse}度`
                             }
                         ],
                     };
@@ -312,28 +313,29 @@ class TapRentContainer extends React.Component {
             });
     };
 
-    completedRentFee = () => {
-        const {rentContract, contractInfo, rentContractUtils, handleComplete, setBalance, rentContractIndex} = this.props;
+    completedRentFee = (_index) => {
+        const {rentContract, rentContractUtils, handleComplete, setBalance, rentContractIndex} = this.props;
+        let contractInfo = this.state.contractInfo;
         rentContractUtils.completedRentFee(rentContract)
             .then(result => {
                 console.log(result);
-                let success = result.events.ContractStatusEvent[1].returnValues[2];
-                let status = result.events.ContractStatusEvent[1].returnValues[1];
+                let success = result.events.ContractStatusEvent.returnValues[2];
+                let status = result.events.ContractStatusEvent.returnValues[1];
                 if (success) {
                     handleComplete();
                     setBalance(rentContract, rentContractIndex);
                     contractInfo.status = status;
-                    this.setState({
-                        contractInfo
 
+                    this.setState({
+                        contractInfo,
                     })
                 }
             });
     };
 
     render() {
-        const {classes, } = this.props;
-        const {columns, data,contractInfo} = this.state;
+        const {classes,} = this.props;
+        const {columns, data, contractInfo} = this.state;
         const status = ["待抄表", "待支付", "已支付"];
 
 
@@ -364,7 +366,12 @@ class TapRentContainer extends React.Component {
                             <Button className={classes.buttonBottom}
                                     onClick={e => this.completedRentFee()}>完成租赁</Button> : ""
                     }
-                    <Button className={classes.buttonBottom} onClick={e => this.completedRentFee()}>完成租赁</Button>
+                    {
+                        contractInfo.status > 3 ?
+                            <span style={{textAlign: 'center', width: '100%', padding: 16}}>已完成租赁</span> :
+                            <Button className={classes.buttonBottom}
+                                    onClick={e => this.completedRentFee()}>完成租赁</Button>
+                    }
                 </div>
             </div>
         )

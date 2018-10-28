@@ -212,8 +212,10 @@ contract RentContract is usingOraclize, DateTime {
             activeFee += msg.value;
             status = RentContractStatus.SIGNATURE_CONTRACT;
             emit ContractStatusEvent(msg.sender, status, true, "合同激活成功");
+            return;
         } else {
             emit ContractStatusEvent(msg.sender, status, false, "合同激活失败，以太过少");
+            return;
         }
     }
 
@@ -221,7 +223,7 @@ contract RentContract is usingOraclize, DateTime {
     function signatrueContractByTenant()
     onlyTenant
     atStage(RentContractStatus.SIGNATURE_CONTRACT)
-    payable public returns (bool){
+    payable public{
         status = RentContractStatus.PAYING_PLEDGE;
         emit ContractStatusEvent(msg.sender, status, true, "签名成功");
     }
@@ -233,15 +235,18 @@ contract RentContract is usingOraclize, DateTime {
     isOwnCash(4)
     payable public {
         pledgeCash += msg.value;
-        if (pledgeCash <= pledgeTotal) {
+        if (pledgeCash > pledgeTotal) {
             emit ContractStatusEvent(msg.sender, status, false, "支付的押金过多");
+            return;
         }
         if (pledgeCash == pledgeTotal) {
             status = RentContractStatus.PAYING_RENT;
             addRentPamentInfo();
             emit ContractStatusEvent(msg.sender, status, true, "已完成押金的支付,请支付租金");
+            return;
         } else {
             emit ContractStatusEvent(msg.sender, status, false, "支付的押金过少");
+            return;
         }
     }
 
@@ -281,13 +286,13 @@ contract RentContract is usingOraclize, DateTime {
                 waterMeterInfo : MeterInfo({
                     fee : 0,
                     lastMonthMeter : rentPaymentInfoMapping[currentStage - 1].waterMeterInfo.lastMonthMeter,
-                    currentMonthMeter : waterMeter,
+                    currentMonthMeter : 0,
                     currentMothUse : 0
                     }),
                 electricityMeterInfo : MeterInfo({
                     fee : 0,
                     lastMonthMeter : rentPaymentInfoMapping[currentStage - 1].electricityMeterInfo.lastMonthMeter,
-                    currentMonthMeter : electricityMeter,
+                    currentMonthMeter : 0,
                     currentMothUse : 0
                     }),
                 processed : false,
@@ -388,19 +393,23 @@ contract RentContract is usingOraclize, DateTime {
     //完成租金支付->改变合同状态为 WITHDRAWING_PLEDGE
     function completedRentFee()
     onlyRentContractParticipator
+
     atStage(RentContractStatus.PAYING_RENT) payable public
     {
         if (currentStage == rentTerm - 1) {
             for (uint i = 0; i <= currentStage; i++) {
                 if (rentPaymentInfoMapping[i].status != RentFeeStatus.PAYED_RENT_FEE) {
                     emit ContractStatusEvent(msg.sender, status, false, "存在未支付租金");
+                    return;
                 }
             }
         } else {
             emit ContractStatusEvent(msg.sender, status, false, "未到约定租期");
+            return;
         }
         status = RentContractStatus.WITHDRAWING_PLEDGE;
         emit ContractStatusEvent(msg.sender, status, true, "修改成功");
+        return;
     }
 
     //协商押金退回
@@ -445,8 +454,11 @@ contract RentContract is usingOraclize, DateTime {
             if (!msg.sender.send(amount)) {
                 withDrawCashToLandlord = amount;
                 emit PledgeWithdrawalEvent(msg.sender, withDrawCashToLandlord, false, "取出押金失败");
+                return;
             }
+            pledgeCash -= amount;
             emit PledgeWithdrawalEvent(msg.sender, withDrawCashToLandlord, true, "取出押金成功");
+            return;
         } else {
             revert();
         }
@@ -463,8 +475,11 @@ contract RentContract is usingOraclize, DateTime {
             if (!msg.sender.send(amount)) {
                 withDrawCashToTenant = amount;
                 emit PledgeWithdrawalEvent(msg.sender, withDrawCashToTenant, false, "取出押金失败");
+                return;
             }
+            pledgeCash -= amount;
             emit PledgeWithdrawalEvent(msg.sender, withDrawCashToTenant, true, "取出押金成功");
+            return;
         } else {
             revert();
         }
@@ -480,8 +495,10 @@ contract RentContract is usingOraclize, DateTime {
             if (!msg.sender.send(amount)) {
                 activeFee = amount;
                 emit ActiveWithdrawalEvent(msg.sender, activeFee, false, "取出合同余额失败");
+                return;
             }
             emit ActiveWithdrawalEvent(msg.sender, activeFee, true, "取出合同余额成功");
+            return;
         } else {
             revert();
         }
@@ -529,7 +546,7 @@ contract RentContract is usingOraclize, DateTime {
         }
         if (flagCallback % 2 == 0) {
             //修改账单的状态
-            rentPaymentInfoMapping[currentStage].status = RentFeeStatus.UN_PAY_RENT_FEE;
+//            rentPaymentInfoMapping[currentStage].status = RentFeeStatus.UN_PAY_RENT_FEE;
             rentPaymentInfoMapping[currentStage].processed = true;
             //创建完成  跟新下一阶段的时间   并通过oraclize的延迟查询操作，能够延迟到下个月租金账单的生成
             nextStageTime();
@@ -578,7 +595,7 @@ contract RentContract is usingOraclize, DateTime {
         }
         // TODO
         if (currentStage < rentTerm - 1) {
-            bytes32 dateId = oraclize_query(60 * 2, oraclizeType, dateUrl, oraclizeGas * 2);
+            bytes32 dateId = oraclize_query(60, oraclizeType, dateUrl, oraclizeGas * 2);
             oraclizeNextStage[dateId] = true;
             nextPayRentDate = toTimestamp(year, month, day);
         } else {

@@ -66,7 +66,8 @@ class TapWithdrawActiveFeeContainer extends React.Component {
     state = {
         activeFee: 0,
         userRole: '',
-        loading: true
+        loading: true,
+        contractInfo: this.props.contractInfo
     };
 
     componentDidMount() {
@@ -74,7 +75,7 @@ class TapWithdrawActiveFeeContainer extends React.Component {
         rentContractUtils.getActiveFee(rentContract)
             .then(result => {
                 this.setState({
-                    activeFee: parseInt(result)
+                    activeFee: parseInt(result),
                 })
             });
         this.getUserRole();
@@ -96,14 +97,14 @@ class TapWithdrawActiveFeeContainer extends React.Component {
                     this.setState({
                         activeFee: result.events.ActiveWithdrawalEvent.returnValues[1]
                     });
-                    this.setBalance(rentContract, rentContractIndex);
+                    setBalance(rentContract, rentContractIndex);
                 }
             });
     };
 
     render() {
         const {classes, handleComplete} = this.props;
-        const {activeFee, userRole, loading} = this.state;
+        const {activeFee, userRole, loading, contractInfo} = this.state;
         // var activeFee = 0;
         return (
             <div className={classes.root}>
@@ -139,7 +140,7 @@ class TapWithdrawActiveFeeContainer extends React.Component {
                                         {handleComplete()}
                                     </div>
                                     : ""
-                                : (userRole == "tenant" && loading) ?
+                                : (contractInfo.status >= 4 && userRole == "tenant" && loading) ?
                                 <div>
                                     {this.setState({loading: false})}
                                     {handleComplete()}
