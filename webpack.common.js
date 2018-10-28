@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
 var babelpolyfill = require("babel-polyfill");
+// var publicPath = ip + name
 HappyPack = require('happypack'),
     os = require('os'),
     happyThreadPool = HappyPack.ThreadPool({size: os.cpus().length});
@@ -12,11 +13,11 @@ module.exports = {
     },
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
+        path: path.resolve(__dirname, './rent'),
+        publicPath: '/ipns/QmaL35BGUi95TSYXZDJbmZzHpSxPVx8ASCrg5h4acw1TjU/'//根据服务器的文件夹定义访问路径
     },
     plugins: [
-        new CleanWebpackPlugin(['dist']),
+        new CleanWebpackPlugin(['rent']),
         new HtmlWebpackPlugin({
             template: "./index.html"
         }),

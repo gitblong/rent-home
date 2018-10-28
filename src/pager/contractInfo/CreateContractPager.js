@@ -205,26 +205,26 @@ class CreateContractPager extends React.Component {
         age: '',
         value: 'female',
         pledgeTypeArr: [{
-            pledgeTypeName: "1",
-            pledgeFee: "1",
+            pledgeTypeName: "",
+            pledgeFee: "",
         }],
-        houseAddress: "1",
-        landlordName: "1",
-        landlordTelephone: "1",
-        landlordIdNumber: "1",
-        tenantPublicKey: "0xcf0c99bfd836737c5d0a291b248a72656aab8ca6",
-        tenantName: "1",
-        tenantTelephone: "1",
-        tenantIdNumber: "1",
-        startTime: "2018-05-01",
-        endTime: "2018-09-01",
-        rentTerm: "1",
-        waterMeter: "1",
-        electricityMeter: "1",
-        waterFee: "1",
-        electricityFee: "1",
-        rentFee: "1",
-        pledgeTotal: "1",
+        houseAddress: "",
+        landlordName: "",
+        landlordTelephone: "",
+        landlordIdNumber: "",
+        tenantPublicKey: "",
+        tenantName: "",
+        tenantTelephone: "",
+        tenantIdNumber: "",
+        startTime: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
+        endTime: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
+        rentTerm: "",
+        waterMeter: "",
+        electricityMeter: "",
+        waterFee: "",
+        electricityFee: "",
+        rentFee: "",
+        pledgeTotal: "",
     };
 
     constructor() {
@@ -266,7 +266,6 @@ class CreateContractPager extends React.Component {
     };
 
     createRentContract = () => {
-        console.log("create", this.props);
         let {rentContractUtils} = this.props;
         let pledgeTotal = this.countPledgeTotal();
         const {
@@ -275,6 +274,18 @@ class CreateContractPager extends React.Component {
             endTime, rentTerm, waterMeter, electricityMeter, waterFee, electricityFee,
             rentFee, pledgeTypeArr
         } = this.state;
+        console.log(houseAddress, landlordName, landlordTelephone, landlordIdNumber,
+            tenantPublicKey, tenantName, tenantTelephone, tenantIdNumber, startTime,
+            endTime, rentTerm, waterMeter, electricityMeter, waterFee, electricityFee,
+            rentFee, pledgeTypeArr);
+        if (houseAddress.length < 0 || landlordName.length < 0 || landlordTelephone.length < 0 || landlordIdNumber.length < 0
+            || tenantPublicKey.length < 0 || tenantName.length < 0 || tenantTelephone.length < 0 || tenantIdNumber.length < 0 ||
+            startTime <= 0 || endTime <= 0 || rentTerm == "" || waterMeter == "" || electricityMeter == "" || waterFee == "" ||
+            electricityFee == "" || rentFee == "" || pledgeTypeArr.length < 0) {
+            console.log('存在空值');
+            alert("存在空值");
+            return;
+        }
         let baseInfoObj = {
             houseAddress,
             landlordName,
@@ -286,14 +297,13 @@ class CreateContractPager extends React.Component {
             tenantPublicKey,
             pledgeTypeArr
         };
-        console.log(JSON.stringify(baseInfoObj), baseInfoObj, this.state);
         rentContractUtils.createRentContract(JSON.stringify(baseInfoObj), tenantPublicKey,
             new Date(startTime).valueOf(), new Date(endTime).valueOf(), parseInt(rentFee), parseInt(rentTerm),
-            parseInt(waterMeter), parseInt(electricityMeter), parseInt(electricityFee),parseInt(waterFee),
+            parseInt(waterMeter), parseInt(electricityMeter), parseInt(electricityFee), parseInt(waterFee),
             pledgeTypeArr, pledgeTotal)
-            .then(result=>{
+            .then(result => {
                 console.log(result);
-
+                alert("新增成功，去我的合同里查看吧");
             });
     };
 

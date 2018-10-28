@@ -15,8 +15,6 @@ class ContractDetailPager extends React.Component {
     }
 
     render() {
-        console.log(this.props)
-        const {children} = this.props;
         return (
             <div>
                 租赁合同详情页
