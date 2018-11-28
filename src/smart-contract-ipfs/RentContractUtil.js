@@ -195,8 +195,8 @@ export class RentContractUtil {
         let currentStage = contractInfo[4][12];
         return {
             tenantPublicKey, landlordPublicKey, baseInfoJson, status,
-            startTime: parseInt(startTime) * 1000,
-            endTime: parseInt(endTime) * 1000,
+            startTime: parseInt(startTime),
+            endTime: parseInt(endTime),
             rentTerm,
             waterMeter: waterMeter / 10,
             waterFee: waterFee / 100,

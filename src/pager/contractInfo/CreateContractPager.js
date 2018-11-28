@@ -216,8 +216,8 @@ class CreateContractPager extends React.Component {
         tenantName: "",
         tenantTelephone: "",
         tenantIdNumber: "",
-        startTime: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
-        endTime: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
+        startTime: `${new Date().getFullYear()}-${new Date().getMonth()<10?"0"+(new Date().getMonth()+1):new Date().getMonth()+1}-${new Date().getDate()<10?"0"+(new Date().getDate()):new Date().getDate()}`,
+        endTime: `${new Date().getFullYear()}-${new Date().getMonth()<10?"0"+(new Date().getMonth()+1):new Date().getMonth()+1}-${new Date().getDate()<10?"0"+(new Date().getDate()):new Date().getDate()}`,
         rentTerm: "",
         waterMeter: "",
         electricityMeter: "",
@@ -274,6 +274,7 @@ class CreateContractPager extends React.Component {
             endTime, rentTerm, waterMeter, electricityMeter, waterFee, electricityFee,
             rentFee, pledgeTypeArr
         } = this.state;
+        console.log(startTime, endTime, new Date(endTime).valueOf());
         console.log(houseAddress, landlordName, landlordTelephone, landlordIdNumber,
             tenantPublicKey, tenantName, tenantTelephone, tenantIdNumber, startTime,
             endTime, rentTerm, waterMeter, electricityMeter, waterFee, electricityFee,

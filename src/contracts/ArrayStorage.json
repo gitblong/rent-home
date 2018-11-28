@@ -1,14 +1,14 @@
 {
   "contractName": "ArrayStorage",
   "abi": [],
-  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3006080604052600080fd00a165627a7a7230582035a95159401d9805f5ba745432c360529caa0987ba3a5559607801912e63cd310029",
-  "deployedBytecode": "0x6080604052600080fd00a165627a7a7230582035a95159401d9805f5ba745432c360529caa0987ba3a5559607801912e63cd310029",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3006080604052600080fd00a165627a7a72305820864d9d85d5cbc24db191c86be4a2ec7011cd2f225379322eedb215f536e386970029",
+  "deployedBytecode": "0x6080604052600080fd00a165627a7a72305820864d9d85d5cbc24db191c86be4a2ec7011cd2f225379322eedb215f536e386970029",
   "sourceMap": "25:2306:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:2306:0;;;;;;;",
   "deployedSourceMap": "25:2306:0:-;;;;;",
   "source": "pragma solidity ^0.4.23;\ncontract ArrayStorage {\n\n    uint8 constant max8 = 2**8 - 1;\n    uint16 constant max16 = 2**16 - 1;\n    uint32 constant max32 = 2**32 - 1;\n    uint64 constant max64 = 2**64 - 1;\n    uint128 constant max128 = 2**128 - 1;\n    uint256 constant  max256 = 2**256 - 1;\n\n    // Convenient function for out of evm world.\n    function getAsBytes(string[] _arr,uint256 _from, uint256 _to)\n    internal\n    pure\n    returns (bytes)\n    {\n        uint256 bytesSize = 0;\n        bytes memory elem;\n        uint8 len;\n        // calculate required length of bytes.\n        for (uint256 a = _from; a < _to; a++) {\n            elem = bytes(_arr[a]);\n            len = lengthBytes(elem.length);\n\n            require(len != 255,\"len!=255\");\n            bytesSize += 1 + len + elem.length;\n\n        }\n\n        uint256 counter = 0;\n        bytes memory b = new bytes(bytesSize);\n        for (uint256 x = _from; x < _to; x++) {\n            elem = bytes(_arr[x]);\n            len = lengthBytes(elem.length);\n\n            // length of next integer specifying string content size.\n            b[counter] = byte(len);\n            counter++;\n\n            // bytes of integer to specify string bytes size\n            // string content it self.\n            for (uint y = 0; y < len; y++) {\n                b[counter] = byte(uint8(elem.length / (2 ** (8 * (len - 1 - y)))));\n                counter++;\n            }\n\n            // string content it self.\n            for (uint z = 0; z < elem.length ; z++) {\n                b[counter] = elem[z];\n                counter++;\n            }\n        }\n        return b;\n    }\n\n    function lengthBytes(uint256 length) pure\n    internal\n    returns\n    (uint8)\n    {\n        // can't handle too long string in this way.\n        require(length <= max256);\n\n        // 8bit\n        if (length >=0 && length <= max8) {\n            return 1;\n        }\n\n        // 16bit\n        if (length > max8 && length <= max16) {\n            return 2;\n        }\n\n        //32 bit\n        if (length >= max16 && length < max32) {\n            return 4;\n        }\n\n        //64bit\n        if (length >= max32 && length < max64) {\n            return 8;\n        }\n\n        //128bit\n        if (length >= max64 && length < max128) {\n            return 16;\n        }\n\n        //256 bit\n        return 32;\n    }\n}",
-  "sourcePath": "/Users/chenqilong/Desktop/MUI/contracts/ArrayStorage.sol",
+  "sourcePath": "/Users/chenqilong/Desktop/blockchain-workspace/MUI/contracts/ArrayStorage.sol",
   "ast": {
-    "absolutePath": "/Users/chenqilong/Desktop/MUI/contracts/ArrayStorage.sol",
+    "absolutePath": "/Users/chenqilong/Desktop/blockchain-workspace/MUI/contracts/ArrayStorage.sol",
     "exportedSymbols": {
       "ArrayStorage": [
         295
@@ -1176,10 +1176,10 @@
                             "name": "require",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [
-                              10063,
-                              10064
+                              10196,
+                              10197
                             ],
-                            "referencedDeclaration": 10064,
+                            "referencedDeclaration": 10197,
                             "src": "716:7:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -3209,10 +3209,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        10063,
-                        10064
+                        10196,
+                        10197
                       ],
-                      "referencedDeclaration": 10063,
+                      "referencedDeclaration": 10196,
                       "src": "1770:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -4087,7 +4087,7 @@
     "src": "0:2331:0"
   },
   "legacyAST": {
-    "absolutePath": "/Users/chenqilong/Desktop/MUI/contracts/ArrayStorage.sol",
+    "absolutePath": "/Users/chenqilong/Desktop/blockchain-workspace/MUI/contracts/ArrayStorage.sol",
     "exportedSymbols": {
       "ArrayStorage": [
         295
@@ -5255,10 +5255,10 @@
                             "name": "require",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [
-                              10063,
-                              10064
+                              10196,
+                              10197
                             ],
-                            "referencedDeclaration": 10064,
+                            "referencedDeclaration": 10197,
                             "src": "716:7:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -7288,10 +7288,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        10063,
-                        10064
+                        10196,
+                        10197
                       ],
-                      "referencedDeclaration": 10063,
+                      "referencedDeclaration": 10196,
                       "src": "1770:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -8176,6 +8176,12 @@
       "address": "0xcefc67f513d96e64fa9bdd3714f0866152796bcc",
       "transactionHash": "0xb3863d73ece3dbd2999cf763092f523cd1fcd8010a3e97b7482bbd2bcada4996"
     },
+    "3000000": {
+      "events": {},
+      "links": {},
+      "address": "0xc4f2c18547a0bb21cb8ff5e8c8c80dd7d785d5b4",
+      "transactionHash": "0x170b96d49198381f12dd43b9edaaecec57733ccb7463a8fe1f4178b6389384bd"
+    },
     "1540547747186": {
       "events": {},
       "links": {},
@@ -8223,8 +8229,44 @@
       "links": {},
       "address": "0xb64d5caa99e7540c986782e809fe8964aa803ef1",
       "transactionHash": "0xb3863d73ece3dbd2999cf763092f523cd1fcd8010a3e97b7482bbd2bcada4996"
+    },
+    "1540977668259": {
+      "events": {},
+      "links": {},
+      "address": "0xbf81401682af2e8828d31cb322dc67c97fa81eb6",
+      "transactionHash": "0x71614a8c8d8617ba7e202e8d4f7b2795511c29324bab3ca613ca10ec9bdda4c2"
+    },
+    "1541057720946": {
+      "events": {},
+      "links": {},
+      "address": "0xb4f1969db975ec1376bfb4f1aa9d1694981290d3",
+      "transactionHash": "0x71614a8c8d8617ba7e202e8d4f7b2795511c29324bab3ca613ca10ec9bdda4c2"
+    },
+    "1541245426441": {
+      "events": {},
+      "links": {},
+      "address": "0xb7609295745395b5604cf8da21ae950c088b7765",
+      "transactionHash": "0x170b96d49198381f12dd43b9edaaecec57733ccb7463a8fe1f4178b6389384bd"
+    },
+    "1541296039670": {
+      "events": {},
+      "links": {},
+      "address": "0x5fd711648ebb34d77601e743cd0edf13a4d34129",
+      "transactionHash": "0xb2d65d84f22e6e47c2429cb76a3dc73d2d76f33a43d62030639d94d188c040f2"
+    },
+    "1541321047096": {
+      "events": {},
+      "links": {},
+      "address": "0x8e1863b49bf4fa9c3437f8407106233e23a6809d",
+      "transactionHash": "0x0d3e8f16383b3a0de27caee148877848819edfee0af6299c4efd41c5cf12ace7"
+    },
+    "1543307283787": {
+      "events": {},
+      "links": {},
+      "address": "0x59c6dd93ebac8562cea469f0f71f0ab1691c96bd",
+      "transactionHash": "0x296ecc3bffff66a108da778710855c5f2e6d5c271f56900519886456a058384c"
     }
   },
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-10-29T03:23:59.296Z"
+  "updatedAt": "2018-11-27T08:31:29.633Z"
 }

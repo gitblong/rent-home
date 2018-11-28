@@ -180,15 +180,15 @@ class TapContractContainer extends React.Component {
                             <td width="100px">租金：</td>
                             <td width="200px">{contractInfo.rentFee} 元/月</td>
                             <td width="100px">收租日期:</td>
-                            <td>每月 {new Date(contractInfo.startTime).getDay()} 号</td>
+                            <td>每月 {new Date(contractInfo.startTime).getDate()} 号</td>
                         </tr>
                         <tr>
                             <td width="100px">租期：</td>
                             <td width="200px">{contractInfo.rentTerm} 个月</td>
                             <td width="100px">起租日期:</td>
-                            <td>{new Date(contractInfo.startTime).getFullYear() + "年"
-                            + new Date(contractInfo.startTime).getMonth() + "月"
-                            + new Date(contractInfo.startTime).getDay() + "日"}</td>
+                            <td>{`${new Date(contractInfo.startTime).getFullYear()}年
+                            ${parseInt(new Date(contractInfo.startTime).getMonth()) + 1 < 10 ? "0" + (parseInt(new Date(contractInfo.startTime).getMonth()) + 1) : parseInt(new Date(contractInfo.startTime).getMonth()) + 1}月
+                            ${parseInt(new Date(contractInfo.startTime).getDate()) < 10 ? "0" + new Date(contractInfo.startTime).getDate(): new Date(contractInfo.startTime).getDate()}日`}</td>
                         </tr>
                     </table>
                 </div>

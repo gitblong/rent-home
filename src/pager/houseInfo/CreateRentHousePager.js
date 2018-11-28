@@ -435,8 +435,9 @@ class TextFields extends React.Component {
             alert("位置不在商圈服务范围");
             return;
         }
-
+        console.log(JSON.stringify(detailInfo));
         ipfsUtils.addToIpfs([Buffer.from(JSON.stringify(detailInfo), 'utf-8')]).then(result => {
+            console.log(result);
             ipfsUtils.addHashToHouseInfoContracts(result).then(result=>{
                 if (result.status) {
                     alert("提交成功");

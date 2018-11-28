@@ -11,11 +11,11 @@ module.exports = {
     entry: {
         app: './src/index.js',
     },
-    output: {
-        filename: '[name].bundle.js',
-        path: path.resolve(__dirname, './rent'),
-        publicPath: '/ipns/QmaL35BGUi95TSYXZDJbmZzHpSxPVx8ASCrg5h4acw1TjU/'//根据服务器的文件夹定义访问路径
-    },
+    // output: {
+    //     filename: '[name].bundle.js',
+    //     path: path.resolve(__dirname, './rent'),
+    //     publicPath: '/ipns/QmaL35BGUi95TSYXZDJbmZzHpSxPVx8ASCrg5h4acw1TjU/'//根据服务器的文件夹定义访问路径
+    // },
     plugins: [
         new CleanWebpackPlugin(['rent']),
         new HtmlWebpackPlugin({

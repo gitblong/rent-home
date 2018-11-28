@@ -127,7 +127,7 @@ contract RentContract is usingOraclize, DateTime {
     //支付到合同回调函数的事件
     event PayEtherEvent(address, uint, bool, string);
     //Oricalize的响应->查询成功之后调用
-    //    event OricalizeResponseEvent(bytes32, string, bool);
+        event OricalizeResponseEvent(bytes32, string, bool);
     //Oricalize的日志->账户余额不足时调用
     event OricalizeLogEvent(address, uint, uint, string);
     //房东取回租金时触发
@@ -139,7 +139,7 @@ contract RentContract is usingOraclize, DateTime {
     //改变合同状态
     event ContractStatusEvent(address, RentContractStatus, bool, string);
     //改变租金账单状态
-    event RentFeeStatusEvent(address, RentFeeStatus, bool, uint, string);
+    event RentFeeStatusEvent(address sender, RentFeeStatus rentFeeStatus, bool SUCCESS, uint rentFeeCash, string info);
     //是否接受退回的押金是否接受退回的押金
     event PledgeWithdrawalStatusEvent(address, PledgeConfirm, bool, string);
 
@@ -283,8 +283,8 @@ contract RentContract is usingOraclize, DateTime {
             rentPaymentInit.status = RentFeeStatus.UN_ADD_METER;
             rentPaymentInit.waterMeterInfo.lastMonthMeter = rentPaymentInfoMapping[currentStage - 1].waterMeterInfo.lastMonthMeter;
             rentPaymentInit.waterMeterInfo.currentMonthMeter = 0;
-            rentPaymentInit.waterMeterInfo.lastMonthMeter = rentPaymentInfoMapping[currentStage - 1].electricityMeterInfo.lastMonthMeter;
-            rentPaymentInit.waterMeterInfo.currentMonthMeter = 0;
+            rentPaymentInit.electricityMeterInfo.lastMonthMeter = rentPaymentInfoMapping[currentStage - 1].electricityMeterInfo.lastMonthMeter;
+            rentPaymentInit.electricityMeterInfo.currentMonthMeter = 0;
             rentPaymentInfoMapping[currentStage] = rentPaymentInit;
         }
 
@@ -311,7 +311,8 @@ contract RentContract is usingOraclize, DateTime {
         currentPaymentInfo.electricityMeterInfo.currentMothUse = electricMeterCount;
         currentPaymentInfo.status = RentFeeStatus.UN_PAY_RENT_FEE;
         rentPaymentInfoMapping[_stage] = currentPaymentInfo;
-
+//        emit RentFeeStatusEvent(msg.sender, rentPaymentInfoMapping[_stage].status,
+//            true, rentPaymentInfoMapping[_stage].rentFeeCash, "抄表成功");
         //水表电表录入之后就可以，查询当期那的人民币汇率，并计算出本期应交的租金的以太币
         updatePrice(_stage);
     }
@@ -379,7 +380,6 @@ contract RentContract is usingOraclize, DateTime {
     //完成租金支付->改变合同状态为 WITHDRAWING_PLEDGE
     function completedRentFee()
     onlyRentContractParticipator
-
     atStage(RentContractStatus.PAYING_RENT) payable public
     {
         if (currentStage == rentTerm - 1) {
@@ -394,7 +394,7 @@ contract RentContract is usingOraclize, DateTime {
             return;
         }
         status = RentContractStatus.WITHDRAWING_PLEDGE;
-        emit ContractStatusEvent(msg.sender, status, true, "修改成功");
+        emit ContractStatusEvent(msg.sender, status, true, "完成全部租赁账单");
         return;
     }
 
@@ -532,7 +532,7 @@ contract RentContract is usingOraclize, DateTime {
             addRentPamentInfo();
             activeFee -= gasPrice * oraclizeGas * 2;
             delete oraclizeNextStage[_myid];
-            //            emit OricalizeResponseEvent(_myid, _result, true);
+//                        emit OricalizeResponseEvent(_myid, _result, true);
         } else {
             revert();
         }
@@ -544,7 +544,7 @@ contract RentContract is usingOraclize, DateTime {
             nextStageTime();
             emit RentFeeStatusEvent(msg.sender, rentPaymentInfoMapping[currentStage].status,
                 true, rentPaymentInfoMapping[currentStage].rentFeeCash, "已抄表");
-            //            emit OricalizeResponseEvent(_myid, _result, true);
+//                        emit OricalizeResponseEvent(_myid, _result, true);
         }
     }
 
@@ -587,7 +587,7 @@ contract RentContract is usingOraclize, DateTime {
             time = 60 * 60 * 24 * 31;
         }
         if (currentStage < rentTerm - 1) {
-            bytes32 dateId = oraclize_query(time, oraclizeType, dateUrl, oraclizeGas * 2);
+            bytes32 dateId = oraclize_query(300, oraclizeType, dateUrl, oraclizeGas * 2);
             oraclizeNextStage[dateId] = true;
             nextPayRentDate = toTimestamp(year, month, day);
         } else {

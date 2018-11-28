@@ -1,0 +1,212 @@
+L           消息发送者
+getAsBytes  字符串数组变为字节字符串
+contractAddress 合约地址
+getDay      获取当前时间戳的日期
+msg.value   请求者发送的以太币
+addRentPaymentInfo 添加账单
+
+HouseInfo
+Init:landlordHouseMapping:L publish house info data，a L-houseInfo array key-value(L,houseInfo[]),initially empty
+     houseInfoTotal: all house Info count,initially 0
+     showHouseInfoCount: visible houseInfoCount，initially 0
+     houseDatas:publish house info array，initially empty；
+AddHouseInfo:Upon receiving (addHouseInfo,$hash) from some Landlord L
+    add($hash,1,houseInfoTotal) to houseDatas
+    add($hash,1,houseInfoTotal) to landlordHouseMapping[L]
+    add(L,landlordHouseMapping[L]) to landlordHouseMapping
+    houseInfoTotal := houseInfoTotal + 1
+    showHouseInfoTotal := showHouseInfoTotal + 1
+UpdateHouoseLtatus:Upon receiving(updateHouseLtatus,$status,$index) from some Landlord L
+    if $status==0 || $status==1 || $status==2
+         if $status == 0
+             showHouseInfoTotal:=showHouseInfoTotal - 1
+         if $status == 1
+             showHouseInfoTotal:=showHouseInfoTotal + 1
+         if $status == 2
+             showHouseInfoTotal:=showHouseInfoTotal - 1
+         if length[landlordHouseMapping[L]]>$index
+             if landlordHose.status != $status
+                 landlordHouseMapping[L][$index].status := $status
+             else
+                 output("consistent with the current state of the house-info")
+         else
+             output("you query house does not exist")
+    else
+         output("does not exist status")
+GetLandlordHouseInfo:Upon receiving(getLandlordHouseInfo,$index) from some Landlord L
+    if length[landlordHouseMapping[L]] > $index
+       return landlordHouseMapping[L][$index]
+    else
+       output("you query house does not exist")
+GetHouseData:Upon receiving(getHouseData,$from,$to) from some Participant P
+    if $from >=0 && $to >= $from && showHouseInfoCount >=$to
+       houseArr :=[]
+       for i := 0 to length[houseDatas]
+           if houseDatas[i].status == 1
+               add houseDatas[i].hash to houseArr
+       return getAsBytes(houseArr,$from,$to)
+    else
+       output("parameter exist error")
+============================================================================================================================
+CreateRentContractProducer
+Init:userRentContractMapping:a set of party-rentContract pairs ,each of the form(P,contractAddress[]),initially empty
+     import package RentContract
+CreateRentContract:Upon receiving(createRentContract,$waterMeter, $waterFee,
+                   $electricityMeter,$electricityFee, $rentFee, $rentTerm,
+                   $pledgeTotal,$startTime, $endTime, $tenantPublicKey,
+                   $baseInfoJson) from L
+    rentContract := new RentContract($waterMeter, $waterFee,
+    $electricityMeter,$electricityFee, $rentFee, $rentTerm,
+    $pledgeTotal,$startTime, $endTime, $tenantPublicKey,$baseInfoJson)
+    add rentContract to userRentContractMapping[L]
+    add rentContract to userRentContractMapping[$tenantPublicKey]
+-----------------------------------------------------------------------------------------------------------------------------
+Init:userRentContractMapping:a set of party-rentContract pairs ,each of the form(P,contractAddress[]),initially empty
+     import package RentContract
+CreateRentContract:Upon receiving(createRentContract,$rentContractInfo) from L
+                       rentContract := new RentContract($$rentContractInfo)
+                       add rentContract to userRentContractMapping[L]
+                       add rentContract to userRentContractMapping[$tenantPublicKey]
+
+============================================================================================================================
+RentContract
+Init:status:current rent contract status,initially 0
+     pledgeTotal:current rent contract need pay pledge fee ,initially 0
+     rentTerm: current rent contract rent period，initially 0
+     waterMeter: current rent contract water meter at check-in，initially 0
+     waterFee: current contract water fee ，initially 0
+     electricityMeter: current rent contract electricity meter at check-in，initially 0
+     electricityFee: current rent contract electricity fee，initially 0
+     startTime: current rent contract start time ,initially 0
+     endTime: current rent contract end time ,initially 0
+     tenantPublicKey:current rent contract tenant public key ,initially 0x
+     landlordPublicKey: current rent contract landlord public key ,initially 0x
+     needActiveFee:The cost of activating the current contract
+     activeFeeCash:Amount to activate contract fees,initially 0
+     pledgeCash:The deposit amount of the current contract storage,initially 0
+     rentBillStage:rent contract bill stage,initially 0
+     withDrawPledgeCashToLandlord:the amount of deposit that the landlord can return,initially 0
+     withDrawPledgeCashToTenant:the amount of deposit that the tenant can return,initially 0
+     currentPledgeStatus:Current status of the refunded deposit，initially 0
+     oraclizeGas:Use the gas required for Oraclize timed mission service ,initially 200000
+     oraclizePrice:Use Oraclize timed task service gas price，initially 1
+     rentPaymentInit:rent payment,initially empty
+Constructor:Upon receiving (constructor,
+                $waterMeter, $waterFee, $electricityMeter,
+                $electricityFee, $rentFee, $rentTerm, $pledgeTotal,
+                $startTime, $endTime, $tenantPublicKey, $landlorPublickey
+            ), which is called when a new smart tenant contract is created
+    status:= 0
+    waterMeter:= $waterMeter
+    waterFee:= $waterFee
+    electricityFee:= $electricityFee
+    electricityMeter:= $electricityMeter
+    rentFee:= $rentFee
+    payRentDate:= getDay($startTime)
+    nextPayRentDate:= startTime
+    rentTerm:= $rentTerm
+    pledgeTotal:= $pledgeTotal
+    startTime:= $startTime
+    endTime:= $endTime
+    tenantPublicKey:= $tenantPublicKey
+    landlordPublicKey:= $landlorPublickey
+    startTime:= $startTime
+    currentStage:= 0
+    needActiveFee:= $rentTerm * oraclizeGas * gasPrice * 4
+ActiveContract:Upon receiving(activeContract) from L
+    if status==1 && L == landlordPublic && msg.value >= needActiveFee
+        activeFee == msg.value
+        status := 1
+SignatureContractByTenant:Upon receiving(signatureContractByTenant) from T
+    if status<2 && L == landlordPublic && msg.value >= needActiveFee
+         status := 2
+PayPledgeByTenant:Upon receiving(payPledgeByTenant) from T
+    if status==3 && L == landlordPublic && msg.value >= needActiveFee
+        pledgeCash := pledgeCash + msg.sender
+        if pledgeCash > pledgeTotal
+            output("Send too much deposit")
+            return
+        else if pledgeCash == pledgeTotal
+            status := 3
+            addRentPaymentInfo()
+            return
+        else if pledgeCash < pledgeTotal
+            output("Send too little ether")
+CompleteRentFee:Upon receiving(completedRentFee) from P
+    if P == landlordPublic || P == tenantPublic
+         if status==4 && currentStage == rentTerm-1
+            for i:=0 to currentStage
+                if(isExistUnpaidRentFee(i))
+                    output("There is unpaid rent")
+                return
+    else
+        output("Lease yet to come")
+    status := 4
+JudgeWithDrawPledge:Upon receiving(judgeWithDrawPledge,$amount) from L
+    if L = landlordPublic && status == 4 && pledgeStatus !=3
+        withDrawCashToLandlord := pledgeCash -  $amount
+        withDrawCashToTenant := $amount
+        pledgeStatus := 1
+IsAgree:Upon receiving(isAgree,$pledgeStatus) from T
+    if T == tenantPublic && status == 4 && pledgeStatus !=3
+        if $pledgeStatus == 2
+            pledgeStatus := 2
+            output("tenant does not accept the amount returned by the landlord")
+        else if $pledgeStatus == 3
+            pledgeStatus := $pledgeStatus
+            status = 5
+WithdrawPledgeToLandlord:Upon receiving(withdrawPledgeToLandlord) from L
+    if L = landlordPublic && status == 5 && pledgeStatus == 3
+        amount = withDrawCashToLandlord
+        if amount >0
+            withDrawCashToLandlord := 0
+            if !msg.send(amount)
+               withDrawCashToLandlord = amount
+        else
+            output("You have no deposit to be taken out")
+WithdrawPledgeToTenant:Upon receiving(withdrawPledgeToTenant) from L
+    if L = tenantPublic && status == 5 && pledgeStatus == 3
+        amount = withDrawCashToTenant
+        if amount >0
+            withDrawCashToTenant := 0
+            if !msg.send(amount)
+               withDrawCashToTenant = amount
+        else
+            output("You have no deposit to be taken out")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
